@@ -27,6 +27,7 @@
 		A3BF2B272F8B7CE400FA5229 /* Claude Usage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Claude Usage.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3BF2B342F8B7CE600FA5229 /* Claude UsageTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Claude UsageTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3BF2B3E2F8B7CE600FA5229 /* Claude UsageUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Claude UsageUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3BF2B512F8B7CE600FA5229 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +76,7 @@
 		A3BF2B1E2F8B7CE400FA5229 = {
 			isa = PBXGroup;
 			children = (
+				A3BF2B512F8B7CE600FA5229 /* README.md */,
 				A3BF2B292F8B7CE400FA5229 /* Claude Usage */,
 				A3BF2B372F8B7CE600FA5229 /* Claude UsageTests */,
 				A3BF2B412F8B7CE600FA5229 /* Claude UsageUITests */,
