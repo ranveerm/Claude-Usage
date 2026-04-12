@@ -21,6 +21,15 @@ enum ConcentricCirclesRenderer {
                 let radius = outerRadius - CGFloat(i) * (lineWidth + gap)
                 let clampedProgress = min(max(progress, 0), 1)
 
+                // Track — same color as fill but faint
+                let trackPath = NSBezierPath()
+                trackPath.appendArc(withCenter: center, radius: radius,
+                                    startAngle: 0, endAngle: 360)
+                trackPath.lineWidth = lineWidth
+                NSColor.labelColor.withAlphaComponent(0.15).setStroke()
+                trackPath.stroke()
+
+                // Fill arc
                 if clampedProgress > 0 {
                     let startAngle: CGFloat = 90
                     let endAngle = startAngle - CGFloat(clampedProgress) * 360
@@ -31,13 +40,6 @@ enum ConcentricCirclesRenderer {
                     arcPath.lineCapStyle = .round
                     NSColor.labelColor.setStroke()
                     arcPath.stroke()
-                } else {
-                    let circlePath = NSBezierPath()
-                    circlePath.appendArc(withCenter: center, radius: radius,
-                                         startAngle: 0, endAngle: 360)
-                    circlePath.lineWidth = lineWidth
-                    NSColor.labelColor.withAlphaComponent(0.25).setStroke()
-                    circlePath.stroke()
                 }
             }
             return true
