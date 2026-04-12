@@ -21,18 +21,27 @@ final class UsageService {
     static let shared = UsageService()
 
     var sessionKey: String {
-        get { UserDefaults.standard.string(forKey: "claude_session_key") ?? "" }
-        set { UserDefaults.standard.set(newValue, forKey: "claude_session_key") }
+        get { KeychainHelper.load(key: "sessionKey") ?? "" }
+        set {
+            if newValue.isEmpty { KeychainHelper.delete(key: "sessionKey") }
+            else { KeychainHelper.save(key: "sessionKey", value: newValue) }
+        }
     }
 
     var cfClearance: String {
-        get { UserDefaults.standard.string(forKey: "claude_cf_clearance") ?? "" }
-        set { UserDefaults.standard.set(newValue, forKey: "claude_cf_clearance") }
+        get { KeychainHelper.load(key: "cfClearance") ?? "" }
+        set {
+            if newValue.isEmpty { KeychainHelper.delete(key: "cfClearance") }
+            else { KeychainHelper.save(key: "cfClearance", value: newValue) }
+        }
     }
 
     var organizationId: String {
-        get { UserDefaults.standard.string(forKey: "claude_org_id") ?? "" }
-        set { UserDefaults.standard.set(newValue, forKey: "claude_org_id") }
+        get { KeychainHelper.load(key: "organizationId") ?? "" }
+        set {
+            if newValue.isEmpty { KeychainHelper.delete(key: "organizationId") }
+            else { KeychainHelper.save(key: "organizationId", value: newValue) }
+        }
     }
 
     var isConfigured: Bool { !sessionKey.isEmpty }
