@@ -58,20 +58,22 @@ struct UsagePopoverView: View {
     }
 
     private var usageView: some View {
-        VStack(spacing: 14) {
-            circlesImage
-                .frame(width: 120, height: 120)
+        VStack(spacing: 10) {
+            HStack(spacing: 14) {
+                circlesImage
+                    .frame(width: 100, height: 100)
 
-            VStack(spacing: 8) {
-                usageRow(label: "Session (5h)",
-                         utilization: usageData.sessionUtilization,
-                         resetsAt: usageData.sessionResetsAt)
-                usageRow(label: "Sonnet Weekly",
-                         utilization: usageData.sonnetWeeklyUtilization,
-                         resetsAt: usageData.sonnetWeeklyResetsAt)
-                usageRow(label: "All Models Weekly",
-                         utilization: usageData.allModelsWeeklyUtilization,
-                         resetsAt: usageData.allModelsWeeklyResetsAt)
+                VStack(alignment: .leading, spacing: 8) {
+                    usageRow(label: "Session (5h)",
+                             utilization: usageData.sessionUtilization,
+                             resetsAt: usageData.sessionResetsAt)
+                    usageRow(label: "Sonnet Weekly",
+                             utilization: usageData.sonnetWeeklyUtilization,
+                             resetsAt: usageData.sonnetWeeklyResetsAt)
+                    usageRow(label: "All Models Weekly",
+                             utilization: usageData.allModelsWeeklyUtilization,
+                             resetsAt: usageData.allModelsWeeklyResetsAt)
+                }
             }
 
             Divider()
