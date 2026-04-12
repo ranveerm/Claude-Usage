@@ -14,20 +14,12 @@ enum ConcentricCirclesRenderer {
             let lineWidth: CGFloat = 2.0
             let gap: CGFloat = 1.0
 
-            let radii: [(Double, CGFloat)] = [
-                (input.sessionProgress, size / 2 - lineWidth / 2),
-                (input.sonnetProgress, size / 2 - lineWidth - gap - lineWidth / 2),
-                (input.allModelsProgress, size / 2 - 2 * (lineWidth + gap) - lineWidth / 2),
-            ]
+            let progresses: [Double] = [input.sessionProgress, input.sonnetProgress, input.allModelsProgress]
+            let outerRadius = size / 2 - lineWidth / 2
 
-            for (progress, radius) in radii {
+            for (i, progress) in progresses.enumerated() {
+                let radius = outerRadius - CGFloat(i) * (lineWidth + gap)
                 let clampedProgress = min(max(progress, 0), 1)
-                let trackPath = NSBezierPath()
-                trackPath.appendArc(withCenter: center, radius: radius,
-                                    startAngle: 0, endAngle: 360)
-                trackPath.lineWidth = lineWidth
-                NSColor.tertiaryLabelColor.setStroke()
-                trackPath.stroke()
 
                 if clampedProgress > 0 {
                     let startAngle: CGFloat = 90
@@ -39,6 +31,13 @@ enum ConcentricCirclesRenderer {
                     arcPath.lineCapStyle = .round
                     NSColor.labelColor.setStroke()
                     arcPath.stroke()
+                } else {
+                    let circlePath = NSBezierPath()
+                    circlePath.appendArc(withCenter: center, radius: radius,
+                                         startAngle: 0, endAngle: 360)
+                    circlePath.lineWidth = lineWidth
+                    NSColor.labelColor.withAlphaComponent(0.25).setStroke()
+                    circlePath.stroke()
                 }
             }
             return true
@@ -49,28 +48,37 @@ enum ConcentricCirclesRenderer {
 
     /// Anthropic brand orange: #DA7756
     private static let anthropicOrange = NSColor(red: 0xDA / 255.0, green: 0x77 / 255.0, blue: 0x56 / 255.0, alpha: 1.0)
+    private static let trackOrange = NSColor(red: 0xDA / 255.0, green: 0x77 / 255.0, blue: 0x56 / 255.0, alpha: 0.2)
 
     static func renderLargeView(input: CircleRendererInput, size: CGFloat = 120) -> NSImage {
         let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { rect in
             let center = CGPoint(x: rect.midX, y: rect.midY)
-            let lineWidth: CGFloat = 10.0
-            let gap: CGFloat = 4.0
+            let lineWidth: CGFloat = 16.0
+            let gap: CGFloat = 3.0
 
-            let radii: [(Double, CGFloat)] = [
-                (input.sessionProgress, size / 2 - lineWidth / 2),
-                (input.sonnetProgress, size / 2 - lineWidth - gap - lineWidth / 2),
-                (input.allModelsProgress, size / 2 - 2 * (lineWidth + gap) - lineWidth / 2),
+            // Apple Fitness-style: outer ring large, tighter inner rings
+            let outerRadius = size / 2 - lineWidth / 2
+            let middleRadius = outerRadius - lineWidth - gap
+            let innerRadius = middleRadius - lineWidth - gap
+
+            let rings: [(Double, CGFloat)] = [
+                (input.sessionProgress, outerRadius),
+                (input.sonnetProgress, middleRadius),
+                (input.allModelsProgress, innerRadius),
             ]
 
-            for (progress, radius) in radii {
+            for (progress, radius) in rings {
                 let clampedProgress = min(max(progress, 0), 1)
+
+                // Track
                 let trackPath = NSBezierPath()
                 trackPath.appendArc(withCenter: center, radius: radius,
                                     startAngle: 0, endAngle: 360)
                 trackPath.lineWidth = lineWidth
-                NSColor.separatorColor.setStroke()
+                trackOrange.setStroke()
                 trackPath.stroke()
 
+                // Fill arc
                 if clampedProgress > 0 {
                     let startAngle: CGFloat = 90
                     let endAngle = startAngle - CGFloat(clampedProgress) * 360
