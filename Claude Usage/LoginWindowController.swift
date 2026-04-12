@@ -4,10 +4,12 @@ import WebKit
 final class LoginWindowController: NSWindowController, WKNavigationDelegate {
     private var webView: WKWebView!
     private var onComplete: ((String, String) -> Void)?
+    private static var current: LoginWindowController?
 
     static func present(onComplete: @escaping (_ sessionKey: String, _ cfClearance: String) -> Void) {
         let controller = LoginWindowController()
         controller.onComplete = onComplete
+        current = controller
         controller.showWindow(nil)
         controller.window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
@@ -50,6 +52,7 @@ final class LoginWindowController: NSWindowController, WKNavigationDelegate {
             DispatchQueue.main.async {
                 self.onComplete?(sessionKey, cfClearance ?? "")
                 self.close()
+                Self.current = nil
             }
         }
     }
