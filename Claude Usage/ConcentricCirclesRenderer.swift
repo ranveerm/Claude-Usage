@@ -1,15 +1,5 @@
 import AppKit
 
-enum CircleColor {
-    static func color(for progress: Double) -> NSColor {
-        switch progress {
-        case ..<0.6: return .systemGreen
-        case ..<0.85: return .systemYellow
-        default: return .systemRed
-        }
-    }
-}
-
 struct CircleRendererInput {
     let sessionProgress: Double
     let sonnetProgress: Double
@@ -47,13 +37,13 @@ enum ConcentricCirclesRenderer {
                                       startAngle: startAngle, endAngle: endAngle, clockwise: true)
                     arcPath.lineWidth = lineWidth
                     arcPath.lineCapStyle = .round
-                    CircleColor.color(for: clampedProgress).setStroke()
+                    NSColor.labelColor.setStroke()
                     arcPath.stroke()
                 }
             }
             return true
         }
-        image.isTemplate = false
+        image.isTemplate = true
         return image
     }
 
@@ -63,19 +53,19 @@ enum ConcentricCirclesRenderer {
             let lineWidth: CGFloat = 10.0
             let gap: CGFloat = 4.0
 
-            let radii: [(Double, CGFloat, String)] = [
-                (input.sessionProgress, size / 2 - lineWidth / 2, "Session"),
-                (input.sonnetProgress, size / 2 - lineWidth - gap - lineWidth / 2, "Sonnet"),
-                (input.allModelsProgress, size / 2 - 2 * (lineWidth + gap) - lineWidth / 2, "All"),
+            let radii: [(Double, CGFloat)] = [
+                (input.sessionProgress, size / 2 - lineWidth / 2),
+                (input.sonnetProgress, size / 2 - lineWidth - gap - lineWidth / 2),
+                (input.allModelsProgress, size / 2 - 2 * (lineWidth + gap) - lineWidth / 2),
             ]
 
-            for (progress, radius, _) in radii {
+            for (progress, radius) in radii {
                 let clampedProgress = min(max(progress, 0), 1)
                 let trackPath = NSBezierPath()
                 trackPath.appendArc(withCenter: center, radius: radius,
                                     startAngle: 0, endAngle: 360)
                 trackPath.lineWidth = lineWidth
-                NSColor.tertiaryLabelColor.withAlphaComponent(0.3).setStroke()
+                NSColor.separatorColor.setStroke()
                 trackPath.stroke()
 
                 if clampedProgress > 0 {
@@ -86,7 +76,7 @@ enum ConcentricCirclesRenderer {
                                       startAngle: startAngle, endAngle: endAngle, clockwise: true)
                     arcPath.lineWidth = lineWidth
                     arcPath.lineCapStyle = .round
-                    CircleColor.color(for: clampedProgress).setStroke()
+                    NSColor.labelColor.setStroke()
                     arcPath.stroke()
                 }
             }

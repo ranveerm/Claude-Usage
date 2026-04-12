@@ -42,7 +42,7 @@ struct UsagePopoverView: View {
         VStack(spacing: 8) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.title)
-                .foregroundColor(.yellow)
+                .foregroundColor(.secondary)
             Text(error)
                 .font(.caption)
                 .foregroundColor(.secondary)
@@ -111,9 +111,6 @@ struct UsagePopoverView: View {
 
     private func usageRow(label: String, utilization: Double, resetsAt: Date?) -> some View {
         HStack {
-            Circle()
-                .fill(Color(nsColor: CircleColor.color(for: utilization / 100.0)))
-                .frame(width: 8, height: 8)
             Text(label)
                 .font(.caption)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -140,7 +137,6 @@ struct UsagePopoverView: View {
             Button("Quit App") {
                 NSApplication.shared.terminate(nil)
             }
-            .foregroundColor(.red)
         }
         .padding()
         .frame(width: 180)
