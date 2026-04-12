@@ -62,6 +62,7 @@ struct UsagePopoverView: View {
             HStack(spacing: 20) {
                 circlesImage
                     .frame(width: 100, height: 100)
+                    .padding(10)
 
                 VStack(alignment: .leading, spacing: 8) {
                     usageRow(label: "Session (5h)",
