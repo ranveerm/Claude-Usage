@@ -59,7 +59,7 @@ struct UsagePopoverView: View {
 
     private var usageView: some View {
         VStack(spacing: 10) {
-            HStack(spacing: 14) {
+            HStack(spacing: 20) {
                 circlesImage
                     .frame(width: 100, height: 100)
 
@@ -112,19 +112,19 @@ struct UsagePopoverView: View {
     }
 
     private func usageRow(label: String, utilization: Double, resetsAt: Date?) -> some View {
-        HStack {
-            Text(label)
-                .font(.caption)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            VStack(alignment: .trailing, spacing: 1) {
+        VStack(alignment: .leading, spacing: 1) {
+            HStack {
+                Text(label)
+                    .font(.caption)
+                Spacer()
                 Text(String(format: "%.0f%%", utilization))
                     .font(.caption)
                     .monospacedDigit()
-                if let resets = resetsAt {
-                    Text("resets \(resets.formatted(.relative(presentation: .named)))")
-                        .font(.system(size: 9))
-                        .foregroundColor(.secondary)
-                }
+            }
+            if let resets = resetsAt {
+                Text("resets \(resets.formatted(.relative(presentation: .named)))")
+                    .font(.system(size: 9))
+                    .foregroundColor(.secondary)
             }
         }
     }
