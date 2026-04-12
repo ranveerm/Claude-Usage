@@ -43,7 +43,7 @@ enum ConcentricCirclesRenderer {
             }
             return true
         }
-        image.isTemplate = true
+        image.isTemplate = false
         return image
     }
 
