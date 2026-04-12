@@ -47,6 +47,9 @@ enum ConcentricCirclesRenderer {
         return image
     }
 
+    /// Anthropic brand orange: #DA7756
+    private static let anthropicOrange = NSColor(red: 0xDA / 255.0, green: 0x77 / 255.0, blue: 0x56 / 255.0, alpha: 1.0)
+
     static func renderLargeView(input: CircleRendererInput, size: CGFloat = 120) -> NSImage {
         let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { rect in
             let center = CGPoint(x: rect.midX, y: rect.midY)
@@ -76,7 +79,7 @@ enum ConcentricCirclesRenderer {
                                       startAngle: startAngle, endAngle: endAngle, clockwise: true)
                     arcPath.lineWidth = lineWidth
                     arcPath.lineCapStyle = .round
-                    NSColor.labelColor.setStroke()
+                    anthropicOrange.setStroke()
                     arcPath.stroke()
                 }
             }
