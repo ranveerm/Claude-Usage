@@ -21,20 +21,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.refreshData()
         }
 
-        refreshData()
+        if UsageService.shared.isConfigured {
+            refreshData()
+        } else {
+            showLogin()
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         refreshTimer?.invalidate()
-        if let monitor = eventMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
+        removeEventMonitor()
     }
+
+    // MARK: - Popover
 
     @objc private func togglePopover() {
         if let popover, popover.isShown {
-            popover.performClose(nil)
-            removeEventMonitor()
+            closePopover()
         } else {
             showPopover()
         }
@@ -42,14 +45,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showPopover() {
         let pop = NSPopover()
-        pop.contentSize = NSSize(width: 300, height: 380)
+        pop.contentSize = NSSize(width: 300, height: 360)
         pop.behavior = .transient
-        pop.contentViewController = NSHostingController(
-            rootView: UsagePopoverView(
-                usageData: usageData,
-                onRefresh: { [weak self] in self?.refreshData() }
-            )
-        )
+        pop.contentViewController = NSHostingController(rootView: makePopoverView())
         self.popover = pop
 
         if let button = statusItem.button {
@@ -57,13 +55,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         addEventMonitor()
-        refreshData()
+        if UsageService.shared.isConfigured { refreshData() }
+    }
+
+    private func closePopover() {
+        popover?.performClose(nil)
+        removeEventMonitor()
     }
 
     private func addEventMonitor() {
         eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
-            self?.popover?.performClose(nil)
-            self?.removeEventMonitor()
+            self?.closePopover()
         }
     }
 
@@ -74,29 +76,47 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    // MARK: - Login
+
+    func showLogin() {
+        closePopover()
+        LoginWindowController.present { [weak self] sessionKey, cfClearance in
+            UsageService.shared.saveCredentials(sessionKey: sessionKey, cfClearance: cfClearance)
+            self?.refreshData()
+        }
+    }
+
+    // MARK: - Data
+
     private func refreshData() {
         Task { @MainActor in
             let data = await UsageService.shared.fetchUsage()
             self.usageData = data
             self.statusItem.button?.image = self.renderIcon()
+            self.updatePopoverIfVisible()
 
-            if let popover = self.popover, popover.isShown {
-                popover.contentViewController = NSHostingController(
-                    rootView: UsagePopoverView(
-                        usageData: data,
-                        onRefresh: { [weak self] in self?.refreshData() }
-                    )
-                )
-            }
+            if data.needsLogin { self.showLogin() }
         }
     }
 
+    private func updatePopoverIfVisible() {
+        guard let popover, popover.isShown else { return }
+        popover.contentViewController = NSHostingController(rootView: makePopoverView())
+    }
+
+    private func makePopoverView() -> UsagePopoverView {
+        UsagePopoverView(
+            usageData: usageData,
+            onRefresh: { [weak self] in self?.refreshData() },
+            onLogin: { [weak self] in self?.showLogin() }
+        )
+    }
+
     private func renderIcon() -> NSImage {
-        let service = UsageService.shared
         let input = CircleRendererInput(
-            sessionProgress: service.sessionLimit > 0 ? Double(usageData.sessionTokens) / Double(service.sessionLimit) : 0,
-            sonnetProgress: service.sonnetWeeklyLimit > 0 ? Double(usageData.sonnetWeeklyTokens) / Double(service.sonnetWeeklyLimit) : 0,
-            allModelsProgress: service.allModelsWeeklyLimit > 0 ? Double(usageData.allModelsWeeklyTokens) / Double(service.allModelsWeeklyLimit) : 0
+            sessionProgress: usageData.sessionUtilization / 100.0,
+            sonnetProgress: usageData.sonnetWeeklyUtilization / 100.0,
+            allModelsProgress: usageData.allModelsWeeklyUtilization / 100.0
         )
         return ConcentricCirclesRenderer.renderMenuBarIcon(input: input)
     }
