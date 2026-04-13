@@ -63,76 +63,99 @@ enum ConcentricCirclesRenderer {
             let lineWidth: CGFloat = 16.0
             let gap: CGFloat = 3.0
 
-            // Apple Fitness-style: outer ring large, tighter inner rings
             let outerRadius = size / 2 - lineWidth / 2
             let middleRadius = outerRadius - lineWidth - gap
             let innerRadius = middleRadius - lineWidth - gap
 
-            let rings: [(progress: Double, timeProgress: Double, radius: CGFloat)] = [
+            let rings: [(Double, Double, CGFloat)] = [
                 (input.sessionProgress, input.sessionTimeProgress, outerRadius),
                 (input.sonnetProgress, input.sonnetTimeProgress, middleRadius),
                 (input.allModelsProgress, input.allModelsTimeProgress, innerRadius),
             ]
 
-            for ring in rings {
-                let usage = min(max(ring.progress, 0), 1)
-                let time = min(max(ring.timeProgress, 0), 1)
-                let shared = min(usage, time)
-
-                // Track
-                let trackPath = NSBezierPath()
-                trackPath.appendArc(withCenter: center, radius: ring.radius,
-                                    startAngle: 0, endAngle: 360)
-                trackPath.lineWidth = lineWidth
-                trackOrange.setStroke()
-                trackPath.stroke()
-
-                func arcPath(from startPct: Double, to endPct: Double) -> NSBezierPath {
-                    let a1: CGFloat = 90 - CGFloat(startPct) * 360
-                    let a2: CGFloat = 90 - CGFloat(endPct) * 360
-                    let path = NSBezierPath()
-                    path.appendArc(withCenter: center, radius: ring.radius,
-                                   startAngle: a1, endAngle: a2, clockwise: true)
-                    path.lineWidth = lineWidth
-                    path.lineCapStyle = .round
-                    return path
-                }
-
-                let longer = max(usage, time)
-                let shorter = min(usage, time)
-
-                guard let ctx = NSGraphicsContext.current?.cgContext else { continue }
-
-                if longer > 0 {
-                    // 1. Draw the full extent (whichever is longer) in faded
-                    fadedOrange.setStroke()
-                    arcPath(from: 0, to: longer).stroke()
-
-                    // 2. Draw solid usage arc, clipped to exclude the faded-only region
-                    //    When time > usage: solid covers 0→usage (fully inside faded, drawn on top)
-                    //    When usage > time: solid covers 0→usage, but we clip to time→usage
-                    //    so the faded time portion stays clean in front.
-                    if usage > 0 {
-                        ctx.saveGState()
-                        if usage > time && time > 0 {
-                            // Clip: exclude the 0→time region by inverting.
-                            // Fill the full rect, then subtract the arc band.
-                            let clipRect = CGRect(origin: .zero, size: rect.size)
-                            let exclude = arcPath(from: 0, to: time)
-                            let full = NSBezierPath(rect: clipRect)
-                            full.append(exclude)
-                            full.windingRule = .evenOdd
-                            full.addClip()
-                        }
-                        anthropicOrange.setStroke()
-                        arcPath(from: 0, to: usage).stroke()
-                        ctx.restoreGState()
-                    }
-                }
+            for (progress, timeProgress, radius) in rings {
+                drawRing(
+                    center: center, radius: radius, lineWidth: lineWidth,
+                    usage: progress, time: timeProgress, rect: rect
+                )
             }
             return true
         }
         image.isTemplate = false
         return image
+    }
+
+    private static func drawRing(
+        center: CGPoint, radius: CGFloat, lineWidth: CGFloat,
+        usage: Double, time: Double, rect: NSRect
+    ) {
+        let usage = min(max(usage, 0), 1)
+        let time = min(max(time, 0), 1)
+
+        // Track
+        let trackPath = NSBezierPath()
+        trackPath.appendArc(withCenter: center, radius: radius,
+                            startAngle: 0, endAngle: 360)
+        trackPath.lineWidth = lineWidth
+        trackOrange.setStroke()
+        trackPath.stroke()
+
+        if usage <= 0 && time <= 0 { return }
+
+        if time > usage {
+            // Time ahead: faded arc for full time, solid usage on top
+            strokeArc(center: center, radius: radius, lineWidth: lineWidth,
+                      from: 0, to: time, color: fadedOrange)
+            strokeArc(center: center, radius: radius, lineWidth: lineWidth,
+                      from: 0, to: usage, color: anthropicOrange)
+        } else if usage > time && time > 0 {
+            // Usage ahead: solid usage first, then replace the 0→time region with faded
+            guard let ctx = NSGraphicsContext.current?.cgContext else { return }
+
+            strokeArc(center: center, radius: radius, lineWidth: lineWidth,
+                      from: 0, to: usage, color: anthropicOrange)
+
+            // Build the thick filled shape of the 0→time arc
+            let a1 = CGFloat(90) * .pi / 180
+            let a2 = CGFloat(90 - time * 360) * .pi / 180
+            let cgCenter = CGPoint(x: center.x, y: center.y)
+            let cgArc = CGMutablePath()
+            cgArc.addArc(center: cgCenter, radius: radius,
+                         startAngle: a1, endAngle: a2, clockwise: true)
+            let thickShape = cgArc.copy(
+                strokingWithWidth: lineWidth,
+                lineCap: .round, lineJoin: .round, miterLimit: 1
+            )
+
+            // Clip to that shape, erase, redraw as faded
+            ctx.saveGState()
+            ctx.addPath(thickShape)
+            ctx.clip()
+            trackOrange.setFill()
+            ctx.fill(rect)
+            strokeArc(center: center, radius: radius, lineWidth: lineWidth,
+                      from: 0, to: time, color: fadedOrange)
+            ctx.restoreGState()
+        } else {
+            // time == 0 or equal
+            strokeArc(center: center, radius: radius, lineWidth: lineWidth,
+                      from: 0, to: usage, color: anthropicOrange)
+        }
+    }
+
+    private static func strokeArc(
+        center: CGPoint, radius: CGFloat, lineWidth: CGFloat,
+        from startPct: Double, to endPct: Double, color: NSColor
+    ) {
+        guard endPct > startPct else { return }
+        let a1: CGFloat = 90 - CGFloat(startPct) * 360
+        let a2: CGFloat = 90 - CGFloat(endPct) * 360
+        let path = NSBezierPath()
+        path.appendArc(withCenter: center, radius: radius,
+                       startAngle: a1, endAngle: a2, clockwise: true)
+        path.lineWidth = lineWidth
+        path.lineCapStyle = .round
+        color.setStroke()
+        path.stroke()
     }
 }
