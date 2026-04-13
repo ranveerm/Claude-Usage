@@ -127,10 +127,12 @@ enum ConcentricCirclesRenderer {
                 lineCap: .round, lineJoin: .round, miterLimit: 1
             )
 
-            // Clip to that shape, erase, redraw as faded
+            // Clip to that shape, clear pixels, redraw track + faded
             ctx.saveGState()
             ctx.addPath(thickShape)
             ctx.clip()
+            ctx.clear(rect)
+            // Redraw the track within the cleared region
             trackOrange.setFill()
             ctx.fill(rect)
             strokeArc(center: center, radius: radius, lineWidth: lineWidth,
