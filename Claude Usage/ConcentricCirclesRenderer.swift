@@ -54,10 +54,8 @@ enum ConcentricCirclesRenderer {
     /// Anthropic brand orange: #DA7756
     private static let anthropicOrange = NSColor(red: 0xDA / 255.0, green: 0x77 / 255.0, blue: 0x56 / 255.0, alpha: 1.0)
     private static let trackOrange = NSColor(red: 0xDA / 255.0, green: 0x77 / 255.0, blue: 0x56 / 255.0, alpha: 0.2)
-    /// Reduced opacity — time is ahead of usage (under budget)
-    private static let aheadOrange = NSColor(red: 0xDA / 255.0, green: 0x77 / 255.0, blue: 0x56 / 255.0, alpha: 0.35)
-    /// Darker — usage is ahead of time (over budget)
-    private static let behindOrange = NSColor(red: 0x9A / 255.0, green: 0x42 / 255.0, blue: 0x26 / 255.0, alpha: 1.0)
+    /// Reduced opacity — time progress indicator
+    private static let fadedOrange = NSColor(red: 0xDA / 255.0, green: 0x77 / 255.0, blue: 0x56 / 255.0, alpha: 0.35)
 
     static func renderLargeView(input: CircleRendererInput, size: CGFloat = 120) -> NSImage {
         let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { rect in
@@ -89,8 +87,7 @@ enum ConcentricCirclesRenderer {
                 trackOrange.setStroke()
                 trackPath.stroke()
 
-                func strokeArc(from startPct: Double, to endPct: Double, color: NSColor) {
-                    guard endPct > startPct else { return }
+                func arcPath(from startPct: Double, to endPct: Double) -> NSBezierPath {
                     let a1: CGFloat = 90 - CGFloat(startPct) * 360
                     let a2: CGFloat = 90 - CGFloat(endPct) * 360
                     let path = NSBezierPath()
@@ -98,19 +95,39 @@ enum ConcentricCirclesRenderer {
                                    startAngle: a1, endAngle: a2, clockwise: true)
                     path.lineWidth = lineWidth
                     path.lineCapStyle = .round
-                    color.setStroke()
-                    path.stroke()
+                    return path
                 }
 
-                // Shared segment: 0 → min(usage, time) — normal orange
-                strokeArc(from: 0, to: shared, color: anthropicOrange)
+                let longer = max(usage, time)
+                let shorter = min(usage, time)
 
-                if time > usage {
-                    // Time ahead of usage: reduced opacity (under budget)
-                    strokeArc(from: usage, to: time, color: aheadOrange)
-                } else if usage > time {
-                    // Usage ahead of time: darker colour (over budget)
-                    strokeArc(from: time, to: usage, color: behindOrange)
+                guard let ctx = NSGraphicsContext.current?.cgContext else { continue }
+
+                if longer > 0 {
+                    // 1. Draw the full extent (whichever is longer) in faded
+                    fadedOrange.setStroke()
+                    arcPath(from: 0, to: longer).stroke()
+
+                    // 2. Draw solid usage arc, clipped to exclude the faded-only region
+                    //    When time > usage: solid covers 0→usage (fully inside faded, drawn on top)
+                    //    When usage > time: solid covers 0→usage, but we clip to time→usage
+                    //    so the faded time portion stays clean in front.
+                    if usage > 0 {
+                        ctx.saveGState()
+                        if usage > time && time > 0 {
+                            // Clip: exclude the 0→time region by inverting.
+                            // Fill the full rect, then subtract the arc band.
+                            let clipRect = CGRect(origin: .zero, size: rect.size)
+                            let exclude = arcPath(from: 0, to: time)
+                            let full = NSBezierPath(rect: clipRect)
+                            full.append(exclude)
+                            full.windingRule = .evenOdd
+                            full.addClip()
+                        }
+                        anthropicOrange.setStroke()
+                        arcPath(from: 0, to: usage).stroke()
+                        ctx.restoreGState()
+                    }
                 }
             }
             return true
