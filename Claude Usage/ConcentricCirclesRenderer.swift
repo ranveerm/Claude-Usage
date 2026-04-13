@@ -4,6 +4,9 @@ struct CircleRendererInput {
     let sessionProgress: Double
     let sonnetProgress: Double
     let allModelsProgress: Double
+    var sessionTimeProgress: Double = 0
+    var sonnetTimeProgress: Double = 0
+    var allModelsTimeProgress: Double = 0
 }
 
 enum ConcentricCirclesRenderer {
@@ -63,29 +66,46 @@ enum ConcentricCirclesRenderer {
             let middleRadius = outerRadius - lineWidth - gap
             let innerRadius = middleRadius - lineWidth - gap
 
-            let rings: [(Double, CGFloat)] = [
-                (input.sessionProgress, outerRadius),
-                (input.sonnetProgress, middleRadius),
-                (input.allModelsProgress, innerRadius),
+            let rings: [(progress: Double, timeProgress: Double, radius: CGFloat)] = [
+                (input.sessionProgress, input.sessionTimeProgress, outerRadius),
+                (input.sonnetProgress, input.sonnetTimeProgress, middleRadius),
+                (input.allModelsProgress, input.allModelsTimeProgress, innerRadius),
             ]
 
-            for (progress, radius) in rings {
-                let clampedProgress = min(max(progress, 0), 1)
+            for ring in rings {
+                let clampedProgress = min(max(ring.progress, 0), 1)
+                let clampedTime = min(max(ring.timeProgress, 0), 1)
 
                 // Track
                 let trackPath = NSBezierPath()
-                trackPath.appendArc(withCenter: center, radius: radius,
+                trackPath.appendArc(withCenter: center, radius: ring.radius,
                                     startAngle: 0, endAngle: 360)
                 trackPath.lineWidth = lineWidth
                 trackOrange.setStroke()
                 trackPath.stroke()
 
-                // Fill arc
+                // Dotted time-elapsed arc
+                if clampedTime > 0 {
+                    let startAngle: CGFloat = 90
+                    let endAngle = startAngle - CGFloat(clampedTime) * 360
+                    let dottedPath = NSBezierPath()
+                    dottedPath.appendArc(withCenter: center, radius: ring.radius,
+                                         startAngle: startAngle, endAngle: endAngle, clockwise: true)
+                    dottedPath.lineWidth = lineWidth
+                    dottedPath.lineCapStyle = .round
+                    let dashLength: CGFloat = 2
+                    let gapLength: CGFloat = 6
+                    dottedPath.setLineDash([dashLength, gapLength], count: 2, phase: 0)
+                    anthropicOrange.withAlphaComponent(0.45).setStroke()
+                    dottedPath.stroke()
+                }
+
+                // Fill arc (drawn on top)
                 if clampedProgress > 0 {
                     let startAngle: CGFloat = 90
                     let endAngle = startAngle - CGFloat(clampedProgress) * 360
                     let arcPath = NSBezierPath()
-                    arcPath.appendArc(withCenter: center, radius: radius,
+                    arcPath.appendArc(withCenter: center, radius: ring.radius,
                                       startAngle: startAngle, endAngle: endAngle, clockwise: true)
                     arcPath.lineWidth = lineWidth
                     arcPath.lineCapStyle = .round
