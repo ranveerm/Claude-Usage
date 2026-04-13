@@ -107,9 +107,19 @@ struct UsagePopoverView: View {
         let input = CircleRendererInput(
             sessionProgress: usageData.sessionUtilization / 100.0,
             sonnetProgress: usageData.sonnetWeeklyUtilization / 100.0,
-            allModelsProgress: usageData.allModelsWeeklyUtilization / 100.0
+            allModelsProgress: usageData.allModelsWeeklyUtilization / 100.0,
+            sessionTimeProgress: Self.timeElapsed(resetsAt: usageData.sessionResetsAt, period: 5 * 3600),
+            sonnetTimeProgress: Self.timeElapsed(resetsAt: usageData.sonnetWeeklyResetsAt, period: 7 * 86400),
+            allModelsTimeProgress: Self.timeElapsed(resetsAt: usageData.allModelsWeeklyResetsAt, period: 7 * 86400)
         )
         return Image(nsImage: ConcentricCirclesRenderer.renderLargeView(input: input))
+    }
+
+    /// Fraction of the period that has elapsed (0.0–1.0).
+    private static func timeElapsed(resetsAt: Date?, period: TimeInterval) -> Double {
+        guard let resets = resetsAt, period > 0 else { return 0 }
+        let remaining = resets.timeIntervalSinceNow
+        return max(0, min(1, 1.0 - remaining / period))
     }
 
     private func usageRow(label: String, utilization: Double, resetsAt: Date?) -> some View {
