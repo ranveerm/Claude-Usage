@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="228" ry="228" fill="#1a1a1a"/>
+
+  <!-- Outer ring track: radius 430, width 64 -->
+  <circle cx="512" cy="512" r="430" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="64"/>
+  <!-- Outer ring fill: 69% -->
+  <path d="M 512 82 A 430 430 0 1 1 112.20 670.29" fill="none" stroke="#DA7756" stroke-width="64" stroke-linecap="round"/>
+
+  <!-- Middle ring track: radius 350, width 64 -->
+  <circle cx="512" cy="512" r="350" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="64"/>
+  <!-- Middle ring fill: 33% -->
+  <path d="M 512 162 A 350 350 0 0 1 818.71 680.61" fill="none" stroke="#DA7756" stroke-width="64" stroke-linecap="round"/>
+
+  <!-- Inner ring track: radius 270, width 64 -->
+  <circle cx="512" cy="512" r="270" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="64"/>
+  <!-- Inner ring fill: 42% -->
+  <path d="M 512 242 A 270 270 0 0 1 642.07 748.60" fill="none" stroke="#DA7756" stroke-width="64" stroke-linecap="round"/>
+</svg>
