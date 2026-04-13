@@ -7,6 +7,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var refreshTimer: Timer?
     private var usageData = UsageData()
     private var hostingController: NSHostingController<UsagePopoverView>!
+    private var eventMonitor: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -34,6 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         refreshTimer?.invalidate()
+        removeEventMonitor()
     }
 
     // MARK: - Popover
@@ -41,11 +43,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func togglePopover() {
         if popover.isShown {
             popover.performClose(nil)
+            removeEventMonitor()
         } else {
             guard let button = statusItem.button else { return }
             updatePopoverContent()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            addEventMonitor()
             if UsageService.shared.isConfigured { refreshData() }
+        }
+    }
+
+    private func addEventMonitor() {
+        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
+            guard let self, self.popover.isShown else { return }
+            // Don't close if the click is on the status bar button (togglePopover handles that)
+            if let button = self.statusItem.button,
+               let buttonWindow = button.window,
+               event.window == buttonWindow {
+                return
+            }
+            self.popover.performClose(nil)
+            self.removeEventMonitor()
+        }
+    }
+
+    private func removeEventMonitor() {
+        if let monitor = eventMonitor {
+            NSEvent.removeMonitor(monitor)
+            eventMonitor = nil
         }
     }
 
