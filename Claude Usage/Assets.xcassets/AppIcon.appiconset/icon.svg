@@ -2,21 +2,21 @@
   <!-- Dark metallic background -->
   <rect width="1024" height="1024" rx="228" ry="228" fill="#111113"/>
 
-  <!-- Ring width: 100, gap: 12 -->
-  <!-- Outer: r=402, Middle: r=290, Inner: r=178 -->
+  <!-- Ring width: 130, gap: 10 -->
+  <!-- Outer: r=390, Middle: r=250, Inner: r=110 -->
 
   <!-- Outer ring track -->
-  <circle cx="512" cy="512" r="402" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="100"/>
+  <circle cx="512" cy="512" r="390" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="130"/>
   <!-- Outer ring fill: 69% -->
-  <path d="M 512 110 A 402 402 0 1 1 138.23 659.99" fill="none" stroke="#DA7756" stroke-width="100" stroke-linecap="round"/>
+  <path d="M 512 122 A 390 390 0 1 1 149.39 655.57" fill="none" stroke="#DA7756" stroke-width="130" stroke-linecap="round"/>
 
   <!-- Middle ring track -->
-  <circle cx="512" cy="512" r="290" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="100"/>
+  <circle cx="512" cy="512" r="250" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="130"/>
   <!-- Middle ring fill: 33% -->
-  <path d="M 512 222 A 290 290 0 0 1 766.13 651.71" fill="none" stroke="#DA7756" stroke-width="100" stroke-linecap="round"/>
+  <path d="M 512 262 A 250 250 0 0 1 731.08 632.44" fill="none" stroke="#DA7756" stroke-width="130" stroke-linecap="round"/>
 
   <!-- Inner ring track -->
-  <circle cx="512" cy="512" r="178" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="100"/>
+  <circle cx="512" cy="512" r="110" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="130"/>
   <!-- Inner ring fill: 42% -->
-  <path d="M 512 334 A 178 178 0 0 1 597.75 667.98" fill="none" stroke="#DA7756" stroke-width="100" stroke-linecap="round"/>
+  <path d="M 512 402 A 110 110 0 0 1 564.99 608.39" fill="none" stroke="#DA7756" stroke-width="130" stroke-linecap="round"/>
 </svg>
