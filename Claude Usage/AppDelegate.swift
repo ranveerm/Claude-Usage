@@ -3,10 +3,10 @@ import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
-    private var popover: NSPopover?
+    private let popover = NSPopover()
     private var refreshTimer: Timer?
     private var usageData = UsageData()
-    private var eventMonitor: Any?
+    private var hostingController: NSHostingController<UsagePopoverView>!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -16,6 +16,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             button.action = #selector(togglePopover)
             button.target = self
         }
+
+        hostingController = NSHostingController(rootView: makePopoverView())
+        popover.contentViewController = hostingController
+        popover.behavior = .transient
 
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
             self?.refreshData()
@@ -30,56 +34,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         refreshTimer?.invalidate()
-        removeEventMonitor()
     }
 
     // MARK: - Popover
 
     @objc private func togglePopover() {
-        if let popover, popover.isShown {
-            closePopover()
+        if popover.isShown {
+            popover.performClose(nil)
         } else {
-            showPopover()
-        }
-    }
-
-    private func showPopover() {
-        let pop = NSPopover()
-        pop.contentSize = NSSize(width: 300, height: 360)
-        pop.behavior = .transient
-        pop.contentViewController = NSHostingController(rootView: makePopoverView())
-        self.popover = pop
-
-        if let button = statusItem.button {
-            pop.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-        }
-
-        addEventMonitor()
-        if UsageService.shared.isConfigured { refreshData() }
-    }
-
-    private func closePopover() {
-        popover?.performClose(nil)
-        removeEventMonitor()
-    }
-
-    private func addEventMonitor() {
-        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
-            self?.closePopover()
-        }
-    }
-
-    private func removeEventMonitor() {
-        if let monitor = eventMonitor {
-            NSEvent.removeMonitor(monitor)
-            eventMonitor = nil
+            guard let button = statusItem.button else { return }
+            updatePopoverContent()
+            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            if UsageService.shared.isConfigured { refreshData() }
         }
     }
 
     // MARK: - Login
 
     func showLogin() {
-        closePopover()
+        popover.performClose(nil)
         LoginWindowController.present { [weak self] sessionKey, cfClearance in
             UsageService.shared.saveCredentials(sessionKey: sessionKey, cfClearance: cfClearance)
             self?.refreshData()
@@ -93,15 +66,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let data = await UsageService.shared.fetchUsage()
             self.usageData = data
             self.statusItem.button?.image = self.renderIcon()
-            self.updatePopoverIfVisible()
+            self.updatePopoverContent()
 
             if data.needsLogin { self.showLogin() }
         }
     }
 
-    private func updatePopoverIfVisible() {
-        guard let popover, popover.isShown else { return }
-        popover.contentViewController = NSHostingController(rootView: makePopoverView())
+    private func updatePopoverContent() {
+        hostingController.rootView = makePopoverView()
     }
 
     private func makePopoverView() -> UsagePopoverView {
