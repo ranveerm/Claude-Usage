@@ -104,6 +104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func makePopoverView() -> UsagePopoverView {
         UsagePopoverView(
             usageData: usageData,
+            isConfigured: UsageService.shared.isConfigured,
             onRefresh: { [weak self] in self?.refreshData() },
             onLogin: { [weak self] in self?.showLogin() }
         )

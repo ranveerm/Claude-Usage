@@ -1,7 +1,83 @@
 import SwiftUI
 
+// MARK: - Preview
+
+#if DEBUG
+private struct UsagePopoverPreview: View {
+    @State private var sessionUsage: Double = 0.69
+    @State private var sonnetUsage: Double = 0.33
+    @State private var allModelsUsage: Double = 0.42
+    @State private var sessionTime: Double = 0.42
+    @State private var sonnetTime: Double = 0.60
+    @State private var allModelsTime: Double = 0.55
+
+    var body: some View {
+        VStack(spacing: 16) {
+            UsagePopoverView(
+                usageData: mockData,
+                isConfigured: true,
+                onRefresh: {},
+                onLogin: {}
+            )
+
+            Divider()
+
+            VStack(spacing: 10) {
+                sliderRow("Session Usage",     value: $sessionUsage)
+                sliderRow("Session Time",      value: $sessionTime)
+                Divider()
+                sliderRow("Sonnet Usage",      value: $sonnetUsage)
+                sliderRow("Sonnet Time",       value: $sonnetTime)
+                Divider()
+                sliderRow("All Models Usage",  value: $allModelsUsage)
+                sliderRow("All Models Time",   value: $allModelsTime)
+            }
+            .padding(.horizontal)
+        }
+        .padding()
+        .frame(width: 340)
+    }
+
+    private var mockData: UsageData {
+        UsageData(
+            sessionUtilization:       sessionUsage    * 100,
+            sessionResetsAt:          resetsAt(timeProgress: sessionTime,    period: 5 * 3600),
+            sonnetWeeklyUtilization:  sonnetUsage     * 100,
+            sonnetWeeklyResetsAt:     resetsAt(timeProgress: sonnetTime,     period: 7 * 86400),
+            allModelsWeeklyUtilization: allModelsUsage * 100,
+            allModelsWeeklyResetsAt:  resetsAt(timeProgress: allModelsTime,  period: 7 * 86400),
+            lastRefreshed:            Date()
+        )
+    }
+
+    /// Convert a 0–1 time-elapsed fraction back to the Date when the period resets.
+    private func resetsAt(timeProgress: Double, period: TimeInterval) -> Date {
+        Date().addingTimeInterval((1.0 - timeProgress) * period)
+    }
+
+    private func sliderRow(_ label: String, value: Binding<Double>) -> some View {
+        HStack {
+            Text(label)
+                .font(.caption)
+                .frame(width: 130, alignment: .leading)
+            Slider(value: value, in: 0...1)
+            Text(String(format: "%.0f%%", value.wrappedValue * 100))
+                .font(.caption.monospacedDigit())
+                .frame(width: 36, alignment: .trailing)
+        }
+    }
+}
+
+#Preview {
+    UsagePopoverPreview()
+}
+#endif
+
+// MARK: - View
+
 struct UsagePopoverView: View {
     let usageData: UsageData
+    let isConfigured: Bool
     let onRefresh: () -> Void
     let onLogin: () -> Void
 
@@ -9,7 +85,7 @@ struct UsagePopoverView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            if usageData.needsLogin || !UsageService.shared.isConfigured {
+            if usageData.needsLogin || !isConfigured {
                 loginPromptView
             } else if let error = usageData.error {
                 errorView(error)

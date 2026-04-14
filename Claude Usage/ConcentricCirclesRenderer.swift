@@ -60,8 +60,10 @@ enum ConcentricCirclesRenderer {
     static func renderLargeView(input: CircleRendererInput, size: CGFloat = 120) -> NSImage {
         let image = NSImage(size: NSSize(width: size, height: size), flipped: false) { rect in
             let center = CGPoint(x: rect.midX, y: rect.midY)
-            let lineWidth: CGFloat = 16.0
-            let gap: CGFloat = 3.0
+            // Scale proportionally so inner ring sits near centre at any render size.
+            // At size=120: lineWidth≈18, gap≈2
+            let lineWidth: CGFloat = size * 0.15
+            let gap: CGFloat = size / 60
 
             let outerRadius = size / 2 - lineWidth / 2
             let middleRadius = outerRadius - lineWidth - gap
