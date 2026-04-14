@@ -1,22 +1,5 @@
 import Foundation
 
-struct UsageData {
-    var sessionUtilization: Double = 0
-    var sessionResetsAt: Date?
-    var sonnetWeeklyUtilization: Double = 0
-    var sonnetWeeklyResetsAt: Date?
-    var allModelsWeeklyUtilization: Double = 0
-    var allModelsWeeklyResetsAt: Date?
-    var lastRefreshed: Date?
-    var error: String?
-    var needsLogin: Bool = false
-}
-
-struct Organization: Decodable {
-    let uuid: String
-    let name: String
-}
-
 final class UsageService {
     static let shared = UsageService()
 
@@ -101,7 +84,9 @@ final class UsageService {
                 let body = String(data: data, encoding: .utf8) ?? ""
                 return UsageData(error: "HTTP \(http.statusCode): \(body.prefix(80))")
             }
-            return parseUsageResponse(data)
+            let result = parseUsageResponse(data)
+            SharedDefaults.save(result)
+            return result
         } catch {
             return UsageData(error: error.localizedDescription)
         }

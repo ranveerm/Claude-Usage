@@ -1,0 +1,119 @@
+name: Claude Usage
+options:
+  bundleIdPrefix: com.ranveer
+  deploymentTarget:
+    macOS: "14.0"
+    iOS: "17.0"
+    watchOS: "10.0"
+  xcodeVersion: "16.3"
+  defaultConfig: Debug
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: 29F59849NR
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.0"
+    ENABLE_PREVIEWS: "YES"
+    SWIFT_APPROACHABLE_CONCURRENCY: "YES"
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+
+schemes:
+  Claude Usage:
+    build:
+      targets:
+        Claude Usage: all
+
+  Claude Usage iOS:
+    build:
+      targets:
+        Claude Usage iOS: all
+        Claude Usage Widget: all
+
+  Claude Usage Watch:
+    build:
+      targets:
+        Claude Usage Watch: all
+
+targets:
+
+  # ── macOS Menu Bar App ──────────────────────────────────────
+  Claude Usage:
+    type: application
+    platform: macOS
+    sources:
+      - path: Claude Usage
+        excludes:
+          - "**/.DS_Store"
+      - path: Shared
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.Claude-Usage
+        INFOPLIST_FILE: Claude Usage/Info.plist
+        GENERATE_INFOPLIST_FILE: "YES"
+        ENABLE_APP_SANDBOX: "YES"
+        ENABLE_HARDENED_RUNTIME: "YES"
+        CODE_SIGN_ENTITLEMENTS: Claude Usage/Claude_Usage.entitlements
+
+  # ── iOS / iPadOS App ────────────────────────────────────────
+  Claude Usage iOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: Claude Usage iOS
+        excludes:
+          - "**/.DS_Store"
+      - path: Shared
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.Claude-Usage-iOS
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait"
+        CODE_SIGN_ENTITLEMENTS: Claude Usage iOS/Claude_Usage_iOS.entitlements
+    dependencies:
+      - target: Claude Usage Widget
+
+  # ── WidgetKit Extension ─────────────────────────────────────
+  Claude Usage Widget:
+    type: app-extension
+    platform: iOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.Claude-Usage-iOS.widget
+        INFOPLIST_FILE: Claude Usage Widget/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Claude Usage Widget/Claude_Usage_Widget.entitlements
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
+    sources:
+      - path: Claude Usage Widget
+        excludes:
+          - "**/.DS_Store"
+      - path: Shared/UsageData.swift
+      - path: Shared/SharedDefaults.swift
+      - path: Shared/ConcentricCirclesView.swift
+      - path: Shared/UsageViews.swift
+    # entitlements managed via CODE_SIGN_ENTITLEMENTS in settings Claude Usage Widget/Claude_Usage_Widget.entitlements
+
+  # ── watchOS App ─────────────────────────────────────────────
+  Claude Usage Watch:
+    type: application
+    platform: watchOS
+    sources:
+      - path: Claude Usage Watch Watch App
+        excludes:
+          - "**/.DS_Store"
+      - path: Shared/UsageData.swift
+      - path: Shared/SharedDefaults.swift
+      - path: Shared/ConcentricCirclesView.swift
+      - path: Shared/UsageViews.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.Claude-Usage-iOS.watchkitapp
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.ranveer.Claude-Usage-iOS
+        CODE_SIGN_ENTITLEMENTS: Claude Usage Watch Watch App/Claude_Usage_Watch.entitlements
+    # entitlements managed via CODE_SIGN_ENTITLEMENTS in settings Claude Usage Watch Watch App/Claude_Usage_Watch.entitlements

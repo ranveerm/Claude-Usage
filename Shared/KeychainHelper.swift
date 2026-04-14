@@ -2,7 +2,8 @@ import Foundation
 import Security
 
 enum KeychainHelper {
-    private static let service = Bundle.main.bundleIdentifier ?? "com.ranveer.Claude-Usage"
+    private static let service = "com.ranveer.Claude-Usage"
+    private static let accessGroup = "29F59849NR.com.ranveer.Claude-Usage.shared"
 
     static func save(key: String, value: String) {
         guard let data = value.data(using: .utf8) else { return }
@@ -11,6 +12,8 @@ enum KeychainHelper {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
+            kSecAttrAccessGroup as String: accessGroup,
+            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny,
         ]
 
         // Delete any existing item first
@@ -18,6 +21,7 @@ enum KeychainHelper {
 
         var addQuery = query
         addQuery[kSecValueData as String] = data
+        addQuery[kSecAttrSynchronizable as String] = true
         SecItemAdd(addQuery as CFDictionary, nil)
     }
 
@@ -26,6 +30,8 @@ enum KeychainHelper {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
+            kSecAttrAccessGroup as String: accessGroup,
+            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny,
             kSecReturnData as String: true,
             kSecMatchLimit as String: kSecMatchLimitOne,
         ]
@@ -46,6 +52,8 @@ enum KeychainHelper {
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
+            kSecAttrAccessGroup as String: accessGroup,
+            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny,
         ]
         SecItemDelete(query as CFDictionary)
     }
