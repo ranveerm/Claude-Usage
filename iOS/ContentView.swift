@@ -28,7 +28,7 @@ struct ContentView: View {
                 .padding()
             }
             .refreshable { await fetchData() }
-            .navigationTitle("Claude Usage")
+            .navigationTitle("Claude Your Rings")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
@@ -169,7 +169,7 @@ private struct ContentViewPreview: View {
                 }
                 .padding()
             }
-            .navigationTitle("Claude Usage")
+            .navigationTitle("Claude Your Rings")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Image(systemName: "person.circle")

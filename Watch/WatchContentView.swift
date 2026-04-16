@@ -23,7 +23,7 @@ private struct WatchBody: View {
                 Image(systemName: "circle.dashed")
                     .font(.title)
                     .foregroundColor(.secondary)
-                Text("Open Claude Usage\non iPhone")
+                Text("Open Claude Your Rings\non iPhone")
                     .font(.caption2)
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)

@@ -1,4 +1,4 @@
-name: Claude Usage
+name: Claude Your Rings
 options:
   bundleIdPrefix: com.ranveer
   deploymentTarget:
@@ -18,30 +18,30 @@ settings:
     SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
 
 schemes:
-  Claude Usage:
+  Claude Your Rings:
     build:
       targets:
-        Claude Usage: all
+        Claude Your Rings: all
 
-  Claude Usage iOS:
+  Claude Your Rings iOS:
     build:
       targets:
-        Claude Usage iOS: all
-        Claude Usage Widget: all
+        Claude Your Rings iOS: all
+        Claude Your Rings Widget: all
 
-  Claude Usage Watch:
+  Claude Your Rings Watch:
     build:
       targets:
-        Claude Usage Watch: all
+        Claude Your Rings Watch: all
 
 targets:
 
   # ── macOS Menu Bar App ──────────────────────────────────────
-  Claude Usage:
+  Claude Your Rings:
     type: application
     platform: macOS
     sources:
-      - path: Claude Usage
+      - path: macOS
         excludes:
           - "**/.DS_Store"
       - path: Shared
@@ -49,19 +49,19 @@ targets:
           - "**/.DS_Store"
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.Claude-Usage
-        INFOPLIST_FILE: Claude Usage/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.ClaudeYourRings
+        INFOPLIST_FILE: macOS/Info.plist
         GENERATE_INFOPLIST_FILE: "YES"
         ENABLE_APP_SANDBOX: "YES"
         ENABLE_HARDENED_RUNTIME: "YES"
-        CODE_SIGN_ENTITLEMENTS: Claude Usage/Claude_Usage.entitlements
+        CODE_SIGN_ENTITLEMENTS: macOS/Claude_Usage.entitlements
 
   # ── iOS / iPadOS App ────────────────────────────────────────
-  Claude Usage iOS:
+  Claude Your Rings iOS:
     type: application
     platform: iOS
     sources:
-      - path: Claude Usage iOS
+      - path: iOS
         excludes:
           - "**/.DS_Store"
       - path: Shared
@@ -69,41 +69,40 @@ targets:
           - "**/.DS_Store"
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.Claude-Usage-iOS
+        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.ClaudeYourRings
         GENERATE_INFOPLIST_FILE: "YES"
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: "YES"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait"
-        CODE_SIGN_ENTITLEMENTS: Claude Usage iOS/Claude_Usage_iOS.entitlements
+        CODE_SIGN_ENTITLEMENTS: iOS/Claude_Usage_iOS.entitlements
     dependencies:
-      - target: Claude Usage Widget
+      - target: Claude Your Rings Widget
 
   # ── WidgetKit Extension ─────────────────────────────────────
-  Claude Usage Widget:
+  Claude Your Rings Widget:
     type: app-extension
     platform: iOS
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.Claude-Usage-iOS.widget
-        INFOPLIST_FILE: Claude Usage Widget/Info.plist
-        CODE_SIGN_ENTITLEMENTS: Claude Usage Widget/Claude_Usage_Widget.entitlements
+        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.ClaudeYourRings.widget
+        INFOPLIST_FILE: Widget/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Widget/Claude_Usage_Widget.entitlements
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
     sources:
-      - path: Claude Usage Widget
+      - path: Widget
         excludes:
           - "**/.DS_Store"
       - path: Shared/UsageData.swift
       - path: Shared/SharedDefaults.swift
       - path: Shared/ConcentricCirclesView.swift
       - path: Shared/UsageViews.swift
-    # entitlements managed via CODE_SIGN_ENTITLEMENTS in settings Claude Usage Widget/Claude_Usage_Widget.entitlements
 
   # ── watchOS App ─────────────────────────────────────────────
-  Claude Usage Watch:
+  Claude Your Rings Watch:
     type: application
     platform: watchOS
     sources:
-      - path: Claude Usage Watch Watch App
+      - path: Watch
         excludes:
           - "**/.DS_Store"
       - path: Shared/UsageData.swift
@@ -112,8 +111,7 @@ targets:
       - path: Shared/UsageViews.swift
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.Claude-Usage-iOS.watchkitapp
+        PRODUCT_BUNDLE_IDENTIFIER: com.ranveer.ClaudeYourRings.watchkitapp
         GENERATE_INFOPLIST_FILE: "YES"
-        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.ranveer.Claude-Usage-iOS
-        CODE_SIGN_ENTITLEMENTS: Claude Usage Watch Watch App/Claude_Usage_Watch.entitlements
-    # entitlements managed via CODE_SIGN_ENTITLEMENTS in settings Claude Usage Watch Watch App/Claude_Usage_Watch.entitlements
+        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.ranveer.ClaudeYourRings
+        CODE_SIGN_ENTITLEMENTS: Watch/Claude_Usage_Watch.entitlements

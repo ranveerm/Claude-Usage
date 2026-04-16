@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1630"
-   version = "1.3">
+   version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "YES"
+      runPostActionsOnFailure = "NO">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -14,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C79C753E2A7F8CD7C172E6F4"
-               BuildableName = "Claude Usage Watch.app"
-               BlueprintName = "Claude Usage Watch"
-               ReferencedContainer = "container:Claude Usage.xcodeproj">
+               BlueprintIdentifier = "34C14271ADFBB6396601B624"
+               BuildableName = "Claude Your Rings.app"
+               BlueprintName = "Claude Your Rings"
+               ReferencedContainer = "container:Claude Your Rings.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -26,14 +27,15 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      onlyGenerateCoverageForSpecifiedTargets = "NO">
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C79C753E2A7F8CD7C172E6F4"
-            BuildableName = "Claude Usage Watch.app"
-            BlueprintName = "Claude Usage Watch"
-            ReferencedContainer = "container:Claude Usage.xcodeproj">
+            BlueprintIdentifier = "34C14271ADFBB6396601B624"
+            BuildableName = "Claude Your Rings.app"
+            BlueprintName = "Claude Your Rings"
+            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -53,10 +55,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C79C753E2A7F8CD7C172E6F4"
-            BuildableName = "Claude Usage Watch.app"
-            BlueprintName = "Claude Usage Watch"
-            ReferencedContainer = "container:Claude Usage.xcodeproj">
+            BlueprintIdentifier = "34C14271ADFBB6396601B624"
+            BuildableName = "Claude Your Rings.app"
+            BlueprintName = "Claude Your Rings"
+            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -70,10 +72,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C79C753E2A7F8CD7C172E6F4"
-            BuildableName = "Claude Usage Watch.app"
-            BlueprintName = "Claude Usage Watch"
-            ReferencedContainer = "container:Claude Usage.xcodeproj">
+            BlueprintIdentifier = "34C14271ADFBB6396601B624"
+            BuildableName = "Claude Your Rings.app"
+            BlueprintName = "Claude Your Rings"
+            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -2,8 +2,8 @@ import Foundation
 import Security
 
 enum KeychainHelper {
-    private static let service = "com.ranveer.Claude-Usage"
-    private static let accessGroup = "29F59849NR.com.ranveer.Claude-Usage.shared"
+    private static let service = "com.ranveer.ClaudeYourRings"
+    private static let accessGroup = "29F59849NR.com.ranveer.ClaudeYourRings.shared"
 
     static func save(key: String, value: String) {
         guard let data = value.data(using: .utf8) else { return }

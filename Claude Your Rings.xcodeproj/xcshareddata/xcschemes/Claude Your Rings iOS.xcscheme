@@ -16,10 +16,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5E3595454041527A6904EAB2"
-               BuildableName = "Claude Usage Widget.appex"
-               BlueprintName = "Claude Usage Widget"
-               ReferencedContainer = "container:Claude Usage.xcodeproj">
+               BlueprintIdentifier = "D9EF71E15778C98B8EEC8CF8"
+               BuildableName = "Claude Your Rings Widget.appex"
+               BlueprintName = "Claude Your Rings Widget"
+               ReferencedContainer = "container:Claude Your Rings.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -30,10 +30,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "7767760AC92B0752F934877F"
-               BuildableName = "Claude Usage iOS.app"
-               BlueprintName = "Claude Usage iOS"
-               ReferencedContainer = "container:Claude Usage.xcodeproj">
+               BlueprintIdentifier = "6049FF0A4DC1C84AC59D91C9"
+               BuildableName = "Claude Your Rings iOS.app"
+               BlueprintName = "Claude Your Rings iOS"
+               ReferencedContainer = "container:Claude Your Rings.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,10 +47,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5E3595454041527A6904EAB2"
-            BuildableName = "Claude Usage Widget.appex"
-            BlueprintName = "Claude Usage Widget"
-            ReferencedContainer = "container:Claude Usage.xcodeproj">
+            BlueprintIdentifier = "D9EF71E15778C98B8EEC8CF8"
+            BuildableName = "Claude Your Rings Widget.appex"
+            BlueprintName = "Claude Your Rings Widget"
+            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -71,10 +71,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5E3595454041527A6904EAB2"
-            BuildableName = "Claude Usage Widget.appex"
-            BlueprintName = "Claude Usage Widget"
-            ReferencedContainer = "container:Claude Usage.xcodeproj">
+            BlueprintIdentifier = "D9EF71E15778C98B8EEC8CF8"
+            BuildableName = "Claude Your Rings Widget.appex"
+            BlueprintName = "Claude Your Rings Widget"
+            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -88,10 +88,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5E3595454041527A6904EAB2"
-            BuildableName = "Claude Usage Widget.appex"
-            BlueprintName = "Claude Usage Widget"
-            ReferencedContainer = "container:Claude Usage.xcodeproj">
+            BlueprintIdentifier = "D9EF71E15778C98B8EEC8CF8"
+            BuildableName = "Claude Your Rings Widget.appex"
+            BlueprintName = "Claude Your Rings Widget"
+            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

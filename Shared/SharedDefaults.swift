@@ -1,7 +1,7 @@
 import Foundation
 
 enum SharedDefaults {
-    private static let suiteName = "group.com.ranveer.Claude-Usage"
+    private static let suiteName = "group.com.ranveer.ClaudeYourRings"
     private static let key = "latestUsage"
 
     static func save(_ data: UsageData) {
