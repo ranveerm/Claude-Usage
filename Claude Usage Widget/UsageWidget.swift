@@ -38,7 +38,6 @@ struct UsageWidgetView: View {
 
     var body: some View {
         ConcentricCirclesView(input: entry.input)
-            .padding(8)
     }
 }
 

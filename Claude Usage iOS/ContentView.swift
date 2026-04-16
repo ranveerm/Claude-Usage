@@ -32,13 +32,16 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
-                        Button("Sign Out") {
+                        Button(role: .destructive) {
                             UsageService.shared.clearCredentials()
                             usageData = UsageData()
                             showLogin = true
+                        } label: {
+                            Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                         }
                     } label: {
-                        Image(systemName: "gear")
+                        Image(systemName: "person.circle")
+                            .imageScale(.large)
                     }
                 }
             }
@@ -169,7 +172,8 @@ private struct ContentViewPreview: View {
             .navigationTitle("Claude Usage")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Image(systemName: "gear")
+                    Image(systemName: "person.circle")
+                        .imageScale(.large)
                 }
             }
         }

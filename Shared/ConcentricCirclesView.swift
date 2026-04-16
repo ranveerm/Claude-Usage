@@ -7,7 +7,7 @@ struct ConcentricCirclesView: View {
         Canvas { context, size in
             let dim = min(size.width, size.height)
             let center = CGPoint(x: size.width / 2, y: size.height / 2)
-            let lineWidth = dim * 0.15
+            let lineWidth = dim * 0.13
             let gap = dim / 60
 
             let outerRadius = dim / 2 - lineWidth / 2
