@@ -15,8 +15,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if let button = statusItem.button {
             button.image = renderIcon()
-            button.action = #selector(togglePopover)
+            button.action = #selector(handleStatusItemClick)
             button.target = self
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
         }
 
         hostingController = NSHostingController(rootView: makePopoverView())
@@ -42,6 +43,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     // MARK: - Popover
+
+    @objc private func handleStatusItemClick() {
+        guard let event = NSApp.currentEvent else { return }
+        if event.type == .rightMouseUp {
+            showStatusMenu()
+        } else {
+            togglePopover()
+        }
+    }
+
+    private func showStatusMenu() {
+        let menu = NSMenu()
+        menu.addItem(withTitle: "Quit Claude Your Rings",
+                     action: #selector(NSApplication.terminate(_:)),
+                     keyEquivalent: "q")
+        if let button = statusItem.button, let event = NSApp.currentEvent {
+            NSMenu.popUpContextMenu(menu, with: event, for: button)
+        }
+    }
 
     @objc private func togglePopover() {
         if popover.isShown {

@@ -3,20 +3,24 @@ import SwiftUI
 // MARK: - Debug keychain inspector (DEBUG only)
 
 #if DEBUG
-/// Shows the live state of every keychain item and UserDefaults flag this app
+/// Shows the live state of every keychain item and UserDefaults entry this app
 /// owns, with values masked so they're recognisable but not fully exposed.
 /// Includes the Reset & Re-onboard action so you can confirm state before and
 /// after a reset in one place.
 private struct KeychainDebugView: View {
     let onReset: () -> Void
 
-    // Read live from keychain so the view always reflects current state.
+    // Read live on each render so the view always reflects current state.
     private var sessionKey:     String { KeychainHelper.load(key: "sessionKey")     ?? "" }
     private var cfClearance:    String { KeychainHelper.load(key: "cfClearance")    ?? "" }
     private var organizationId: String { KeychainHelper.load(key: "organizationId") ?? "" }
+
     private var hasCompletedWelcome: Bool {
         UserDefaults.standard.bool(forKey: "hasCompletedWelcome")
     }
+    /// Cached usage payload written by UsageService after every successful
+    /// fetch so the widget and watch can read it.
+    private var cachedUsage: UsageData? { SharedDefaults.load() }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -24,10 +28,8 @@ private struct KeychainDebugView: View {
                 .font(.headline)
                 .padding(.bottom, 10)
 
-            Text("Keychain  ·  service: com.ranveer.ClaudeYourRings")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .padding(.bottom, 6)
+            // ── Keychain ──────────────────────────────────────────
+            sectionHeader("Keychain  ·  service: com.ranveer.ClaudeYourRings")
 
             keychainRow("sessionKey",     value: sessionKey)
             keychainRow("cfClearance",    value: cfClearance)
@@ -35,15 +37,43 @@ private struct KeychainDebugView: View {
 
             Divider().padding(.vertical, 8)
 
-            Text("UserDefaults  ·  standard suite")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .padding(.bottom, 6)
+            // ── UserDefaults (standard suite) ─────────────────────
+            sectionHeader("UserDefaults  ·  standard suite")
 
             flagRow("hasCompletedWelcome", value: hasCompletedWelcome)
 
             Divider().padding(.vertical, 8)
 
+            // ── UserDefaults (App Group suite) ────────────────────
+            sectionHeader("UserDefaults  ·  group.com.ranveer.ClaudeYourRings")
+
+            if let usage = cachedUsage {
+                let refreshed = usage.lastRefreshed.map {
+                    $0.formatted(date: .omitted, time: .shortened)
+                } ?? "–"
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green).font(.caption).frame(width: 14)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("latestUsage").font(.caption.monospaced())
+                        Text("last refreshed \(refreshed)")
+                            .font(.caption2.monospaced()).foregroundColor(.secondary)
+                    }
+                }
+                .padding(.vertical, 2)
+            } else {
+                HStack(spacing: 8) {
+                    Image(systemName: "xmark.circle")
+                        .foregroundColor(.secondary).font(.caption).frame(width: 14)
+                    Text("latestUsage  (absent)")
+                        .font(.caption.monospaced()).foregroundColor(.secondary)
+                }
+                .padding(.vertical, 2)
+            }
+
+            Divider().padding(.vertical, 8)
+
+            // ── Scope of reset ────────────────────────────────────
             Text("Scope of Reset & Re-onboard")
                 .font(.caption2.bold())
                 .foregroundColor(.secondary)
@@ -51,9 +81,10 @@ private struct KeychainDebugView: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 scopeRow("Keychain: deletes the 3 items above")
-                scopeRow("UserDefaults: removes hasCompletedWelcome")
-                scopeRow("WebKit: clears cookies for this app's webview")
+                scopeRow("UserDefaults (standard): removes hasCompletedWelcome")
+                scopeRow("WebKit: clears cookies for this app's webview only")
                 scopeRow("In-memory: resets UsageData to empty")
+                scopeRow("Note: App Group cache (latestUsage) is NOT cleared")
             }
 
             Divider().padding(.vertical, 8)
@@ -67,10 +98,17 @@ private struct KeychainDebugView: View {
             .controlSize(.small)
         }
         .padding()
-        .frame(width: 310)
+        .frame(width: 320)
     }
 
-    // MARK: Rows
+    // MARK: Sub-views
+
+    private func sectionHeader(_ label: String) -> some View {
+        Text(label)
+            .font(.caption2)
+            .foregroundColor(.secondary)
+            .padding(.bottom, 6)
+    }
 
     private func keychainRow(_ label: String, value: String) -> some View {
         HStack(alignment: .top, spacing: 8) {
@@ -79,8 +117,7 @@ private struct KeychainDebugView: View {
                 .font(.caption)
                 .frame(width: 14)
             VStack(alignment: .leading, spacing: 1) {
-                Text(label)
-                    .font(.caption.monospaced())
+                Text(label).font(.caption.monospaced())
                 if !value.isEmpty {
                     Text(masked(value))
                         .font(.caption2.monospaced())
@@ -97,8 +134,7 @@ private struct KeychainDebugView: View {
                 .foregroundColor(value ? .green : .secondary)
                 .font(.caption)
                 .frame(width: 14)
-            Text(label)
-                .font(.caption.monospaced())
+            Text(label).font(.caption.monospaced())
             Spacer()
             Text(value ? "true" : "false")
                 .font(.caption2.monospaced())
@@ -233,6 +269,30 @@ struct UsagePopoverView: View {
             } else {
                 usageView
             }
+
+            // DEBUG info button is always visible regardless of auth state so
+            // you can inspect / reset even from the signed-out screen.
+            if let onDebugReset {
+                Divider()
+                HStack {
+                    Spacer()
+                    Button(action: { showDebugInfo.toggle() }) {
+                        Image(systemName: "info.circle")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Debug Info")
+                    #if DEBUG
+                    .popover(isPresented: $showDebugInfo) {
+                        KeychainDebugView(onReset: {
+                            showDebugInfo = false
+                            onDebugReset()
+                        })
+                    }
+                    #endif
+                }
+            }
         }
         .padding(16)
         .frame(width: 300)
@@ -271,6 +331,7 @@ struct UsagePopoverView: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
+
                 Button(action: onRefresh) {
                     Image(systemName: "arrow.clockwise").font(.caption)
                 }
@@ -287,33 +348,6 @@ struct UsagePopoverView: View {
                 }
                 .buttonStyle(.borderless)
                 .help("Sign Out")
-
-                Button(action: { NSApplication.shared.terminate(nil) }) {
-                    Image(systemName: "power")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.borderless)
-                .help("Quit")
-
-                // DEBUG-only inspector + reset button
-                if let onDebugReset {
-                    Button(action: { showDebugInfo.toggle() }) {
-                        Image(systemName: "info.circle")
-                            .font(.caption)
-                            .foregroundColor(.blue)
-                    }
-                    .buttonStyle(.borderless)
-                    .help("Debug Info")
-                    #if DEBUG
-                    .popover(isPresented: $showDebugInfo) {
-                        KeychainDebugView(onReset: {
-                            showDebugInfo = false
-                            onDebugReset()
-                        })
-                    }
-                    #endif
-                }
             }
         }
     }
