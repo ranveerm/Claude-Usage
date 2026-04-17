@@ -139,6 +139,12 @@ final class UsageService {
     }
 
     private func applyHeaders(to request: inout URLRequest) {
+        Self.applyHeaders(to: &request, sessionKey: sessionKey, cfClearance: cfClearance)
+    }
+
+    /// Stateless header application — used by `verifyCredentials` so we can
+    /// test credentials without persisting them to the keychain first.
+    static func applyHeaders(to request: inout URLRequest, sessionKey: String, cfClearance: String) {
         var cookieParts = ["sessionKey=\(sessionKey)"]
         if !cfClearance.isEmpty { cookieParts.append("cf_clearance=\(cfClearance)") }
 
@@ -157,6 +163,24 @@ final class UsageService {
         ]
         for (key, value) in headers {
             request.setValue(value, forHTTPHeaderField: key)
+        }
+    }
+
+    /// Tests whether the given cookies can fetch data from the Claude API.
+    /// Used by the login window to detect a successful sign-in without relying
+    /// on WKWebView's navigation callbacks (which miss SPA routing changes).
+    static func verifyCredentials(sessionKey: String, cfClearance: String) async -> Bool {
+        guard !sessionKey.isEmpty,
+              let url = URL(string: "https://claude.ai/api/organizations") else { return false }
+        var request = URLRequest(url: url)
+        applyHeaders(to: &request, sessionKey: sessionKey, cfClearance: cfClearance)
+        request.timeoutInterval = 8
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            return (response as? HTTPURLResponse)?.statusCode == 200
+        } catch {
+            return false
         }
     }
 

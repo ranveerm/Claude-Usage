@@ -79,8 +79,23 @@ struct UsagePopoverView: View {
     let isConfigured: Bool
     let onRefresh: () -> Void
     let onLogin: () -> Void
+    /// Debug-only reset handler. Only non-nil in DEBUG builds, via AppDelegate.
+    let onDebugReset: (() -> Void)?
 
-    @State private var showSettings = false
+
+    init(
+        usageData: UsageData,
+        isConfigured: Bool,
+        onRefresh: @escaping () -> Void,
+        onLogin: @escaping () -> Void,
+        onDebugReset: (() -> Void)? = nil
+    ) {
+        self.usageData = usageData
+        self.isConfigured = isConfigured
+        self.onRefresh = onRefresh
+        self.onLogin = onLogin
+        self.onDebugReset = onDebugReset
+    }
 
     var body: some View {
         VStack(spacing: 12) {
@@ -136,27 +151,34 @@ struct UsagePopoverView: View {
                     Image(systemName: "arrow.clockwise").font(.caption)
                 }
                 .buttonStyle(.borderless)
-                Button(action: { showSettings.toggle() }) {
-                    Image(systemName: "gear").font(.caption)
+                .help("Refresh")
+                Button(action: {
+                    UsageService.shared.clearCredentials()
+                    onLogin()
+                }) {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .font(.caption)
+                        .foregroundColor(.red)
                 }
                 .buttonStyle(.borderless)
-                .popover(isPresented: $showSettings) { settingsView }
+                .help("Sign Out")
+                Button(action: { NSApplication.shared.terminate(nil) }) {
+                    Image(systemName: "power")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.borderless)
+                .help("Quit")
+                if let onDebugReset {
+                    Button(action: onDebugReset) {
+                        Image(systemName: "arrow.counterclockwise.circle")
+                            .font(.caption)
+                            .foregroundColor(.orange)
+                    }
+                    .buttonStyle(.borderless)
+                    .help("Reset & Re-onboard (DEBUG)")
+                }
             }
         }
-    }
-
-    private var settingsView: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Button("Sign Out") {
-                UsageService.shared.clearCredentials()
-                showSettings = false
-                onLogin()
-            }
-            Button("Quit App") {
-                NSApplication.shared.terminate(nil)
-            }
-        }
-        .padding()
-        .frame(width: 180)
     }
 }

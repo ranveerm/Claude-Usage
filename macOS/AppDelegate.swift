@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import WebKit
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
@@ -28,8 +29,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if UsageService.shared.isConfigured {
             refreshData()
-        } else {
+        } else if WelcomeWindowController.hasCompleted {
             showLogin()
+        } else {
+            showWelcome()
         }
     }
 
@@ -74,15 +77,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    // MARK: - Login
+    // MARK: - Onboarding / Login
+
+    func showWelcome() {
+        popover.performClose(nil)
+        WelcomeWindowController.present { [weak self] in
+            self?.showLogin()
+        }
+    }
 
     func showLogin() {
         popover.performClose(nil)
+        WelcomeWindowController.dismiss()
         LoginWindowController.present { [weak self] sessionKey, cfClearance in
             UsageService.shared.saveCredentials(sessionKey: sessionKey, cfClearance: cfClearance)
             self?.refreshData()
         }
     }
+
+    #if DEBUG
+    /// Wipes credentials, welcome flag, and in-memory state so the next
+    /// launch re-runs the full onboarding flow. Wired up to a debug-only
+    /// button in the popover.
+    func resetAndReonboard() {
+        UsageService.shared.clearCredentials()
+        WelcomeWindowController.resetForDebug()
+        WKWebsiteDataStore.default().removeData(
+            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+            modifiedSince: .distantPast
+        ) { }
+        usageData = UsageData()
+        statusItem.button?.image = renderIcon()
+        popover.performClose(nil)
+        removeEventMonitor()
+        showWelcome()
+    }
+    #endif
 
     // MARK: - Data
 
@@ -102,11 +132,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func makePopoverView() -> UsagePopoverView {
-        UsagePopoverView(
+        #if DEBUG
+        let debugReset: (() -> Void)? = { [weak self] in self?.resetAndReonboard() }
+        #else
+        let debugReset: (() -> Void)? = nil
+        #endif
+
+        return UsagePopoverView(
             usageData: usageData,
             isConfigured: UsageService.shared.isConfigured,
             onRefresh: { [weak self] in self?.refreshData() },
-            onLogin: { [weak self] in self?.showLogin() }
+            onLogin: { [weak self] in self?.showLogin() },
+            onDebugReset: debugReset
         )
     }
 

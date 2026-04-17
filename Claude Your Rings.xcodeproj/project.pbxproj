@@ -33,6 +33,7 @@
 		9497EA397BA661E77C4CEE15 /* UsageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DF0533D82BA7540D8026E6 /* UsageViews.swift */; };
 		9EA73940916554AA49AE6BD3 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
 		A6127CBE60225E6B8D8CDE19 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
+		A64510FA5C2410016399D4AA /* WelcomeWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6BC06A53EAEDBEC50D7992 /* WelcomeWindowController.swift */; };
 		AA7740F1C84E2A0F4E420F1A /* Claude Your Rings Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D785AA8DBDEC7C2C001ABBDB /* Claude Your Rings Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BF2E1FDCED3B62B918FC5843 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A8C96E203B54080374D251 /* AppDelegate.swift */; };
 		C5B66ED363AC4EA757D8F97A /* ConcentricCirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AECB6850F4359F607BCEDF3 /* ConcentricCirclesView.swift */; };
@@ -96,6 +97,7 @@
 		E2067667D40685B11CF39FFB /* UsageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageData.swift; sourceTree = "<group>"; };
 		E252F6DA8F781F92E73CBA72 /* Claude_UsageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Claude_UsageApp.swift; sourceTree = "<group>"; };
 		E6A8C96E203B54080374D251 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		EE6BC06A53EAEDBEC50D7992 /* WelcomeWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeWindowController.swift; sourceTree = "<group>"; };
 		F365ECED4F04C6605F294732 /* Claude_Usage_Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage_Widget.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -179,6 +181,7 @@
 				7A75975E223E11BF0164174A /* Info.plist */,
 				4736BF0B9471FF429C8C2FE9 /* LoginWindowController.swift */,
 				3FB92722AC4A2689C2685692 /* UsagePopoverView.swift */,
+				EE6BC06A53EAEDBEC50D7992 /* WelcomeWindowController.swift */,
 			);
 			path = macOS;
 			sourceTree = "<group>";
@@ -362,6 +365,7 @@
 				68AEDAC3C33FFAEFDC592556 /* UsagePopoverView.swift in Sources */,
 				5A9264B5DABD712A304CE347 /* UsageService.swift in Sources */,
 				FA0559F1FA91CB9BA7091F4F /* UsageViews.swift in Sources */,
+				A64510FA5C2410016399D4AA /* WelcomeWindowController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
