@@ -269,34 +269,12 @@ struct UsagePopoverView: View {
             } else {
                 usageView
             }
-
-            // DEBUG info button is always visible regardless of auth state so
-            // you can inspect / reset even from the signed-out screen.
-            if let onDebugReset {
-                Divider()
-                HStack {
-                    Spacer()
-                    Button(action: { showDebugInfo.toggle() }) {
-                        Image(systemName: "info.circle")
-                            .font(.caption)
-                            .foregroundColor(.orange)
-                    }
-                    .buttonStyle(.borderless)
-                    .help("Debug Info")
-                    #if DEBUG
-                    .popover(isPresented: $showDebugInfo) {
-                        KeychainDebugView(onReset: {
-                            showDebugInfo = false
-                            onDebugReset()
-                        })
-                    }
-                    #endif
-                }
-            }
         }
         .padding(16)
         .frame(width: 300)
     }
+
+    // MARK: - Usage content (shown when logged in and data is available)
 
     private var usageView: some View {
         VStack(spacing: 10) {
@@ -320,6 +298,9 @@ struct UsagePopoverView: View {
 
             Divider()
 
+            // Footer: timestamp on the left, action buttons on the right.
+            // The debug info button sits in this same row so all controls
+            // are grouped together and visible at the same level.
             HStack {
                 if let refreshed = usageData.lastRefreshed {
                     Text("Updated \(refreshed.formatted(.relative(presentation: .named)))")
@@ -348,7 +329,34 @@ struct UsagePopoverView: View {
                 }
                 .buttonStyle(.borderless)
                 .help("Sign Out")
+
+                if let onDebugReset {
+                    debugInfoButton(onDebugReset: onDebugReset)
+                }
             }
         }
+    }
+
+    // MARK: - Debug info button
+
+    /// Orange info button that opens the KeychainDebugView popover.
+    /// Extracted so it can be reused in any footer row.
+    @ViewBuilder
+    private func debugInfoButton(onDebugReset: @escaping () -> Void) -> some View {
+        Button(action: { showDebugInfo.toggle() }) {
+            Image(systemName: "info.circle")
+                .font(.caption)
+                .foregroundColor(.orange)
+        }
+        .buttonStyle(.borderless)
+        .help("Debug Info")
+        #if DEBUG
+        .popover(isPresented: $showDebugInfo) {
+            KeychainDebugView(onReset: {
+                showDebugInfo = false
+                onDebugReset()
+            })
+        }
+        #endif
     }
 }
