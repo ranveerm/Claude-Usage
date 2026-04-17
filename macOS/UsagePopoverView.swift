@@ -1,5 +1,128 @@
 import SwiftUI
 
+// MARK: - Debug keychain inspector (DEBUG only)
+
+#if DEBUG
+/// Shows the live state of every keychain item and UserDefaults flag this app
+/// owns, with values masked so they're recognisable but not fully exposed.
+/// Includes the Reset & Re-onboard action so you can confirm state before and
+/// after a reset in one place.
+private struct KeychainDebugView: View {
+    let onReset: () -> Void
+
+    // Read live from keychain so the view always reflects current state.
+    private var sessionKey:     String { KeychainHelper.load(key: "sessionKey")     ?? "" }
+    private var cfClearance:    String { KeychainHelper.load(key: "cfClearance")    ?? "" }
+    private var organizationId: String { KeychainHelper.load(key: "organizationId") ?? "" }
+    private var hasCompletedWelcome: Bool {
+        UserDefaults.standard.bool(forKey: "hasCompletedWelcome")
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Debug — App State")
+                .font(.headline)
+                .padding(.bottom, 10)
+
+            Text("Keychain  ·  service: com.ranveer.ClaudeYourRings")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 6)
+
+            keychainRow("sessionKey",     value: sessionKey)
+            keychainRow("cfClearance",    value: cfClearance)
+            keychainRow("organizationId", value: organizationId)
+
+            Divider().padding(.vertical, 8)
+
+            Text("UserDefaults  ·  standard suite")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 6)
+
+            flagRow("hasCompletedWelcome", value: hasCompletedWelcome)
+
+            Divider().padding(.vertical, 8)
+
+            Text("Scope of Reset & Re-onboard")
+                .font(.caption2.bold())
+                .foregroundColor(.secondary)
+                .padding(.bottom, 4)
+
+            VStack(alignment: .leading, spacing: 3) {
+                scopeRow("Keychain: deletes the 3 items above")
+                scopeRow("UserDefaults: removes hasCompletedWelcome")
+                scopeRow("WebKit: clears cookies for this app's webview")
+                scopeRow("In-memory: resets UsageData to empty")
+            }
+
+            Divider().padding(.vertical, 8)
+
+            Button(role: .destructive) {
+                onReset()
+            } label: {
+                Label("Reset & Re-onboard", systemImage: "arrow.counterclockwise.circle")
+                    .frame(maxWidth: .infinity)
+            }
+            .controlSize(.small)
+        }
+        .padding()
+        .frame(width: 310)
+    }
+
+    // MARK: Rows
+
+    private func keychainRow(_ label: String, value: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: value.isEmpty ? "xmark.circle" : "checkmark.circle.fill")
+                .foregroundColor(value.isEmpty ? .secondary : .green)
+                .font(.caption)
+                .frame(width: 14)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(label)
+                    .font(.caption.monospaced())
+                if !value.isEmpty {
+                    Text(masked(value))
+                        .font(.caption2.monospaced())
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding(.vertical, 2)
+    }
+
+    private func flagRow(_ label: String, value: Bool) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: value ? "checkmark.circle.fill" : "xmark.circle")
+                .foregroundColor(value ? .green : .secondary)
+                .font(.caption)
+                .frame(width: 14)
+            Text(label)
+                .font(.caption.monospaced())
+            Spacer()
+            Text(value ? "true" : "false")
+                .font(.caption2.monospaced())
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 2)
+    }
+
+    private func scopeRow(_ text: String) -> some View {
+        HStack(alignment: .top, spacing: 6) {
+            Text("•").font(.caption2).foregroundColor(.secondary)
+            Text(text).font(.caption2).foregroundColor(.secondary)
+        }
+    }
+
+    /// Shows the first 4 and last 4 characters; replaces the middle with dots.
+    /// A value shorter than 9 characters is fully masked.
+    private func masked(_ s: String) -> String {
+        guard s.count > 8 else { return String(repeating: "•", count: s.count) }
+        return "\(s.prefix(4))\(String(repeating: "•", count: min(s.count - 8, 24)))\(s.suffix(4))"
+    }
+}
+#endif
+
 // MARK: - Preview
 
 #if DEBUG
@@ -82,6 +205,7 @@ struct UsagePopoverView: View {
     /// Debug-only reset handler. Only non-nil in DEBUG builds, via AppDelegate.
     let onDebugReset: (() -> Void)?
 
+    @State private var showDebugInfo = false
 
     init(
         usageData: UsageData,
@@ -152,6 +276,7 @@ struct UsagePopoverView: View {
                 }
                 .buttonStyle(.borderless)
                 .help("Refresh")
+
                 Button(action: {
                     UsageService.shared.clearCredentials()
                     onLogin()
@@ -162,6 +287,7 @@ struct UsagePopoverView: View {
                 }
                 .buttonStyle(.borderless)
                 .help("Sign Out")
+
                 Button(action: { NSApplication.shared.terminate(nil) }) {
                     Image(systemName: "power")
                         .font(.caption)
@@ -169,14 +295,24 @@ struct UsagePopoverView: View {
                 }
                 .buttonStyle(.borderless)
                 .help("Quit")
+
+                // DEBUG-only inspector + reset button
                 if let onDebugReset {
-                    Button(action: onDebugReset) {
-                        Image(systemName: "arrow.counterclockwise.circle")
+                    Button(action: { showDebugInfo.toggle() }) {
+                        Image(systemName: "info.circle")
                             .font(.caption)
-                            .foregroundColor(.orange)
+                            .foregroundColor(.blue)
                     }
                     .buttonStyle(.borderless)
-                    .help("Reset & Re-onboard (DEBUG)")
+                    .help("Debug Info")
+                    #if DEBUG
+                    .popover(isPresented: $showDebugInfo) {
+                        KeychainDebugView(onReset: {
+                            showDebugInfo = false
+                            onDebugReset()
+                        })
+                    }
+                    #endif
                 }
             }
         }
