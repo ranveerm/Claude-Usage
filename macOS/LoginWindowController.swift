@@ -8,22 +8,27 @@ final class LoginWindowController: NSWindowController, WKNavigationDelegate, NSW
     private var isVerifying = false
     private static var current: LoginWindowController?
 
-    /// Presents the login window. If one is already open, brings it to the
-    /// front instead of stacking another on top (fixes the multi-window bug
-    /// where the refresh timer would spawn new windows on every tick while
-    /// the user was still signing in).
+    /// Presents the login window. If one is already open and visible, brings
+    /// it to the front. Stale references (window closed without proper cleanup)
+    /// are discarded and a fresh window is created.
     static func present(onComplete: @escaping (_ sessionKey: String, _ cfClearance: String) -> Void) {
+        // Guard against stale references: if current exists but its window is
+        // gone or hidden, discard it and fall through to create a new one.
         if let existing = current {
-            existing.onComplete = onComplete
-            existing.window?.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
-            return
+            if let win = existing.window, win.isVisible {
+                existing.onComplete = onComplete
+                win.orderFrontRegardless()
+                NSApp.activate(ignoringOtherApps: true)
+                return
+            } else {
+                // Stale — clean up and recreate.
+                existing.pollTimer?.invalidate()
+                current = nil
+            }
         }
 
         let config = WKWebViewConfiguration()
         config.websiteDataStore = .default()
-        // Keep the webview's surface area small to minimise chances of
-        // triggering local-network / WebRTC permission prompts.
         config.allowsAirPlayForMediaPlayback = false
         let prefs = WKWebpagePreferences()
         prefs.allowsContentJavaScript = true
@@ -38,8 +43,11 @@ final class LoginWindowController: NSWindowController, WKNavigationDelegate, NSW
             defer: false
         )
         win.title = "Sign in to Claude"
+        win.isReleasedWhenClosed = false   // controller owns lifetime
         win.center()
         win.contentView = webView
+        // Ensure the window moves to the user's current Space when shown.
+        win.collectionBehavior = [.moveToActiveSpace]
 
         let controller = LoginWindowController(window: win)
         controller.webView = webView
@@ -49,7 +57,7 @@ final class LoginWindowController: NSWindowController, WKNavigationDelegate, NSW
 
         current = controller
         controller.showWindow(nil)
-        win.makeKeyAndOrderFront(nil)
+        win.orderFrontRegardless()
         NSApp.activate(ignoringOtherApps: true)
 
         webView.load(URLRequest(url: URL(string: "https://claude.ai/login")!))

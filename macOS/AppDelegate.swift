@@ -108,10 +108,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showLogin() {
         popover.performClose(nil)
+        removeEventMonitor()
         WelcomeWindowController.dismiss()
-        LoginWindowController.present { [weak self] sessionKey, cfClearance in
-            UsageService.shared.saveCredentials(sessionKey: sessionKey, cfClearance: cfClearance)
-            self?.refreshData()
+        // Defer to the next run loop turn so the popover finishes closing
+        // before the login window is created and ordered front.
+        DispatchQueue.main.async {
+            LoginWindowController.present { [weak self] sessionKey, cfClearance in
+                UsageService.shared.saveCredentials(sessionKey: sessionKey, cfClearance: cfClearance)
+                self?.refreshData()
+            }
         }
     }
 
