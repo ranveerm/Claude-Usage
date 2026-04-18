@@ -5,8 +5,11 @@ struct ContentView: View {
     @State private var usageData = UsageData()
     @State private var showLogin = false
     @State private var isLoading = false
+    @Environment(\.scenePhase) private var scenePhase
 
     private var isConfigured: Bool { UsageService.shared.isConfigured }
+
+    private let refreshTimer = Timer.publish(every: 300, on: .main, in: .common).autoconnect()
 
     var body: some View {
         NavigationStack {
@@ -47,6 +50,15 @@ struct ContentView: View {
             }
         }
         .task { await fetchData() }
+        // Re-fetch whenever the app returns to the foreground
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await fetchData() } }
+        }
+        // Periodic refresh every 5 minutes while the app is active
+        .onReceive(refreshTimer) { _ in
+            guard scenePhase == .active else { return }
+            Task { await fetchData() }
+        }
         .sheet(isPresented: $showLogin) {
             WebLoginView { sessionKey, cfClearance in
                 UsageService.shared.saveCredentials(sessionKey: sessionKey, cfClearance: cfClearance)
@@ -58,22 +70,30 @@ struct ContentView: View {
 
     private var usageContent: some View {
         VStack(spacing: 24) {
-            ConcentricCirclesView(input: circleInput(from: usageData))
-                .frame(width: 250, height: 250)
-                .padding(.top, 8)
+            ConcentricCirclesView(
+                input: circleInput(from: usageData),
+                outerIcon:  "calendar.day.timeline.left",
+                middleIcon: "calendar",
+                innerIcon:  "shippingbox"
+            )
+            .frame(width: 250, height: 250)
+            .padding(.top, 8)
 
             VStack(spacing: 16) {
                 UsageRowView(label: "Session (5h)",
                              utilization: usageData.sessionUtilization,
-                             resetsAt: usageData.sessionResetsAt)
+                             resetsAt: usageData.sessionResetsAt,
+                             systemImage: "calendar.day.timeline.left")
                 Divider()
                 UsageRowView(label: "Sonnet Weekly",
                              utilization: usageData.sonnetWeeklyUtilization,
-                             resetsAt: usageData.sonnetWeeklyResetsAt)
+                             resetsAt: usageData.sonnetWeeklyResetsAt,
+                             systemImage: "calendar")
                 Divider()
                 UsageRowView(label: "All Models Weekly",
                              utilization: usageData.allModelsWeeklyUtilization,
-                             resetsAt: usageData.allModelsWeeklyResetsAt)
+                             resetsAt: usageData.allModelsWeeklyResetsAt,
+                             systemImage: "shippingbox")
             }
             .padding(.horizontal)
 
@@ -130,22 +150,30 @@ private struct ContentViewPreview: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    ConcentricCirclesView(input: circleInput(from: mockData))
-                        .frame(width: 250, height: 250)
-                        .padding(.top, 8)
+                    ConcentricCirclesView(
+                        input: circleInput(from: mockData),
+                        outerIcon:  "calendar.day.timeline.left",
+                        middleIcon: "calendar",
+                        innerIcon:  "shippingbox"
+                    )
+                    .frame(width: 250, height: 250)
+                    .padding(.top, 8)
 
                     VStack(spacing: 16) {
                         UsageRowView(label: "Session (5h)",
                                      utilization: mockData.sessionUtilization,
-                                     resetsAt: mockData.sessionResetsAt)
+                                     resetsAt: mockData.sessionResetsAt,
+                                     systemImage: "calendar.day.timeline.left")
                         Divider()
                         UsageRowView(label: "Sonnet Weekly",
                                      utilization: mockData.sonnetWeeklyUtilization,
-                                     resetsAt: mockData.sonnetWeeklyResetsAt)
+                                     resetsAt: mockData.sonnetWeeklyResetsAt,
+                                     systemImage: "calendar")
                         Divider()
                         UsageRowView(label: "All Models Weekly",
                                      utilization: mockData.allModelsWeeklyUtilization,
-                                     resetsAt: mockData.allModelsWeeklyResetsAt)
+                                     resetsAt: mockData.allModelsWeeklyResetsAt,
+                                     systemImage: "shippingbox")
                     }
                     .padding(.horizontal)
 

@@ -242,6 +242,7 @@ struct UsagePopoverView: View {
     let onDebugReset: (() -> Void)?
 
     @State private var showDebugInfo = false
+    @State private var showSignOutConfirmation = false
 
     init(
         usageData: UsageData,
@@ -279,20 +280,28 @@ struct UsagePopoverView: View {
     private var usageView: some View {
         VStack(spacing: 10) {
             HStack(spacing: 20) {
-                ConcentricCirclesView(input: circleInput(from: usageData))
-                    .frame(width: 100, height: 100)
-                    .padding(10)
+                ConcentricCirclesView(
+                    input: circleInput(from: usageData),
+                    outerIcon:  "calendar.day.timeline.left",
+                    middleIcon: "calendar",
+                    innerIcon:  "shippingbox"
+                )
+                .frame(width: 100, height: 100)
+                .padding(10)
 
                 VStack(alignment: .leading, spacing: 8) {
                     UsageRowView(label: "Session (5h)",
                                  utilization: usageData.sessionUtilization,
-                                 resetsAt: usageData.sessionResetsAt)
+                                 resetsAt: usageData.sessionResetsAt,
+                                 systemImage: "calendar.day.timeline.left")
                     UsageRowView(label: "Sonnet Weekly",
                                  utilization: usageData.sonnetWeeklyUtilization,
-                                 resetsAt: usageData.sonnetWeeklyResetsAt)
+                                 resetsAt: usageData.sonnetWeeklyResetsAt,
+                                 systemImage: "calendar")
                     UsageRowView(label: "All Models Weekly",
                                  utilization: usageData.allModelsWeeklyUtilization,
-                                 resetsAt: usageData.allModelsWeeklyResetsAt)
+                                 resetsAt: usageData.allModelsWeeklyResetsAt,
+                                 systemImage: "shippingbox")
                 }
             }
 
@@ -319,16 +328,24 @@ struct UsagePopoverView: View {
                 .buttonStyle(.borderless)
                 .help("Refresh")
 
-                Button(action: {
-                    UsageService.shared.clearCredentials()
-                    onLogin()
-                }) {
+                Button(action: { showSignOutConfirmation = true }) {
                     Image(systemName: "rectangle.portrait.and.arrow.right")
                         .font(.caption)
-                        .foregroundColor(.red)
+                        .foregroundColor(.white)
                 }
                 .buttonStyle(.borderless)
                 .help("Sign Out")
+                .confirmationDialog("Sign out of Claude?",
+                                    isPresented: $showSignOutConfirmation,
+                                    titleVisibility: .visible) {
+                    Button("Sign Out", role: .destructive) {
+                        UsageService.shared.clearCredentials()
+                        onLogin()
+                    }
+                    Button("Cancel", role: .cancel) { }
+                } message: {
+                    Text("You will need to sign in again to view your usage data.")
+                }
 
                 if let onDebugReset {
                     debugInfoButton(onDebugReset: onDebugReset)

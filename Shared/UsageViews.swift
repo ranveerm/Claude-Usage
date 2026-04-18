@@ -25,21 +25,31 @@ struct UsageRowView: View {
     let label: String
     let utilization: Double
     let resetsAt: Date?
+    /// Optional SF symbol shown to the left as a subtle ring legend indicator.
+    var systemImage: String? = nil
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 1) {
-            HStack {
-                Text(label)
+        HStack(alignment: .center, spacing: 6) {
+            if let systemImage {
+                Image(systemName: systemImage)
                     .font(.caption)
-                Spacer()
-                Text(String(format: "%.0f%%", utilization))
-                    .font(.caption)
-                    .monospacedDigit()
+                    .foregroundStyle(ConcentricCirclesView.anthropicOrange.opacity(0.8))
+                    .frame(width: 14)
             }
-            if let resets = resetsAt {
-                Text("resets \(resets.formatted(.relative(presentation: .named)))")
-                    .font(.system(size: 9))
-                    .foregroundColor(.secondary)
+            VStack(alignment: .leading, spacing: 1) {
+                HStack {
+                    Text(label)
+                        .font(.caption)
+                    Spacer()
+                    Text(String(format: "%.0f%%", utilization))
+                        .font(.caption)
+                        .monospacedDigit()
+                }
+                if let resets = resetsAt {
+                    Text("resets \(resets.formatted(.relative(presentation: .named)))")
+                        .font(.system(size: 9))
+                        .foregroundColor(.secondary)
+                }
             }
         }
     }
