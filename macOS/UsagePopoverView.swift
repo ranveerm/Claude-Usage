@@ -280,13 +280,8 @@ struct UsagePopoverView: View {
     private var usageView: some View {
         VStack(spacing: 10) {
             HStack(spacing: 20) {
-                ConcentricCirclesView(
-                    input: circleInput(from: usageData),
-                    outerIcon:  "calendar.day.timeline.left",
-                    middleIcon: "calendar",
-                    innerIcon:  "shippingbox"
-                )
-                .frame(width: 100, height: 100)
+                ConcentricCirclesView(input: circleInput(from: usageData))
+                    .frame(width: 100, height: 100)
                 .padding(10)
 
                 VStack(alignment: .leading, spacing: 8) {

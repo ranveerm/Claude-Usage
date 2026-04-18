@@ -3,11 +3,11 @@ import SwiftUI
 struct ConcentricCirclesView: View {
     let input: CircleRendererInput
 
-    /// Optional SF symbol names overlaid at the 12 o'clock position of each
-    /// ring. Pass nil (the default) to show no icon for that ring.
-    var outerIcon:  String? = nil
-    var middleIcon: String? = nil
-    var innerIcon:  String? = nil
+    /// SF symbol names overlaid at the 12 o'clock position of each ring.
+    /// Defaults match the macOS popover (source of truth). Pass nil to hide.
+    var outerIcon:  String? = "calendar.day.timeline.left"
+    var middleIcon: String? = "calendar"
+    var innerIcon:  String? = "shippingbox"
 
     var body: some View {
         Canvas { context, size in
@@ -110,15 +110,15 @@ struct ConcentricCirclesView: View {
 
         } else {
             // Usage ahead of time:
-            //   • Solid arc 0→usage (starts at 12 o'clock, full round caps).
-            //   • White semi-transparent overlay 0→time dims the elapsed region,
-            //     making it read as "time has clipped this portion of the arc".
-            //     The un-dimmed tail (time→usage) remains the full solid orange.
+            //   Solid arc 0→usage (round caps at both ends — usage shape starts
+            //   at 12 o'clock). White semi-transparent overlay on 0→time dims the
+            //   elapsed portion, making time progress read as clipping the usage arc.
+            //   The un-dimmed tail (time→usage) remains full solid orange.
             strokeArc(in: &context, center: center, radius: radius,
                       from: 0, to: usage, color: anthropicOrange, style: roundStyle)
 
             strokeArc(in: &context, center: center, radius: radius,
-                      from: 0, to: time, color: .white.opacity(0.55), style: roundStyle)
+                      from: 0, to: time, color: .white.opacity(0.3), style: roundStyle)
         }
     }
 
@@ -160,7 +160,6 @@ struct ConcentricCirclesView: View {
 
 #if DEBUG
 #Preview("Circles — usage ahead") {
-    // All rings: usage > time, exercises the butt-cap path
     ConcentricCirclesView(
         input: CircleRendererInput(
             sessionProgress:       0.80,
@@ -169,10 +168,7 @@ struct ConcentricCirclesView: View {
             sessionTimeProgress:   0.30,
             sonnetTimeProgress:    0.20,
             allModelsTimeProgress: 0.15
-        ),
-        outerIcon:  "calendar.day.timeline.left",
-        middleIcon: "calendar",
-        innerIcon:  "shippingbox"
+        )
     )
     .frame(width: 200, height: 200)
     .padding()
@@ -180,7 +176,6 @@ struct ConcentricCirclesView: View {
 }
 
 #Preview("Circles — time ahead") {
-    // All rings: time > usage
     ConcentricCirclesView(
         input: CircleRendererInput(
             sessionProgress:       0.30,
@@ -189,10 +184,7 @@ struct ConcentricCirclesView: View {
             sessionTimeProgress:   0.70,
             sonnetTimeProgress:    0.60,
             allModelsTimeProgress: 0.50
-        ),
-        outerIcon:  "calendar.day.timeline.left",
-        middleIcon: "calendar",
-        innerIcon:  "shippingbox"
+        )
     )
     .frame(width: 200, height: 200)
     .padding()

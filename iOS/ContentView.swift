@@ -70,14 +70,9 @@ struct ContentView: View {
 
     private var usageContent: some View {
         VStack(spacing: 24) {
-            ConcentricCirclesView(
-                input: circleInput(from: usageData),
-                outerIcon:  "calendar.day.timeline.left",
-                middleIcon: "calendar",
-                innerIcon:  "shippingbox"
-            )
-            .frame(width: 250, height: 250)
-            .padding(.top, 8)
+            ConcentricCirclesView(input: circleInput(from: usageData))
+                .frame(width: 250, height: 250)
+                .padding(.top, 8)
 
             VStack(spacing: 16) {
                 UsageRowView(label: "Session (5h)",
@@ -150,14 +145,9 @@ private struct ContentViewPreview: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    ConcentricCirclesView(
-                        input: circleInput(from: mockData),
-                        outerIcon:  "calendar.day.timeline.left",
-                        middleIcon: "calendar",
-                        innerIcon:  "shippingbox"
-                    )
-                    .frame(width: 250, height: 250)
-                    .padding(.top, 8)
+                    ConcentricCirclesView(input: circleInput(from: mockData))
+                        .frame(width: 250, height: 250)
+                        .padding(.top, 8)
 
                     VStack(spacing: 16) {
                         UsageRowView(label: "Session (5h)",
