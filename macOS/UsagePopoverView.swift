@@ -318,7 +318,9 @@ struct UsagePopoverView: View {
                 Spacer()
 
                 Button(action: onRefresh) {
-                    Image(systemName: "arrow.clockwise").font(.caption)
+                    Image(systemName: "arrow.clockwise")
+                        .font(.caption)
+                        .foregroundColor(.white)
                 }
                 .buttonStyle(.borderless)
                 .help("Refresh")
