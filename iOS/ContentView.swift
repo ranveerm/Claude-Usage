@@ -133,23 +133,37 @@ struct ContentView: View {
     /// would cascade sign-outs back to the originator.
     private func signOut(broadcast: Bool) {
         if broadcast {
+            // Revoke the session on Claude's server *before* we clear the
+            // cookies locally, so the POST can carry them. Fire-and-forget
+            // so the UI stays responsive — the caller has committed to
+            // signing out regardless of the server's response.
+            let sk = UsageService.shared.sessionKey
+            let cf = UsageService.shared.cfClearance
+            if !sk.isEmpty {
+                Task { await UsageService.revokeSession(sessionKey: sk, cfClearance: cf) }
+            }
             SignOutSignal.markSignedOut()
         }
         UsageService.shared.clearCredentials()
 
-        // Stamp the cached payload as "signed out" so downstream consumers
-        // (widget, watch, watch complication) switch to a sign-in prompt
-        // instead of rendering stale rings.
-        let signedOutPayload = UsageData(needsLogin: true)
-        SharedDefaults.save(signedOutPayload)
-        WatchSender.shared.send(signedOutPayload)
-        WidgetCenter.shared.reloadAllTimelines()
+        publishSignedOutState()
 
         usageData = UsageData()
         // Don't auto-open the login screen — let the user explicitly tap
         // "Sign In" in the LoginPromptView that now shows because
         // !isConfigured.
         showLogin = false
+    }
+
+    /// Stamps the cached payload as "signed out" for every downstream
+    /// consumer (widget, watch, complication). Idempotent — safe to call
+    /// whenever we detect we aren't configured, so no consumer keeps
+    /// rendering stale rings.
+    private func publishSignedOutState() {
+        let payload = UsageData(needsLogin: true)
+        SharedDefaults.save(payload)
+        WatchSender.shared.send(payload)
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     /// Read the KVS session signal and apply whatever it tells us to do.
@@ -165,7 +179,13 @@ struct ContentView: View {
             // the credentials, so refresh now and retry a couple of times.
             refreshAfterRemoteSignIn()
         case .inSync:
-            break
+            // If iCloud Keychain already synced a sign-out (so we're
+            // !isConfigured) before the KVS notification arrived, we'd
+            // otherwise miss the chance to tell the widget. Make sure its
+            // cached payload reflects reality — idempotent, so cheap.
+            if !isConfigured, SharedDefaults.load()?.needsLogin != true {
+                publishSignedOutState()
+            }
         }
     }
 
@@ -193,9 +213,12 @@ struct ContentView: View {
 
         // Auth failure: surface it so the body swaps in LoginPromptView,
         // but don't auto-present the WebView sheet — user should tap to
-        // sign in explicitly.
+        // sign in explicitly. Also propagate the signed-out state
+        // downstream so the widget and watch don't keep rendering rings
+        // from the last successful fetch.
         if data.needsLogin {
             usageData = data
+            publishSignedOutState()
             return
         }
 

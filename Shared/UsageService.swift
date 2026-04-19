@@ -171,6 +171,24 @@ final class UsageService {
         }
     }
 
+    /// Best-effort server-side session revocation. Fires a POST to Claude's
+    /// logout endpoint so the session is invalidated on Anthropic's side,
+    /// not just forgotten locally. Without this, every development sign-in
+    /// piles up as an "active session" on the claude.ai dashboard, and a
+    /// leaked sessionKey stays valid until natural expiry.
+    ///
+    /// Failures are swallowed silently — the caller has already committed
+    /// to signing out regardless of what the server says.
+    static func revokeSession(sessionKey: String, cfClearance: String) async {
+        guard !sessionKey.isEmpty,
+              let url = URL(string: "https://claude.ai/api/auth/logout") else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        applyHeaders(to: &request, sessionKey: sessionKey, cfClearance: cfClearance)
+        request.timeoutInterval = 8
+        _ = try? await URLSession.shared.data(for: request)
+    }
+
     /// Tests whether the given cookies can fetch data from the Claude API.
     /// Used by the login window to detect a successful sign-in without relying
     /// on WKWebView's navigation callbacks (which miss SPA routing changes).

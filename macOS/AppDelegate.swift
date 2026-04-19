@@ -52,7 +52,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func handleRemoteKVSChange() {
-        observeSessionSignal()
+        // `didChangeExternallyNotification` is delivered on an arbitrary
+        // thread. observeSessionSignal ends up touching `statusItem.button`
+        // and NSHostingController state, both of which are main-thread only
+        // (AppKit raises "NSStatusBarButton.setImage: must be used from main
+        // thread only" otherwise). Hop to main before doing anything.
+        DispatchQueue.main.async { [weak self] in
+            self?.observeSessionSignal()
+        }
     }
 
     /// Inspect the KVS session signal and apply whatever it tells us to do.
@@ -217,6 +224,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// would cascade across every other device.
     func signOut(broadcast: Bool) {
         if broadcast {
+            // Revoke the session on Claude's server *before* we clear the
+            // cookies locally. Fire-and-forget — we're signing out locally
+            // regardless of whether the POST succeeds.
+            let sk = UsageService.shared.sessionKey
+            let cf = UsageService.shared.cfClearance
+            if !sk.isEmpty {
+                Task { await UsageService.revokeSession(sessionKey: sk, cfClearance: cf) }
+            }
             SignOutSignal.markSignedOut()
         }
         UsageService.shared.clearCredentials()
