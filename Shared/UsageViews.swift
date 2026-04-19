@@ -67,7 +67,7 @@ struct LoginPromptView: View {
                 .foregroundColor(.secondary)
             Text("Sign in to Claude")
                 .font(.headline)
-            Text("Sign in with your Claude account\nto view usage data.")
+            Text("Sign in with your Claude account to view usage data.")
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)

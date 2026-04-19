@@ -159,8 +159,29 @@ struct ContentView: View {
         switch SignOutSignal.observe(isConfigured: isConfigured) {
         case .shouldSignOut:
             signOut(broadcast: false)
-        case .inSync, .adoptedRemote:
+        case .adoptedRemote:
+            // Another device's sign-in just landed in iCloud KVS.
+            // iCloud Keychain often takes a second or two longer to deliver
+            // the credentials, so refresh now and retry a couple of times.
+            refreshAfterRemoteSignIn()
+        case .inSync:
             break
+        }
+    }
+
+    /// Retry schedule after picking up a remote sign-in: fire immediately,
+    /// then again at +3s and +8s. Each attempt is a no-op if credentials
+    /// haven't arrived yet (fetchData's isConfigured guard). The first
+    /// attempt that finds credentials runs the fetch and stops the loop.
+    private func refreshAfterRemoteSignIn() {
+        Task {
+            for delay: Duration in [.zero, .seconds(3), .seconds(8)] {
+                if delay > .zero { try? await Task.sleep(for: delay) }
+                if isConfigured {
+                    await fetchData()
+                    return
+                }
+            }
         }
     }
 

@@ -65,8 +65,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         switch SignOutSignal.observe(isConfigured: UsageService.shared.isConfigured) {
         case .shouldSignOut:
             signOut(broadcast: false)
-        case .inSync, .adoptedRemote:
+        case .adoptedRemote:
+            // Another device's sign-in just landed in iCloud KVS.
+            // iCloud Keychain often takes a second or two longer to deliver
+            // the credentials, so refresh now and retry a couple of times.
+            refreshAfterRemoteSignIn()
+        case .inSync:
             break
+        }
+    }
+
+    /// Retry schedule after picking up a remote sign-in: fire immediately,
+    /// then again at +3s and +8s. Each attempt is a no-op if credentials
+    /// haven't arrived yet. The first attempt that finds credentials kicks
+    /// off refreshData and stops the loop.
+    private func refreshAfterRemoteSignIn() {
+        Task { @MainActor in
+            for delay: Duration in [.zero, .seconds(3), .seconds(8)] {
+                if delay > .zero { try? await Task.sleep(for: delay) }
+                if UsageService.shared.isConfigured {
+                    self.refreshData()
+                    return
+                }
+            }
         }
     }
 

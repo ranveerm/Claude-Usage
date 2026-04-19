@@ -52,7 +52,7 @@ struct UsageWidgetView: View {
                     .foregroundStyle(.secondary)
                 Text("Sign In")
                     .font(.caption.weight(.semibold))
-                Text("Open Claude Your Rings")
+                Text("Open App")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)

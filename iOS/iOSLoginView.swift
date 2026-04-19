@@ -36,6 +36,7 @@ private struct WebViewRepresentable: UIViewRepresentable {
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
         webView.load(URLRequest(url: URL(string: "https://claude.ai/login")!))
+        context.coordinator.startPolling(webView: webView)
         return webView
     }
 
@@ -48,26 +49,56 @@ private struct WebViewRepresentable: UIViewRepresentable {
     final class Coordinator: NSObject, WKNavigationDelegate {
         let onComplete: (_ sessionKey: String, _ cfClearance: String) -> Void
         private var completed = false
+        private var isVerifying = false
+        private var pollTimer: Timer?
+        private weak var webView: WKWebView?
 
         init(onComplete: @escaping (_ sessionKey: String, _ cfClearance: String) -> Void) {
             self.onComplete = onComplete
         }
 
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            checkForSession(webView: webView)
+        deinit { pollTimer?.invalidate() }
+
+        /// Claude.ai's final login redirect uses SPA pushState routing, which
+        /// doesn't reliably fire `didFinish`. A cheap 2-second poll covers
+        /// the gap — matches the macOS `LoginWindowController` implementation.
+        func startPolling(webView: WKWebView) {
+            self.webView = webView
+            pollTimer?.invalidate()
+            pollTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
+                self?.checkForSession()
+            }
         }
 
-        private func checkForSession(webView: WKWebView) {
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            checkForSession()
+        }
+
+        private func checkForSession() {
+            guard !completed, !isVerifying, let webView else { return }
             webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { [weak self] cookies in
-                guard let self, !self.completed else { return }
-                let sessionKey = cookies.first(where: { $0.name == "sessionKey" && $0.domain.contains("claude.ai") })?.value
-                let cfClearance = cookies.first(where: { $0.name == "cf_clearance" && $0.domain.contains("claude.ai") })?.value
+                guard let self, !self.completed, !self.isVerifying else { return }
+                let sessionKey = cookies.first(where: { $0.name == "sessionKey" && $0.domain.contains("claude.ai") })?.value ?? ""
+                let cfClearance = cookies.first(where: { $0.name == "cf_clearance" && $0.domain.contains("claude.ai") })?.value ?? ""
 
-                guard let sessionKey, !sessionKey.isEmpty else { return }
+                guard !sessionKey.isEmpty else { return }
 
-                DispatchQueue.main.async {
-                    self.completed = true
-                    self.onComplete(sessionKey, cfClearance ?? "")
+                // Only complete when the API actually accepts the cookies —
+                // avoids false positives from a partially-authenticated
+                // intermediate state.
+                self.isVerifying = true
+                Task { [sessionKey, cfClearance] in
+                    let ok = await UsageService.verifyCredentials(
+                        sessionKey: sessionKey, cfClearance: cfClearance
+                    )
+                    await MainActor.run {
+                        self.isVerifying = false
+                        guard ok else { return }
+                        self.completed = true
+                        self.pollTimer?.invalidate()
+                        self.pollTimer = nil
+                        self.onComplete(sessionKey, cfClearance)
+                    }
                 }
             }
         }
