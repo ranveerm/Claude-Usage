@@ -107,12 +107,27 @@ struct ContentView: View {
         }
         isLoading = true
         let data = await UsageService.shared.fetchUsage()
-        usageData = data
         isLoading = false
-        if data.needsLogin { showLogin = true }
-        SharedDefaults.save(data)
-        WatchSender.shared.send(data)
-        WidgetCenter.shared.reloadAllTimelines()
+
+        // Auth failures always take immediate effect — user must act
+        if data.needsLogin {
+            usageData = data
+            showLogin = true
+            return
+        }
+
+        // Transient errors (e.g. network not yet re-established after screen unlock):
+        // silently discard if we already have valid data on screen
+        if data.error != nil, usageData.lastRefreshed != nil {
+            return
+        }
+
+        usageData = data
+        if data.error == nil {
+            SharedDefaults.save(data)
+            WatchSender.shared.send(data)
+            WidgetCenter.shared.reloadAllTimelines()
+        }
     }
 }
 
