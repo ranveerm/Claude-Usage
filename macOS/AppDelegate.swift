@@ -28,8 +28,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.refreshData()
         }
 
-        // Observe cross-device sign-out signal (arrives within seconds via
-        // iCloud KVS when another device signs out).
+        // Observe cross-device session signal (arrives within seconds via
+        // iCloud KVS when another device signs in or out).
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleRemoteKVSChange),
@@ -40,10 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // If another device signed us out while this app wasn't running,
         // pick that up immediately before doing anything else.
-        if UsageService.shared.isConfigured, SignOutSignal.shouldSignOutFromRemoteSignal() {
-            signOut()
-            return
-        }
+        observeSessionSignal()
 
         if UsageService.shared.isConfigured {
             refreshData()
@@ -55,9 +52,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func handleRemoteKVSChange() {
-        guard UsageService.shared.isConfigured else { return }
-        if SignOutSignal.shouldSignOutFromRemoteSignal() {
-            signOut()
+        observeSessionSignal()
+    }
+
+    /// Inspect the KVS session signal and apply whatever it tells us to do.
+    /// Passive — never writes to KVS (only the explicit sign-in/out paths
+    /// mutate it). Removing the `isConfigured` guard the previous version
+    /// had is intentional: when keychain sync beats the KVS notification,
+    /// `isConfigured` can already be false by the time we arrive here, and
+    /// we still need to clear the menu bar icon and popover content.
+    private func observeSessionSignal() {
+        switch SignOutSignal.observe(isConfigured: UsageService.shared.isConfigured) {
+        case .shouldSignOut:
+            signOut(broadcast: false)
+        case .inSync, .adoptedRemote:
+            break
         }
     }
 
@@ -178,8 +187,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    func signOut() {
+    /// Explicit user sign-out from the popover. Broadcasts via KVS so other
+    /// devices pick it up within seconds.
+    func signOut() { signOut(broadcast: true) }
+
+    /// Shared sign-out cleanup. Pass `broadcast: false` when reacting to a
+    /// remote sign-out signal; rebroadcasting from the reacting device
+    /// would cascade across every other device.
+    func signOut(broadcast: Bool) {
+        if broadcast {
+            SignOutSignal.markSignedOut()
+        }
         UsageService.shared.clearCredentials()
+
+        // Stamp the cached payload as "signed out" so the watch and any
+        // companion widgets switch to a sign-in prompt instead of rendering
+        // stale rings.
+        let signedOutPayload = UsageData(needsLogin: true)
+        SharedDefaults.save(signedOutPayload)
+
         // Reset displayed state immediately.
         usageData = UsageData()
         statusItem.button?.image = renderIcon()

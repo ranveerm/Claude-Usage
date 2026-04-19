@@ -42,7 +42,10 @@ final class UsageService {
         sessionKey = ""
         cfClearance = ""
         organizationId = ""
-        SignOutSignal.markSignedOut()
+        // Intentionally does NOT call SignOutSignal.markSignedOut().
+        // Broadcasting is the job of the *explicit* sign-out call sites
+        // (menu button / confirmation dialog). A reaction to a remote
+        // sign-out must not re-broadcast — that cascades across devices.
     }
 
     func fetchUsage() async -> UsageData {

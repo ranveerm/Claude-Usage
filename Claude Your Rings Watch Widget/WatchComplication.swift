@@ -6,6 +6,9 @@ import SwiftUI
 struct WatchUsageEntry: TimelineEntry {
     let date: Date
     let input: CircleRendererInput
+    /// True when the paired iPhone has broadcast a signed-out state.
+    /// The complication renders a small sign-in glyph rather than rings.
+    var needsLogin: Bool = false
 }
 
 // MARK: - Timeline provider
@@ -40,9 +43,13 @@ struct WatchUsageProvider: TimelineProvider {
         guard let data else {
             return WatchUsageEntry(date: .now, input: CircleRendererInput(
                 sessionProgress: 0, sonnetProgress: 0, allModelsProgress: 0
-            ))
+            ), needsLogin: true)
         }
-        return WatchUsageEntry(date: .now, input: circleInput(from: data))
+        return WatchUsageEntry(
+            date: .now,
+            input: circleInput(from: data),
+            needsLogin: data.needsLogin
+        )
     }
 }
 
@@ -55,12 +62,22 @@ struct WatchComplicationView: View {
     let entry: WatchUsageEntry
 
     var body: some View {
-        ConcentricCirclesView(
-            input: entry.input,
-            outerIcon: nil,
-            middleIcon: nil,
-            innerIcon: nil
-        )
+        Group {
+            if entry.needsLogin {
+                // Signed out — show a small sign-in glyph so the user isn't
+                // staring at a stale snapshot of rings from before sign-out.
+                Image(systemName: "person.crop.circle.badge.questionmark")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+            } else {
+                ConcentricCirclesView(
+                    input: entry.input,
+                    outerIcon: nil,
+                    middleIcon: nil,
+                    innerIcon: nil
+                )
+            }
+        }
         // AccessoryWidgetBackground is the system-defined translucent
         // backdrop that matches how built-in complications look on
         // photo/colourful faces.

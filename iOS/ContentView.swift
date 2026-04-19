@@ -60,31 +60,22 @@ struct ContentView: View {
             }
         }
         .task {
-            // Initial remote-sign-out check before the first fetch.
-            if SignOutSignal.shouldSignOutFromRemoteSignal() {
-                signOut()
-                return
-            }
-            await fetchData()
+            observeSessionSignal()
+            if isConfigured { await fetchData() }
         }
         // Re-fetch whenever the app returns to the foreground. Also
-        // re-check the remote sign-out signal first.
+        // re-check the remote session signal first.
         .onChange(of: scenePhase) { _, phase in
             if phase == .active {
-                if SignOutSignal.shouldSignOutFromRemoteSignal() {
-                    signOut()
-                } else {
-                    Task { await fetchData() }
-                }
+                observeSessionSignal()
+                if isConfigured { Task { await fetchData() } }
             }
         }
         // React immediately when another device bumps the KVS signal.
         .onReceive(NotificationCenter.default.publisher(
             for: NSUbiquitousKeyValueStore.didChangeExternallyNotification
         )) { _ in
-            if SignOutSignal.shouldSignOutFromRemoteSignal() {
-                signOut()
-            }
+            observeSessionSignal()
         }
         // Periodic refresh every 5 minutes while the app is active
         .onReceive(refreshTimer) { _ in
@@ -132,15 +123,45 @@ struct ContentView: View {
         }
     }
 
-    private func signOut() {
+    /// Explicit user sign-out. Broadcasts via KVS so other devices pick it
+    /// up within seconds. Also clears the cached payload the widget and
+    /// watch read from so they stop showing stale rings.
+    private func signOut() { signOut(broadcast: true) }
+
+    /// Shared sign-out cleanup. Pass `broadcast: false` when reacting to a
+    /// remote sign-out signal — rebroadcasting from every reacting device
+    /// would cascade sign-outs back to the originator.
+    private func signOut(broadcast: Bool) {
+        if broadcast {
+            SignOutSignal.markSignedOut()
+        }
         UsageService.shared.clearCredentials()
-        // Push an empty payload so the watch clears its display too.
-        WatchSender.shared.send(UsageData())
+
+        // Stamp the cached payload as "signed out" so downstream consumers
+        // (widget, watch, watch complication) switch to a sign-in prompt
+        // instead of rendering stale rings.
+        let signedOutPayload = UsageData(needsLogin: true)
+        SharedDefaults.save(signedOutPayload)
+        WatchSender.shared.send(signedOutPayload)
+        WidgetCenter.shared.reloadAllTimelines()
+
         usageData = UsageData()
         // Don't auto-open the login screen — let the user explicitly tap
         // "Sign In" in the LoginPromptView that now shows because
         // !isConfigured.
         showLogin = false
+    }
+
+    /// Read the KVS session signal and apply whatever it tells us to do.
+    /// Never writes to KVS — only mutation happens in the explicit sign-in
+    /// (`saveCredentials` → `markSignedIn`) and sign-out paths.
+    private func observeSessionSignal() {
+        switch SignOutSignal.observe(isConfigured: isConfigured) {
+        case .shouldSignOut:
+            signOut(broadcast: false)
+        case .inSync, .adoptedRemote:
+            break
+        }
     }
 
     private func fetchData() async {

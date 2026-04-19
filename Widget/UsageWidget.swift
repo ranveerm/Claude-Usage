@@ -4,6 +4,10 @@ import SwiftUI
 struct UsageEntry: TimelineEntry {
     let date: Date
     let input: CircleRendererInput
+    /// True when the iOS app has signalled a signed-out state. The widget
+    /// renders a sign-in prompt instead of rings so the user isn't staring
+    /// at stale percentages from the last fetch before sign-out.
+    var needsLogin: Bool = false
 }
 
 struct UsageTimelineProvider: TimelineProvider {
@@ -27,9 +31,13 @@ struct UsageTimelineProvider: TimelineProvider {
         guard let data else {
             return UsageEntry(date: .now, input: CircleRendererInput(
                 sessionProgress: 0, sonnetProgress: 0, allModelsProgress: 0
-            ))
+            ), needsLogin: true)
         }
-        return UsageEntry(date: .now, input: circleInput(from: data))
+        return UsageEntry(
+            date: .now,
+            input: circleInput(from: data),
+            needsLogin: data.needsLogin
+        )
     }
 }
 
@@ -37,7 +45,21 @@ struct UsageWidgetView: View {
     let entry: UsageEntry
 
     var body: some View {
-        ConcentricCirclesView(input: entry.input)
+        if entry.needsLogin {
+            VStack(spacing: 6) {
+                Image(systemName: "person.crop.circle.badge.questionmark")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+                Text("Sign In")
+                    .font(.caption.weight(.semibold))
+                Text("Open Claude Your Rings")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+        } else {
+            ConcentricCirclesView(input: entry.input)
+        }
     }
 }
 

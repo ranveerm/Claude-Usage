@@ -14,7 +14,11 @@ private struct WatchBody: View {
     let usageData: UsageData?
 
     var body: some View {
-        if let data = usageData {
+        // `needsLogin` means the iPhone explicitly broadcast a signed-out
+        // state (via SharedDefaults / WatchConnectivity); `nil` means we
+        // simply haven't received anything yet. Either way, point the user
+        // back at the iPhone app rather than showing 0% rings.
+        if let data = usageData, !data.needsLogin {
             TabView {
                 CirclesPage(data: data)
                 DetailPage(data: data)
