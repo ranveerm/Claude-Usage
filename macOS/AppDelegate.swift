@@ -78,14 +78,62 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showStatusMenu() {
+        // Close the main popover first — we're showing a right-click context
+        // menu and don't want the popover floating alongside it.
+        popover.performClose(nil)
+        removeEventMonitor()
+
         let menu = NSMenu()
-        menu.addItem(withTitle: "Quit Claude Your Rings",
-                     action: #selector(NSApplication.terminate(_:)),
-                     keyEquivalent: "q")
+
+        #if DEBUG
+        let debugItem = NSMenuItem(title: "Debug Info",
+                                   action: #selector(showDebugInfoFromMenu),
+                                   keyEquivalent: "")
+        debugItem.target = self
+        menu.addItem(debugItem)
+        menu.addItem(NSMenuItem.separator())
+        #endif
+
+        // Route through our own selector so macOS doesn't auto-attach an
+        // SF Symbol next to the title (it decorates standard Apple actions
+        // like NSApplication.terminate(_:)).
+        let quitItem = NSMenuItem(title: "Quit \u{201C}Claude Your Rings\u{201D}",
+                                  action: #selector(handleQuit),
+                                  keyEquivalent: "")
+        quitItem.target = self
+        menu.addItem(quitItem)
+
         if let button = statusItem.button, let event = NSApp.currentEvent {
             NSMenu.popUpContextMenu(menu, with: event, for: button)
         }
     }
+
+    @objc private func handleQuit() {
+        NSApp.terminate(nil)
+    }
+
+    #if DEBUG
+    /// Stand-alone popover that hosts KeychainDebugView. Kept as a member so
+    /// it isn't collected while showing.
+    private var debugInfoPopover: NSPopover?
+
+    @objc private func showDebugInfoFromMenu() {
+        debugInfoPopover?.performClose(nil)
+
+        let pop = NSPopover()
+        pop.behavior = .transient
+        let view = KeychainDebugView(onReset: { [weak self] in
+            self?.debugInfoPopover?.performClose(nil)
+            self?.resetAndReonboard()
+        })
+        pop.contentViewController = NSHostingController(rootView: view)
+
+        if let button = statusItem.button {
+            pop.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        }
+        debugInfoPopover = pop
+    }
+    #endif
 
     @objc private func togglePopover() {
         if popover.isShown {
@@ -131,18 +179,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func signOut() {
-        // Clear WebKit cookies so the login window doesn't auto-dismiss
-        // by finding the stale session cookie on its first navigation.
-        WKWebsiteDataStore.default().removeData(
-            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
-            modifiedSince: .distantPast
-        ) { }
         UsageService.shared.clearCredentials()
         // Reset displayed state immediately.
         usageData = UsageData()
         statusItem.button?.image = renderIcon()
         updatePopoverContent()
-        showLogin()
+        // Don't auto-open the login window — the popover's LoginPromptView
+        // (shown because !isConfigured) has a "Sign In" button that the
+        // user can tap to explicitly open the login flow.
     }
 
     func showLogin() {
@@ -186,8 +230,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.usageData = data
             self.statusItem.button?.image = self.renderIcon()
             self.updatePopoverContent()
-
-            if data.needsLogin { self.showLogin() }
+            // Intentionally do NOT auto-call showLogin() here. If the user
+            // has signed out (or their session expired) while the app is
+            // running, updatePopoverContent() will swap in LoginPromptView
+            // and the user can tap its "Sign In" button when ready. The
+            // login window is only auto-opened on app launch from
+            // applicationDidFinishLaunching.
         }
     }
 

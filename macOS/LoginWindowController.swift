@@ -28,7 +28,11 @@ final class LoginWindowController: NSWindowController, WKNavigationDelegate, NSW
         }
 
         let config = WKWebViewConfiguration()
-        config.websiteDataStore = .default()
+        // Non-persistent store: the WebView starts with zero cookies every
+        // time, so it can never auto-close by finding a stale session.
+        // Cookies captured during the sign-in flow are read via getAllCookies
+        // and saved to the keychain before this window closes.
+        config.websiteDataStore = .nonPersistent()
         config.allowsAirPlayForMediaPlayback = false
         let prefs = WKWebpagePreferences()
         prefs.allowsContentJavaScript = true

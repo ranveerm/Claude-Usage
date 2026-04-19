@@ -1,5 +1,4 @@
 import SwiftUI
-import WebKit
 import WidgetKit
 
 struct ContentView: View {
@@ -9,6 +8,10 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     private var isConfigured: Bool { UsageService.shared.isConfigured }
+    /// True when the app is in its main signed-in state (rings or error shown).
+    /// Used to gate the navigation bar's sign-out toolbar item — we don't want
+    /// to offer "sign out" on a screen that's already asking the user to sign in.
+    private var isSignedIn: Bool { isConfigured && !usageData.needsLogin }
 
     private let refreshTimer = Timer.publish(every: 300, on: .main, in: .common).autoconnect()
 
@@ -33,17 +36,25 @@ struct ContentView: View {
             }
             .refreshable { await fetchData() }
             .navigationTitle("Claude Your Rings")
+            // Use inline title to avoid a large-title layout-state bug that
+            // left-clips the title after a fullScreenCover dismiss.
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Button(role: .destructive) {
-                            signOut()
+                // Only show the sign-out menu when there's actually something
+                // to sign out of. On the LoginPromptView screen the icon is
+                // confusing — it looks like a sign-in affordance.
+                if isSignedIn {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            Button(role: .destructive) {
+                                signOut()
+                            } label: {
+                                Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                            }
                         } label: {
-                            Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                            Image(systemName: "person.circle")
+                                .imageScale(.large)
                         }
-                    } label: {
-                        Image(systemName: "person.circle")
-                            .imageScale(.large)
                     }
                 }
             }
@@ -80,7 +91,7 @@ struct ContentView: View {
             guard scenePhase == .active else { return }
             Task { await fetchData() }
         }
-        .sheet(isPresented: $showLogin) {
+        .fullScreenCover(isPresented: $showLogin) {
             WebLoginView { sessionKey, cfClearance in
                 UsageService.shared.saveCredentials(sessionKey: sessionKey, cfClearance: cfClearance)
                 showLogin = false
@@ -122,32 +133,27 @@ struct ContentView: View {
     }
 
     private func signOut() {
-        // Clear WebKit cookies first so the login WebView doesn't find a
-        // cached session and auto-dismiss on the first navigation callback.
-        WKWebsiteDataStore.default().removeData(
-            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
-            modifiedSince: .distantPast
-        ) { }
         UsageService.shared.clearCredentials()
         // Push an empty payload so the watch clears its display too.
         WatchSender.shared.send(UsageData())
         usageData = UsageData()
-        showLogin = true
+        // Don't auto-open the login screen — let the user explicitly tap
+        // "Sign In" in the LoginPromptView that now shows because
+        // !isConfigured.
+        showLogin = false
     }
 
     private func fetchData() async {
-        guard isConfigured else {
-            showLogin = true
-            return
-        }
+        guard isConfigured else { return }
         isLoading = true
         let data = await UsageService.shared.fetchUsage()
         isLoading = false
 
-        // Auth failures always take immediate effect — user must act
+        // Auth failure: surface it so the body swaps in LoginPromptView,
+        // but don't auto-present the WebView sheet — user should tap to
+        // sign in explicitly.
         if data.needsLogin {
             usageData = data
-            showLogin = true
             return
         }
 
@@ -269,6 +275,37 @@ private struct ContentViewPreview: View {
 
 #Preview("Dark") {
     ContentViewPreview()
+        .preferredColorScheme(.dark)
+}
+
+// MARK: - Login state preview
+//
+// Mirrors the signed-out screen exactly so we can eyeball the nav bar and
+// title behaviour without needing to actually sign out at runtime. The key
+// things this preview catches:
+//   - `.inline` title mode prevents the large-title left-crop bug.
+//   - The toolbar sign-out menu is absent (nothing to sign out of here).
+private struct LoginStatePreview: View {
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                LoginPromptView(onLogin: {})
+                    .padding(.top, 40)
+                    .padding()
+            }
+            .navigationTitle("Claude Your Rings")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+#Preview("Login (Light)") {
+    LoginStatePreview()
+        .preferredColorScheme(.light)
+}
+
+#Preview("Login (Dark)") {
+    LoginStatePreview()
         .preferredColorScheme(.dark)
 }
 #endif

@@ -28,7 +28,11 @@ private struct WebViewRepresentable: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
-        config.websiteDataStore = .default()
+        // Non-persistent store: the WebView starts with zero cookies every
+        // time, so it can never auto-dismiss by finding a stale session.
+        // Cookies captured during the sign-in flow are read via getAllCookies
+        // and saved to the keychain before this WebView is torn down.
+        config.websiteDataStore = .nonPersistent()
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = context.coordinator
         webView.load(URLRequest(url: URL(string: "https://claude.ai/login")!))

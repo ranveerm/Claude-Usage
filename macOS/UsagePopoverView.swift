@@ -7,7 +7,11 @@ import SwiftUI
 /// owns, with values masked so they're recognisable but not fully exposed.
 /// Includes the Reset & Re-onboard action so you can confirm state before and
 /// after a reset in one place.
-private struct KeychainDebugView: View {
+///
+/// Not `private` because AppDelegate presents it from the right-click context
+/// menu (so the user can inspect state and reset even while signed out, when
+/// the main popover's debug-info button wouldn't otherwise be reachable).
+struct KeychainDebugView: View {
     let onReset: () -> Void
 
     // Read live on each render so the view always reflects current state.
