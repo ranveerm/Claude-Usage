@@ -57,6 +57,7 @@
       "layers" : [
         {
           "blend-mode" : "normal",
+          "hidden" : false,
           "image-name" : "outer-ring.svg",
           "name" : "outer-ring"
         },

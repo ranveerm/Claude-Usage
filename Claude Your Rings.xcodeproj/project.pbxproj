@@ -42,6 +42,7 @@
 		A6127CBE60225E6B8D8CDE19 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
 		A64510FA5C2410016399D4AA /* WelcomeWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6BC06A53EAEDBEC50D7992 /* WelcomeWindowController.swift */; };
 		AA7740F1C84E2A0F4E420F1A /* Claude Your Rings Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D785AA8DBDEC7C2C001ABBDB /* Claude Your Rings Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BBBB111111111111111A0001 /* Claude Your Rings Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0872308317299AF9E5D1861A /* Claude Your Rings Watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AAAA111111111111111A0001 /* UsageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2067667D40685B11CF39FFB /* UsageData.swift */; };
 		AAAA111111111111111A0002 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
 		AAAA111111111111111A0003 /* ConcentricCirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AECB6850F4359F607BCEDF3 /* ConcentricCirclesView.swift */; };
@@ -64,6 +65,13 @@
 			remoteGlobalIDString = A3DEF17C2F9458D2008B9DA4;
 			remoteInfo = "Claude Your Rings Watch WidgetExtension";
 		};
+		BBBB111111111111111A0003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E353528F24EE79536AA3DE7E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C97218F7F974488344AFEE83;
+			remoteInfo = "Claude Your Rings Watch";
+		};
 		E9B00783FBF549D59E8060DB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E353528F24EE79536AA3DE7E /* Project object */;
@@ -74,6 +82,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		BBBB111111111111111A0002 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				BBBB111111111111111A0001 /* Claude Your Rings Watch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3EC11FA340087B7B26104177 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -298,11 +317,13 @@
 				3D8B5B64CB5D2E4D43D3269F /* Sources */,
 				C7FD0BBF7AB489717E4C8230 /* Resources */,
 				3EC11FA340087B7B26104177 /* Embed Foundation Extensions */,
+				BBBB111111111111111A0002 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				4B9F6766A8A317823BA950AA /* PBXTargetDependency */,
+				BBBB111111111111111A0004 /* PBXTargetDependency */,
 			);
 			name = "Claude Your Rings iOS";
 			packageProductDependencies = (
@@ -547,6 +568,11 @@
 			isa = PBXTargetDependency;
 			target = A3DEF17C2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension */;
 			targetProxy = A3DEF18B2F9458D4008B9DA4 /* PBXContainerItemProxy */;
+		};
+		BBBB111111111111111A0004 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C97218F7F974488344AFEE83 /* Claude Your Rings Watch */;
+			targetProxy = BBBB111111111111111A0003 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
