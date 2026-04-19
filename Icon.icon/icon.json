@@ -63,6 +63,22 @@
         },
         {
           "blend-mode" : "normal",
+          "hidden" : false,
+          "image-name" : "outer-ring-time.svg",
+          "name" : "outer-ring-time"
+        },
+        {
+          "blend-mode" : "normal",
+          "image-name" : "middle-ring-time.svg",
+          "name" : "middle-ring-time"
+        },
+        {
+          "blend-mode" : "normal",
+          "image-name" : "inner-ring-time.svg",
+          "name" : "inner-ring-time"
+        },
+        {
+          "blend-mode" : "normal",
           "image-name" : "3-middle-ring.svg",
           "name" : "3-middle-ring"
         },
