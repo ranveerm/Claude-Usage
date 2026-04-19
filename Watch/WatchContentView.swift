@@ -1,11 +1,10 @@
 import SwiftUI
 
 struct WatchContentView: View {
-    @State private var usageData: UsageData?
+    @EnvironmentObject private var receiver: WatchReceiver
 
     var body: some View {
-        WatchBody(usageData: usageData)
-            .onAppear { usageData = SharedDefaults.load() }
+        WatchBody(usageData: receiver.usageData)
     }
 }
 

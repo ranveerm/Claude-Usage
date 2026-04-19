@@ -111,6 +111,7 @@ struct ContentView: View {
         isLoading = false
         if data.needsLogin { showLogin = true }
         SharedDefaults.save(data)
+        WatchSender.shared.send(data)
         WidgetCenter.shared.reloadAllTimelines()
     }
 }
