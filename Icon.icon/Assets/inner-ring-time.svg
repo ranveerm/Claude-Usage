@@ -1,4 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <!-- Inner ring: time elapsed (54%) -->
-  <path d="M 512 402 A 110 110 0 1 1 484.64 618.54" fill="none" stroke="#DA7756" stroke-opacity="0.35" stroke-width="130" stroke-linecap="round"/>
+  <!-- Inner ring: time elapsed (54%) r=90 stroke=120 -->
+  <path d="M 512 422 A 90 90 0 1 1 489.62 599.17" fill="none" stroke="#DA7756" stroke-opacity="0.35" stroke-width="120" stroke-linecap="round"/>
 </svg>

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <!-- Middle ring: track + usage progress (34.167%) -->
-  <circle cx="512" cy="512" r="250" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="130"/>
-  <path d="M 512 262 A 250 250 0 0 1 721.66 648.16" fill="none" stroke="#DA7756" stroke-width="130" stroke-linecap="round"/>
+  <!-- Middle ring: track + usage progress (34.167%) r=220 stroke=120 -->
+  <circle cx="512" cy="512" r="220" fill="none" stroke="#DA7756" stroke-opacity="0.2" stroke-width="120"/>
+  <path d="M 512 292 A 220 220 0 0 1 696.51 631.82" fill="none" stroke="#DA7756" stroke-width="120" stroke-linecap="round"/>
 </svg>
