@@ -110,6 +110,7 @@ struct ContentView: View {
         usageData = data
         isLoading = false
         if data.needsLogin { showLogin = true }
+        SharedDefaults.save(data)
         WidgetCenter.shared.reloadAllTimelines()
     }
 }
