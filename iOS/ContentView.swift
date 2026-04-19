@@ -1,4 +1,5 @@
 import SwiftUI
+import WebKit
 import WidgetKit
 
 struct ContentView: View {
@@ -36,9 +37,7 @@ struct ContentView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button(role: .destructive) {
-                            UsageService.shared.clearCredentials()
-                            usageData = UsageData()
-                            showLogin = true
+                            signOut()
                         } label: {
                             Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                         }
@@ -49,10 +48,32 @@ struct ContentView: View {
                 }
             }
         }
-        .task { await fetchData() }
-        // Re-fetch whenever the app returns to the foreground
+        .task {
+            // Initial remote-sign-out check before the first fetch.
+            if SignOutSignal.shouldSignOutFromRemoteSignal() {
+                signOut()
+                return
+            }
+            await fetchData()
+        }
+        // Re-fetch whenever the app returns to the foreground. Also
+        // re-check the remote sign-out signal first.
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await fetchData() } }
+            if phase == .active {
+                if SignOutSignal.shouldSignOutFromRemoteSignal() {
+                    signOut()
+                } else {
+                    Task { await fetchData() }
+                }
+            }
+        }
+        // React immediately when another device bumps the KVS signal.
+        .onReceive(NotificationCenter.default.publisher(
+            for: NSUbiquitousKeyValueStore.didChangeExternallyNotification
+        )) { _ in
+            if SignOutSignal.shouldSignOutFromRemoteSignal() {
+                signOut()
+            }
         }
         // Periodic refresh every 5 minutes while the app is active
         .onReceive(refreshTimer) { _ in
@@ -98,6 +119,20 @@ struct ContentView: View {
                     .foregroundColor(.secondary)
             }
         }
+    }
+
+    private func signOut() {
+        // Clear WebKit cookies first so the login WebView doesn't find a
+        // cached session and auto-dismiss on the first navigation callback.
+        WKWebsiteDataStore.default().removeData(
+            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+            modifiedSince: .distantPast
+        ) { }
+        UsageService.shared.clearCredentials()
+        // Push an empty payload so the watch clears its display too.
+        WatchSender.shared.send(UsageData())
+        usageData = UsageData()
+        showLogin = true
     }
 
     private func fetchData() async {

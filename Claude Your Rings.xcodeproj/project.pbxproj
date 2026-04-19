@@ -59,6 +59,8 @@
 		CCCC111111111111111C0003 /* WatchConnectivity.framework in Frameworks (iOS) */ = {isa = PBXBuildFile; fileRef = CCCC111111111111111C0001 /* WatchConnectivity.framework */; };
 		DDDD111111111111111D0003 /* WatchSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD111111111111111D0001 /* WatchSender.swift */; };
 		DDDD111111111111111D0004 /* WatchReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD111111111111111D0002 /* WatchReceiver.swift */; };
+		EEEE111111111111111E0002 /* SignOutSignal.swift in Sources (iOS) */ = {isa = PBXBuildFile; fileRef = EEEE111111111111111E0001 /* SignOutSignal.swift */; };
+		EEEE111111111111111E0003 /* SignOutSignal.swift in Sources (macOS) */ = {isa = PBXBuildFile; fileRef = EEEE111111111111111E0001 /* SignOutSignal.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -161,6 +163,7 @@
 		CCCC111111111111111C0001 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = System/Library/Frameworks/WatchConnectivity.framework; sourceTree = SDKROOT; };
 		DDDD111111111111111D0001 /* WatchSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSender.swift; sourceTree = "<group>"; };
 		DDDD111111111111111D0002 /* WatchReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchReceiver.swift; sourceTree = "<group>"; };
+		EEEE111111111111111E0001 /* SignOutSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignOutSignal.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -231,6 +234,7 @@
 				7AECB6850F4359F607BCEDF3 /* ConcentricCirclesView.swift */,
 				4A8BE984C8A5C9922570BF34 /* KeychainHelper.swift */,
 				6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */,
+				EEEE111111111111111E0001 /* SignOutSignal.swift */,
 				E2067667D40685B11CF39FFB /* UsageData.swift */,
 				5E7E3A791CA2AB8863C53101 /* UsageService.swift */,
 				62DF0533D82BA7540D8026E6 /* UsageViews.swift */,
@@ -538,6 +542,7 @@
 				61B25766728EC3D12216B40D /* iOSApp.swift in Sources */,
 				01792DC534BC72187F931F28 /* iOSLoginView.swift in Sources */,
 				DDDD111111111111111D0003 /* WatchSender.swift in Sources */,
+				EEEE111111111111111E0002 /* SignOutSignal.swift in Sources (iOS) */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -557,6 +562,7 @@
 				5A9264B5DABD712A304CE347 /* UsageService.swift in Sources */,
 				FA0559F1FA91CB9BA7091F4F /* UsageViews.swift in Sources */,
 				A64510FA5C2410016399D4AA /* WelcomeWindowController.swift in Sources */,
+				EEEE111111111111111E0003 /* SignOutSignal.swift in Sources (macOS) */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

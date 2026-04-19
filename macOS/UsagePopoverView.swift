@@ -238,6 +238,7 @@ struct UsagePopoverView: View {
     let isConfigured: Bool
     let onRefresh: () -> Void
     let onLogin: () -> Void
+    let onSignOut: () -> Void
     /// Debug-only reset handler. Only non-nil in DEBUG builds, via AppDelegate.
     let onDebugReset: (() -> Void)?
 
@@ -249,12 +250,14 @@ struct UsagePopoverView: View {
         isConfigured: Bool,
         onRefresh: @escaping () -> Void,
         onLogin: @escaping () -> Void,
+        onSignOut: @escaping () -> Void = {},
         onDebugReset: (() -> Void)? = nil
     ) {
         self.usageData = usageData
         self.isConfigured = isConfigured
         self.onRefresh = onRefresh
         self.onLogin = onLogin
+        self.onSignOut = onSignOut
         self.onDebugReset = onDebugReset
     }
 
@@ -264,8 +267,7 @@ struct UsagePopoverView: View {
                 LoginPromptView(onLogin: onLogin)
             } else if let error = usageData.error {
                 ErrorDisplayView(error: error, onRetry: onRefresh, onReLogin: {
-                    UsageService.shared.clearCredentials()
-                    onLogin()
+                    onSignOut()
                 })
             } else {
                 usageView
@@ -336,8 +338,7 @@ struct UsagePopoverView: View {
                                     isPresented: $showSignOutConfirmation,
                                     titleVisibility: .visible) {
                     Button("Sign Out", role: .destructive) {
-                        UsageService.shared.clearCredentials()
-                        onLogin()
+                        onSignOut()
                     }
                     Button("Cancel", role: .cancel) { }
                 } message: {

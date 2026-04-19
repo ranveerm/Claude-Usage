@@ -28,12 +28,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.refreshData()
         }
 
+        // Observe cross-device sign-out signal (arrives within seconds via
+        // iCloud KVS when another device signs out).
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleRemoteKVSChange),
+            name: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+            object: NSUbiquitousKeyValueStore.default
+        )
+        NSUbiquitousKeyValueStore.default.synchronize()
+
+        // If another device signed us out while this app wasn't running,
+        // pick that up immediately before doing anything else.
+        if UsageService.shared.isConfigured, SignOutSignal.shouldSignOutFromRemoteSignal() {
+            signOut()
+            return
+        }
+
         if UsageService.shared.isConfigured {
             refreshData()
         } else if WelcomeWindowController.hasCompleted {
             showLogin()
         } else {
             showWelcome()
+        }
+    }
+
+    @objc private func handleRemoteKVSChange() {
+        guard UsageService.shared.isConfigured else { return }
+        if SignOutSignal.shouldSignOutFromRemoteSignal() {
+            signOut()
         }
     }
 
@@ -106,6 +130,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    func signOut() {
+        // Clear WebKit cookies so the login window doesn't auto-dismiss
+        // by finding the stale session cookie on its first navigation.
+        WKWebsiteDataStore.default().removeData(
+            ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+            modifiedSince: .distantPast
+        ) { }
+        UsageService.shared.clearCredentials()
+        // Reset displayed state immediately.
+        usageData = UsageData()
+        statusItem.button?.image = renderIcon()
+        updatePopoverContent()
+        showLogin()
+    }
+
     func showLogin() {
         popover.performClose(nil)
         removeEventMonitor()
@@ -168,6 +207,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             isConfigured: UsageService.shared.isConfigured,
             onRefresh: { [weak self] in self?.refreshData() },
             onLogin: { [weak self] in self?.showLogin() },
+            onSignOut: { [weak self] in self?.signOut() },
             onDebugReset: debugReset
         )
     }

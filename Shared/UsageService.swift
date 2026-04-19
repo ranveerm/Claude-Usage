@@ -35,12 +35,14 @@ final class UsageService {
         self.sessionKey = sessionKey
         self.cfClearance = cfClearance
         self.organizationId = ""
+        SignOutSignal.markSignedIn()
     }
 
     func clearCredentials() {
         sessionKey = ""
         cfClearance = ""
         organizationId = ""
+        SignOutSignal.markSignedOut()
     }
 
     func fetchUsage() async -> UsageData {

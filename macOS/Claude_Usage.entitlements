@@ -14,5 +14,7 @@
 	<array>
 		<string>$(AppIdentifierPrefix)com.ranveer.ClaudeYourRings.shared</string>
 	</array>
+	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
+	<string>$(TeamIdentifierPrefix)com.ranveer.ClaudeYourRings</string>
 </dict>
 </plist>

@@ -4,25 +4,21 @@ import Security
 enum KeychainHelper {
     private static let service = "com.ranveer.ClaudeYourRings"
 
-    // On iOS/watchOS we share the keychain via an access group and iCloud-sync
-    // so the Watch can read what the phone wrote. The macOS menu bar app is
-    // standalone, so we use a plain device-scoped keychain — this avoids the
-    // "allow this app to access your keychain for other apps" prompt.
-    #if !os(macOS)
+    // All platforms use the same iCloud-synced shared access group so that
+    // credentials written on one device are visible on all others, and a
+    // sign-out deletion propagates everywhere automatically.
+    // The access group is declared in each target's entitlements under
+    // keychain-access-groups, which suppresses the macOS authorisation prompt.
     private static let accessGroup = "29F59849NR.com.ranveer.ClaudeYourRings.shared"
-    #endif
 
     private static func baseQuery(key: String) -> [String: Any] {
-        var q: [String: Any] = [
+        [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,
+            kSecAttrAccessGroup as String: accessGroup,
+            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny,
         ]
-        #if !os(macOS)
-        q[kSecAttrAccessGroup as String] = accessGroup
-        q[kSecAttrSynchronizable as String] = kSecAttrSynchronizableAny
-        #endif
-        return q
     }
 
     static func save(key: String, value: String) {
@@ -32,9 +28,7 @@ enum KeychainHelper {
 
         var addQuery = query
         addQuery[kSecValueData as String] = data
-        #if !os(macOS)
         addQuery[kSecAttrSynchronizable as String] = true
-        #endif
         SecItemAdd(addQuery as CFDictionary, nil)
     }
 
