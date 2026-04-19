@@ -55,6 +55,10 @@
 		E7333982B68D38D1F7E7A1A3 /* WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B951864C3A8F03CC1E55132 /* WatchApp.swift */; };
 		FA0559F1FA91CB9BA7091F4F /* UsageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DF0533D82BA7540D8026E6 /* UsageViews.swift */; };
 		FEA240232F12D0BABEFB8108 /* ConcentricCirclesRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFDC3AB7273D072DFF03B526 /* ConcentricCirclesRenderer.swift */; };
+		CCCC111111111111111C0002 /* WatchConnectivity.framework in Frameworks (Watch) */ = {isa = PBXBuildFile; fileRef = CCCC111111111111111C0001 /* WatchConnectivity.framework */; };
+		CCCC111111111111111C0003 /* WatchConnectivity.framework in Frameworks (iOS) */ = {isa = PBXBuildFile; fileRef = CCCC111111111111111C0001 /* WatchConnectivity.framework */; };
+		DDDD111111111111111D0003 /* WatchSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD111111111111111D0001 /* WatchSender.swift */; };
+		DDDD111111111111111D0004 /* WatchReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD111111111111111D0002 /* WatchReceiver.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -154,6 +158,9 @@
 		E6A8C96E203B54080374D251 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EE6BC06A53EAEDBEC50D7992 /* WelcomeWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeWindowController.swift; sourceTree = "<group>"; };
 		F365ECED4F04C6605F294732 /* Claude_Usage_Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage_Widget.entitlements; sourceTree = "<group>"; };
+		CCCC111111111111111C0001 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = System/Library/Frameworks/WatchConnectivity.framework; sourceTree = SDKROOT; };
+		DDDD111111111111111D0001 /* WatchSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSender.swift; sourceTree = "<group>"; };
+		DDDD111111111111111D0002 /* WatchReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchReceiver.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -187,6 +194,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CCCC111111111111111C0004 /* Frameworks (Watch) */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCCC111111111111111C0002 /* WatchConnectivity.framework in Frameworks (Watch) */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CCCC111111111111111C0005 /* Frameworks (iOS) */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCCC111111111111111C0003 /* WatchConnectivity.framework in Frameworks (iOS) */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -197,6 +220,7 @@
 				8A4C94EDB128C54D9B0F1E4C /* Claude_Usage_Watch.entitlements */,
 				7B951864C3A8F03CC1E55132 /* WatchApp.swift */,
 				2C29CE515E428743F4DEC43F /* WatchContentView.swift */,
+				DDDD111111111111111D0002 /* WatchReceiver.swift */,
 			);
 			path = Watch;
 			sourceTree = "<group>";
@@ -233,6 +257,7 @@
 				C5075BCD92F3235F0B45B45E /* ContentView.swift */,
 				7D8071F779789219DA59E299 /* iOSApp.swift */,
 				BFC9C0F89785681B5B5ACD3E /* iOSLoginView.swift */,
+				DDDD111111111111111D0001 /* WatchSender.swift */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -315,6 +340,7 @@
 			buildConfigurationList = A4C996038335253F166EBA8C /* Build configuration list for PBXNativeTarget "Claude Your Rings iOS" */;
 			buildPhases = (
 				3D8B5B64CB5D2E4D43D3269F /* Sources */,
+				CCCC111111111111111C0005 /* Frameworks (iOS) */,
 				C7FD0BBF7AB489717E4C8230 /* Resources */,
 				3EC11FA340087B7B26104177 /* Embed Foundation Extensions */,
 				BBBB111111111111111A0002 /* Embed Watch Content */,
@@ -359,6 +385,7 @@
 			buildConfigurationList = 55AF612F0CB1FA698FCBDD55 /* Build configuration list for PBXNativeTarget "Claude Your Rings Watch" */;
 			buildPhases = (
 				DB3D6DC55F44992FEAE4DF28 /* Sources */,
+				CCCC111111111111111C0004 /* Frameworks (Watch) */,
 				AD1F5BDBEFB63CA6EF4F1432 /* Resources */,
 				A3DEF18E2F9458D4008B9DA4 /* Embed Foundation Extensions */,
 			);
@@ -510,6 +537,7 @@
 				27CA6A8F2798A4FBA991ED46 /* UsageViews.swift in Sources */,
 				61B25766728EC3D12216B40D /* iOSApp.swift in Sources */,
 				01792DC534BC72187F931F28 /* iOSLoginView.swift in Sources */,
+				DDDD111111111111111D0003 /* WatchSender.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,6 +581,7 @@
 				0DAF3EC9A8C198F46D146D24 /* UsageViews.swift in Sources */,
 				E7333982B68D38D1F7E7A1A3 /* WatchApp.swift in Sources */,
 				696A556B63809A5714DD9B43 /* WatchContentView.swift in Sources */,
+				DDDD111111111111111D0004 /* WatchReceiver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
