@@ -36,9 +36,16 @@
 		A3DEF1762F94512A008B9DA4 /* Icon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A3DEF1752F94512A008B9DA4 /* Icon.icon */; };
 		A3DEF1772F94512A008B9DA4 /* Icon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A3DEF1752F94512A008B9DA4 /* Icon.icon */; };
 		A3DEF1782F94512A008B9DA4 /* Icon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A3DEF1752F94512A008B9DA4 /* Icon.icon */; };
+		A3DEF1802F9458D2008B9DA4 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3DEF17F2F9458D2008B9DA4 /* WidgetKit.framework */; };
+		A3DEF1822F9458D2008B9DA4 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3DEF1812F9458D2008B9DA4 /* SwiftUI.framework */; };
+		A3DEF18D2F9458D4008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A3DEF17D2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A6127CBE60225E6B8D8CDE19 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
 		A64510FA5C2410016399D4AA /* WelcomeWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6BC06A53EAEDBEC50D7992 /* WelcomeWindowController.swift */; };
 		AA7740F1C84E2A0F4E420F1A /* Claude Your Rings Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D785AA8DBDEC7C2C001ABBDB /* Claude Your Rings Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AAAA111111111111111A0001 /* UsageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2067667D40685B11CF39FFB /* UsageData.swift */; };
+		AAAA111111111111111A0002 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
+		AAAA111111111111111A0003 /* ConcentricCirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AECB6850F4359F607BCEDF3 /* ConcentricCirclesView.swift */; };
+		AAAA111111111111111A0004 /* UsageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DF0533D82BA7540D8026E6 /* UsageViews.swift */; };
 		BF2E1FDCED3B62B918FC5843 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A8C96E203B54080374D251 /* AppDelegate.swift */; };
 		C5B66ED363AC4EA757D8F97A /* ConcentricCirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AECB6850F4359F607BCEDF3 /* ConcentricCirclesView.swift */; };
 		CC1D31340D3EE47408DB2C7A /* UsageWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A5A02CDA21267D6A3989DD /* UsageWidget.swift */; };
@@ -50,6 +57,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A3DEF18B2F9458D4008B9DA4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E353528F24EE79536AA3DE7E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A3DEF17C2F9458D2008B9DA4;
+			remoteInfo = "Claude Your Rings Watch WidgetExtension";
+		};
 		E9B00783FBF549D59E8060DB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E353528F24EE79536AA3DE7E /* Project object */;
@@ -67,6 +81,17 @@
 			dstSubfolderSpec = 13;
 			files = (
 				AA7740F1C84E2A0F4E420F1A /* Claude Your Rings Widget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A3DEF18E2F9458D4008B9DA4 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A3DEF18D2F9458D4008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -95,6 +120,9 @@
 		907B23A66F81990524E3D27E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		98DE101EEA7D5873F7AF4FB5 /* Claude Your Rings iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Claude Your Rings iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3DEF1752F94512A008B9DA4 /* Icon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Icon.icon; sourceTree = "<group>"; };
+		A3DEF17D2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Claude Your Rings Watch WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3DEF17F2F9458D2008B9DA4 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		A3DEF1812F9458D2008B9DA4 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		A41BD7189CBAB0D61A33F3D3 /* Claude_Usage.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage.entitlements; sourceTree = "<group>"; };
 		AFDC3AB7273D072DFF03B526 /* ConcentricCirclesRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcentricCirclesRenderer.swift; sourceTree = "<group>"; };
 		BFC9C0F89785681B5B5ACD3E /* iOSLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSLoginView.swift; sourceTree = "<group>"; };
@@ -108,6 +136,39 @@
 		EE6BC06A53EAEDBEC50D7992 /* WelcomeWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeWindowController.swift; sourceTree = "<group>"; };
 		F365ECED4F04C6605F294732 /* Claude_Usage_Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage_Widget.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AAAA111111111111111E0001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Info.plist",
+			);
+			target = A3DEF17C2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A3DEF1832F9458D2008B9DA4 /* Claude Your Rings Watch Widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AAAA111111111111111E0001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			path = "Claude Your Rings Watch Widget";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A3DEF17A2F9458D2008B9DA4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A3DEF1822F9458D2008B9DA4 /* SwiftUI.framework in Frameworks */,
+				A3DEF1802F9458D2008B9DA4 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		01EFDD37D73FA4F11F6F49E6 /* Watch */ = {
@@ -164,8 +225,18 @@
 				0872308317299AF9E5D1861A /* Claude Your Rings Watch.app */,
 				D785AA8DBDEC7C2C001ABBDB /* Claude Your Rings Widget.appex */,
 				120E4BF5343E91F316E0B0B7 /* Claude Your Rings.app */,
+				A3DEF17D2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A3DEF17E2F9458D2008B9DA4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A3DEF17F2F9458D2008B9DA4 /* WidgetKit.framework */,
+				A3DEF1812F9458D2008B9DA4 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		D2F0F93A6F378ACE57CF34B6 = {
@@ -176,6 +247,8 @@
 				2FB366BC4A0AE63545606415 /* Shared */,
 				01EFDD37D73FA4F11F6F49E6 /* Watch */,
 				70268C00EB30A47299AC3C7F /* Widget */,
+				A3DEF1832F9458D2008B9DA4 /* Claude Your Rings Watch Widget */,
+				A3DEF17E2F9458D2008B9DA4 /* Frameworks */,
 				916840461552EBEA1FCFAE1C /* Products */,
 				A3DEF1752F94512A008B9DA4 /* Icon.icon */,
 			);
@@ -238,16 +311,40 @@
 			productReference = 98DE101EEA7D5873F7AF4FB5 /* Claude Your Rings iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A3DEF17C2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A3DEF1922F9458D4008B9DA4 /* Build configuration list for PBXNativeTarget "Claude Your Rings Watch WidgetExtension" */;
+			buildPhases = (
+				A3DEF1792F9458D2008B9DA4 /* Sources */,
+				A3DEF17A2F9458D2008B9DA4 /* Frameworks */,
+				A3DEF17B2F9458D2008B9DA4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A3DEF1832F9458D2008B9DA4 /* Claude Your Rings Watch Widget */,
+			);
+			name = "Claude Your Rings Watch WidgetExtension";
+			packageProductDependencies = (
+			);
+			productName = "Claude Your Rings Watch WidgetExtension";
+			productReference = A3DEF17D2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		C97218F7F974488344AFEE83 /* Claude Your Rings Watch */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 55AF612F0CB1FA698FCBDD55 /* Build configuration list for PBXNativeTarget "Claude Your Rings Watch" */;
 			buildPhases = (
 				DB3D6DC55F44992FEAE4DF28 /* Sources */,
 				AD1F5BDBEFB63CA6EF4F1432 /* Resources */,
+				A3DEF18E2F9458D4008B9DA4 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A3DEF18C2F9458D4008B9DA4 /* PBXTargetDependency */,
 			);
 			name = "Claude Your Rings Watch";
 			packageProductDependencies = (
@@ -280,6 +377,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					34C14271ADFBB6396601B624 = {
@@ -289,6 +387,10 @@
 					6049FF0A4DC1C84AC59D91C9 = {
 						DevelopmentTeam = 29F59849NR;
 						ProvisioningStyle = Automatic;
+					};
+					A3DEF17C2F9458D2008B9DA4 = {
+						CreatedOnToolsVersion = 26.3;
+						LastSwiftMigration = 2630;
 					};
 					C97218F7F974488344AFEE83 = {
 						DevelopmentTeam = 29F59849NR;
@@ -318,11 +420,19 @@
 				C97218F7F974488344AFEE83 /* Claude Your Rings Watch */,
 				D9EF71E15778C98B8EEC8CF8 /* Claude Your Rings Widget */,
 				6049FF0A4DC1C84AC59D91C9 /* Claude Your Rings iOS */,
+				A3DEF17C2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		A3DEF17B2F9458D2008B9DA4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AD1F5BDBEFB63CA6EF4F1432 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -401,6 +511,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A3DEF1792F9458D2008B9DA4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAAA111111111111111A0003 /* ConcentricCirclesView.swift in Sources */,
+				AAAA111111111111111A0002 /* SharedDefaults.swift in Sources */,
+				AAAA111111111111111A0001 /* UsageData.swift in Sources */,
+				AAAA111111111111111A0004 /* UsageViews.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DB3D6DC55F44992FEAE4DF28 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -421,6 +542,11 @@
 			isa = PBXTargetDependency;
 			target = D9EF71E15778C98B8EEC8CF8 /* Claude Your Rings Widget */;
 			targetProxy = E9B00783FBF549D59E8060DB /* PBXContainerItemProxy */;
+		};
+		A3DEF18C2F9458D4008B9DA4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A3DEF17C2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension */;
+			targetProxy = A3DEF18B2F9458D4008B9DA4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -614,6 +740,87 @@
 			};
 			name = Debug;
 		};
+		A3DEF18F2F9458D4008B9DA4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Claude Your Rings Watch Widget/Claude_Usage_WatchWidget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = 29F59849NR;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Claude Your Rings Watch Widget/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.ClaudeYourRings.watchkitapp.Claude-Your-Rings-Watch-Widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		A3DEF1902F9458D4008B9DA4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Claude Your Rings Watch Widget/Claude_Usage_WatchWidget.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = 29F59849NR;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Claude Your Rings Watch Widget/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.ClaudeYourRings.watchkitapp.Claude-Your-Rings-Watch-Widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 		DEEAA1F0FDA112A72827AFCD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -726,6 +933,15 @@
 			buildConfigurations = (
 				FEB33953CED294A9575D6E1D /* Debug */,
 				DEEAA1F0FDA112A72827AFCD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A3DEF1922F9458D4008B9DA4 /* Build configuration list for PBXNativeTarget "Claude Your Rings Watch WidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A3DEF18F2F9458D4008B9DA4 /* Debug */,
+				A3DEF1902F9458D4008B9DA4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
