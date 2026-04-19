@@ -29,7 +29,7 @@ struct UsageRowView: View {
     var systemImage: String? = nil
 
     var body: some View {
-        HStack(alignment: .center, spacing: 6) {
+        HStack(alignment: .center, spacing: 10) {
             if let systemImage {
                 Image(systemName: systemImage)
                     .font(.caption)
