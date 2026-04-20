@@ -110,15 +110,27 @@ struct ConcentricCirclesView: View {
 
         } else {
             // Usage ahead of time:
-            //   Solid arc 0→usage (round caps at both ends — usage shape starts
-            //   at 12 o'clock). White semi-transparent overlay on 0→time dims the
-            //   elapsed portion, making time progress read as clipping the usage arc.
-            //   The un-dimmed tail (time→usage) remains full solid orange.
+            //   Faded arc 0→time (the "on-schedule" spend) and solid arc
+            //   time→usage (the overshoot) drawn as two adjacent segments.
+            //
+            //   The earlier implementation drew solid 0→usage and overlaid
+            //   white.opacity(0.3) on 0→time to dim it. That works in
+            //   full-colour mode but collapses on the watchOS accented
+            //   render for complications: `.widgetAccentable()` discards
+            //   pixel colour and uses alpha as a mask, so a 30% white layer
+            //   on top of a 100% accent layer blends to still 100% accent —
+            //   the dim portion disappears and the only visible faded arc
+            //   becomes the track, which is a full circle. That's what was
+            //   being misread as "time progress at 100%".
+            //
+            //   Two distinct arcs with distinct alpha values keep the
+            //   semantic intact in both full-colour and accented modes,
+            //   and incidentally make the overshoot more prominent on
+            //   iOS/macOS too.
             strokeArc(in: &context, center: center, radius: radius,
-                      from: 0, to: usage, color: anthropicOrange, style: roundStyle)
-
+                      from: 0, to: time, color: fadedOrange, style: roundStyle)
             strokeArc(in: &context, center: center, radius: radius,
-                      from: 0, to: time, color: .white.opacity(0.3), style: roundStyle)
+                      from: time, to: usage, color: anthropicOrange, style: roundStyle)
         }
     }
 

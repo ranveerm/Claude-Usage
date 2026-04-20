@@ -12,7 +12,7 @@ struct UsageData: Codable {
     var needsLogin: Bool = false
 }
 
-struct CircleRendererInput {
+struct CircleRendererInput: Equatable {
     let sessionProgress: Double
     let sonnetProgress: Double
     let allModelsProgress: Double

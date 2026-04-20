@@ -107,7 +107,7 @@ struct ContentView: View {
 
     private var usageContent: some View {
         VStack(spacing: 24) {
-            ConcentricCirclesView(input: circleInput(from: usageData))
+            AnimatedConcentricCirclesView(target: circleInput(from: usageData))
                 .frame(width: 250, height: 250)
                 .padding(.top, 8)
 
@@ -298,8 +298,56 @@ enum SessionTransition: Equatable {
     var tint: Color {
         switch self {
         case .signedIn:  .green
-        case .signedOut: .orange
+        case .signedOut: .secondary
         }
+    }
+}
+
+// MARK: - Animated ring wrapper
+//
+// `ConcentricCirclesView` draws with `Canvas`, which SwiftUI treats as an
+// opaque output and doesn't interpolate across input changes. To get the
+// rings to *fill in* on cold boot (instead of snapping from 0% to the
+// fetched value), we mirror each progress value into its own `@State Double`
+// and drive them inside a `withAnimation` block. SwiftUI interpolates those
+// primitives frame-by-frame, and each frame re-runs the body with the
+// interpolated inputs, so the Canvas gets a smooth stream of values to draw.
+private struct AnimatedConcentricCirclesView: View {
+    let target: CircleRendererInput
+
+    @State private var session = 0.0
+    @State private var sonnet = 0.0
+    @State private var allModels = 0.0
+    @State private var sessionTime = 0.0
+    @State private var sonnetTime = 0.0
+    @State private var allModelsTime = 0.0
+
+    var body: some View {
+        ConcentricCirclesView(input: CircleRendererInput(
+            sessionProgress:      session,
+            sonnetProgress:       sonnet,
+            allModelsProgress:    allModels,
+            sessionTimeProgress:  sessionTime,
+            sonnetTimeProgress:   sonnetTime,
+            allModelsTimeProgress: allModelsTime
+        ))
+        .onAppear {
+            // Cold-boot fill: start from zero and animate up to target.
+            withAnimation(.easeOut(duration: 0.8)) { applyTarget() }
+        }
+        .onChange(of: target) { _, _ in
+            // Data refresh: ease between previous and new values.
+            withAnimation(.easeInOut(duration: 0.5)) { applyTarget() }
+        }
+    }
+
+    private func applyTarget() {
+        session       = target.sessionProgress
+        sonnet        = target.sonnetProgress
+        allModels     = target.allModelsProgress
+        sessionTime   = target.sessionTimeProgress
+        sonnetTime    = target.sonnetTimeProgress
+        allModelsTime = target.allModelsTimeProgress
     }
 }
 
