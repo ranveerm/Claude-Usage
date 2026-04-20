@@ -5,6 +5,8 @@ struct ContentView: View {
     @State private var usageData = UsageData()
     @State private var showLogin = false
     @State private var isLoading = false
+    @State private var transition: SessionTransition?
+    @State private var transitionDismissTask: Task<Void, Never>?
     @Environment(\.scenePhase) private var scenePhase
 
     private var isConfigured: Bool { UsageService.shared.isConfigured }
@@ -86,9 +88,21 @@ struct ContentView: View {
             WebLoginView { sessionKey, cfClearance in
                 UsageService.shared.saveCredentials(sessionKey: sessionKey, cfClearance: cfClearance)
                 showLogin = false
+                showTransition(.signedIn(remote: false))
                 Task { await fetchData() }
             }
         }
+        // Brief centred overlay that confirms a sign-in or sign-out, then
+        // fades itself out. Non-interactive — just acknowledgement. See the
+        // SessionTransition enum below for copy variants.
+        .overlay(alignment: .center) {
+            if let transition {
+                TransitionOverlay(transition: transition)
+                    .allowsHitTesting(false)
+                    .transition(.scale(scale: 0.92).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: transition)
     }
 
     private var usageContent: some View {
@@ -153,6 +167,20 @@ struct ContentView: View {
         // "Sign In" in the LoginPromptView that now shows because
         // !isConfigured.
         showLogin = false
+        showTransition(.signedOut(remote: !broadcast))
+    }
+
+    /// Display a transient sign-in / sign-out confirmation overlay. Cancels
+    /// any in-flight dismiss from a previous transition so overlapping
+    /// events don't clear the latest one early.
+    private func showTransition(_ t: SessionTransition) {
+        transitionDismissTask?.cancel()
+        transition = t
+        transitionDismissTask = Task {
+            try? await Task.sleep(for: .seconds(1.8))
+            guard !Task.isCancelled else { return }
+            await MainActor.run { transition = nil }
+        }
     }
 
     /// Stamps the cached payload as "signed out" for every downstream
@@ -199,6 +227,7 @@ struct ContentView: View {
                 if delay > .zero { try? await Task.sleep(for: delay) }
                 if isConfigured {
                     await fetchData()
+                    showTransition(.signedIn(remote: true))
                     return
                 }
             }
@@ -234,6 +263,67 @@ struct ContentView: View {
             WatchSender.shared.send(data)
             WidgetCenter.shared.reloadAllTimelines()
         }
+    }
+}
+
+// MARK: - Session transition overlay
+
+/// What to show when sign-in / sign-out state flips. We distinguish local
+/// from remote so the overlay can annotate cross-device events.
+enum SessionTransition: Equatable {
+    case signedIn(remote: Bool)
+    case signedOut(remote: Bool)
+
+    var systemImage: String {
+        switch self {
+        case .signedIn:  "checkmark.circle.fill"
+        case .signedOut: "rectangle.portrait.and.arrow.right"
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .signedIn:  "Signed In"
+        case .signedOut: "Signed Out"
+        }
+    }
+
+    var subtitle: String? {
+        switch self {
+        case .signedIn(let remote), .signedOut(let remote):
+            remote ? "From another device" : nil
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .signedIn:  .green
+        case .signedOut: .orange
+        }
+    }
+}
+
+struct TransitionOverlay: View {
+    let transition: SessionTransition
+
+    var body: some View {
+        VStack(spacing: 14) {
+            Image(systemName: transition.systemImage)
+                .font(.system(size: 44, weight: .semibold))
+                .foregroundStyle(transition.tint)
+                .symbolEffect(.bounce, value: transition)
+            Text(transition.title)
+                .font(.title3.weight(.semibold))
+            if let subtitle = transition.subtitle {
+                Text(subtitle)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(28)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.12), radius: 18, y: 6)
+        .padding(.horizontal, 40)
     }
 }
 

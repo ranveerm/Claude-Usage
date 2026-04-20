@@ -103,6 +103,10 @@ final class LoginWindowController: NSWindowController, WKNavigationDelegate, NSW
                     self.isVerifying = false
                     guard ok else { return }
                     self.onComplete?(sessionKey, cfClearance)
+                    // Close the window on success. The AppDelegate's
+                    // completion handler opens the popover so the user
+                    // sees their usage without needing to hunt for the
+                    // menu-bar icon.
                     self.close()
                 }
             }

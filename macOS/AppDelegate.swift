@@ -49,6 +49,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             showWelcome()
         }
+
+        // Auto-open the popover on every launch so the menu-bar icon's role
+        // is self-evident: the user sees either the rings (signed in) or
+        // the LoginPromptView (signed out) without having to discover and
+        // click the icon. Dispatched one runloop turn later so the status
+        // item button has a frame we can anchor to.
+        DispatchQueue.main.async { [weak self] in
+            self?.openPopover()
+        }
     }
 
     @objc private func handleRemoteKVSChange() {
@@ -188,12 +197,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             popover.performClose(nil)
             removeEventMonitor()
         } else {
-            guard let button = statusItem.button else { return }
-            updatePopoverContent()
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            addEventMonitor()
-            if UsageService.shared.isConfigured { refreshData() }
+            openPopover(fetchOnOpen: true)
         }
+    }
+
+    /// Show the popover anchored to the status item without requiring a
+    /// user click. No-op if it's already visible. `fetchOnOpen` triggers a
+    /// fresh fetch only when the caller expects interactive usage; the
+    /// launch and post-login auto-open paths pass `false` because they
+    /// have their own fetch scheduling.
+    private func openPopover(fetchOnOpen: Bool = false) {
+        guard !popover.isShown, let button = statusItem.button else { return }
+        updatePopoverContent()
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        addEventMonitor()
+        if fetchOnOpen, UsageService.shared.isConfigured { refreshData() }
     }
 
     private func addEventMonitor() {
@@ -272,6 +290,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             LoginWindowController.present { [weak self] sessionKey, cfClearance in
                 UsageService.shared.saveCredentials(sessionKey: sessionKey, cfClearance: cfClearance)
                 self?.refreshData()
+                // Auto-open the popover now that the login window is
+                // closing, so the user's first view of "success" is the
+                // rings themselves — and discovers the menu-bar icon in
+                // the process. Refresh is already in flight via
+                // refreshData above, so pass fetchOnOpen: false.
+                self?.openPopover()
             }
         }
     }
