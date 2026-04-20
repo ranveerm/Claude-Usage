@@ -230,8 +230,50 @@ private struct UsagePopoverPreview: View {
     }
 }
 
-#Preview {
+private struct PopoverOnBackground: View {
+    let background: Color
+    let label: String
+
+    var body: some View {
+        ZStack {
+            background.ignoresSafeArea()
+            UsagePopoverView(
+                usageData: UsageData(
+                    sessionUtilization: 69,
+                    sessionResetsAt: Date().addingTimeInterval(0.31 * 5 * 3600),
+                    sonnetWeeklyUtilization: 14,
+                    sonnetWeeklyResetsAt: Date().addingTimeInterval(0.4 * 7 * 86400),
+                    allModelsWeeklyUtilization: 25,
+                    allModelsWeeklyResetsAt: Date().addingTimeInterval(0.45 * 7 * 86400),
+                    lastRefreshed: Date()
+                ),
+                isConfigured: true,
+                onRefresh: {},
+                onLogin: {}
+            )
+        }
+        .frame(width: 380, height: 220)
+    }
+}
+
+#Preview("Interactive") {
     UsagePopoverPreview()
+}
+
+#Preview("Dark desktop") {
+    PopoverOnBackground(background: Color(white: 0.12), label: "Dark desktop")
+}
+
+#Preview("Light desktop") {
+    PopoverOnBackground(background: Color(white: 0.85), label: "Light desktop")
+}
+
+#Preview("Yellow/vibrant") {
+    PopoverOnBackground(background: Color(red: 0.95, green: 0.82, blue: 0.35), label: "Yellow/vibrant")
+}
+
+#Preview("Deep blue") {
+    PopoverOnBackground(background: Color(red: 0.1, green: 0.2, blue: 0.5), label: "Deep blue")
 }
 #endif
 
@@ -277,8 +319,9 @@ struct UsagePopoverView: View {
                 usageView
             }
         }
-        .padding(16)
+        .padding(10)
         .frame(width: 300)
+        .background(.thickMaterial)
     }
 
     // MARK: - Usage content (shown when logged in and data is available)
