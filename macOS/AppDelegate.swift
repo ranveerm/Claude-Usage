@@ -78,7 +78,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // the credentials, so refresh now and retry a couple of times.
             refreshAfterRemoteSignIn()
         case .inSync:
-            break
+            // Race: iCloud Keychain may have synced a sign-out before this
+            // KVS notification arrived — so observe() reports inSync (both
+            // sides empty), but our in-memory `usageData` still holds the
+            // last successful fetch. The popover view is driven off
+            // `isConfigured` and will re-render correctly when opened, but
+            // the menu-bar icon is set imperatively from `usageData` and
+            // would otherwise keep showing stale rings. Reset and redraw.
+            if !UsageService.shared.isConfigured, usageData.lastRefreshed != nil {
+                usageData = UsageData()
+                statusItem.button?.image = renderIcon()
+                updatePopoverContent()
+            }
         }
     }
 
