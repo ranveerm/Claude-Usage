@@ -107,7 +107,11 @@ struct ContentView: View {
 
     private var usageContent: some View {
         VStack(spacing: 24) {
-            AnimatedConcentricCirclesView(target: circleInput(from: usageData))
+            // ConcentricCirclesView uses SwiftUI Shapes (Circle().trim), whose
+            // animatableData SwiftUI interpolates natively. Wrapping the
+            // `usageData` assignments below in `withAnimation` is what drives
+            // the fill animation — no separate wrapper view is needed.
+            ConcentricCirclesView(input: circleInput(from: usageData))
                 .frame(width: 250, height: 250)
                 .padding(.top, 8)
 
@@ -257,7 +261,15 @@ struct ContentView: View {
             return
         }
 
-        usageData = data
+        // Animate the ring fill: the `Circle().trim` inside
+        // ConcentricCirclesView is Shape-animatable, so wrapping the state
+        // change in `withAnimation` makes SwiftUI interpolate the trim
+        // values over the duration — producing the "rings fill in from the
+        // top" effect on cold boot as well as ease transitions on later
+        // refreshes.
+        withAnimation(.easeInOut(duration: 0.6)) {
+            usageData = data
+        }
         if data.error == nil {
             SharedDefaults.save(data)
             WatchSender.shared.send(data)
@@ -303,53 +315,6 @@ enum SessionTransition: Equatable {
     }
 }
 
-// MARK: - Animated ring wrapper
-//
-// `ConcentricCirclesView` draws with `Canvas`, which SwiftUI treats as an
-// opaque output and doesn't interpolate across input changes. To get the
-// rings to *fill in* on cold boot (instead of snapping from 0% to the
-// fetched value), we mirror each progress value into its own `@State Double`
-// and drive them inside a `withAnimation` block. SwiftUI interpolates those
-// primitives frame-by-frame, and each frame re-runs the body with the
-// interpolated inputs, so the Canvas gets a smooth stream of values to draw.
-private struct AnimatedConcentricCirclesView: View {
-    let target: CircleRendererInput
-
-    @State private var session = 0.0
-    @State private var sonnet = 0.0
-    @State private var allModels = 0.0
-    @State private var sessionTime = 0.0
-    @State private var sonnetTime = 0.0
-    @State private var allModelsTime = 0.0
-
-    var body: some View {
-        ConcentricCirclesView(input: CircleRendererInput(
-            sessionProgress:      session,
-            sonnetProgress:       sonnet,
-            allModelsProgress:    allModels,
-            sessionTimeProgress:  sessionTime,
-            sonnetTimeProgress:   sonnetTime,
-            allModelsTimeProgress: allModelsTime
-        ))
-        .onAppear {
-            // Cold-boot fill: start from zero and animate up to target.
-            withAnimation(.easeOut(duration: 0.8)) { applyTarget() }
-        }
-        .onChange(of: target) { _, _ in
-            // Data refresh: ease between previous and new values.
-            withAnimation(.easeInOut(duration: 0.5)) { applyTarget() }
-        }
-    }
-
-    private func applyTarget() {
-        session       = target.sessionProgress
-        sonnet        = target.sonnetProgress
-        allModels     = target.allModelsProgress
-        sessionTime   = target.sessionTimeProgress
-        sonnetTime    = target.sonnetTimeProgress
-        allModelsTime = target.allModelsTimeProgress
-    }
-}
 
 struct TransitionOverlay: View {
     let transition: SessionTransition
@@ -510,5 +475,66 @@ private struct LoginStatePreview: View {
 #Preview("Login (Dark)") {
     LoginStatePreview()
         .preferredColorScheme(.dark)
+}
+
+// MARK: - Ring animation preview
+//
+// Interactive preview: tap the button to animate the rings between a
+// zero state and a populated state. Verifies the cold-boot fill animation
+// visually without needing to launch the app and sign in.
+//
+// Lives in this iOS-target file (rather than Shared/ConcentricCirclesView.swift)
+// so Xcode Previews resolves the translation unit unambiguously to the iOS
+// app target — the shared file is compiled by every target, and the preview
+// subsystem was picking the watchOS target and failing to build.
+//
+// The populated state deliberately uses the overshoot configuration
+// (session usage 0.78 vs time 0.42) so the preview also exercises the
+// semi-transparent-overlap-with-angular-gradient path.
+private struct RingAnimationPreview: View {
+    @State private var filled = false
+
+    var body: some View {
+        VStack(spacing: 28) {
+            ConcentricCirclesView(input: filled ? populated : zeroInput)
+                .frame(width: 240, height: 240)
+
+            Button(filled ? "Reset" : "Fill rings") {
+                withAnimation(.easeInOut(duration: 1.0)) {
+                    filled.toggle()
+                }
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .padding(32)
+    }
+
+    private var zeroInput: CircleRendererInput {
+        CircleRendererInput(
+            sessionProgress:   0,
+            sonnetProgress:    0,
+            allModelsProgress: 0
+        )
+    }
+
+    private var populated: CircleRendererInput {
+        // Mix of scenarios across the three rings so the preview exercises
+        // both branches of the compositing logic:
+        //   - Session:   heavy overshoot (0.82 usage vs 0.35 time)
+        //   - Sonnet:    time ahead of usage (0.28 usage vs 0.65 time)
+        //   - All Models: mild overshoot (0.45 usage vs 0.30 time)
+        CircleRendererInput(
+            sessionProgress:       0.82,
+            sonnetProgress:        0.28,
+            allModelsProgress:     0.45,
+            sessionTimeProgress:   0.35,
+            sonnetTimeProgress:    0.65,
+            allModelsTimeProgress: 0.30
+        )
+    }
+}
+
+#Preview("Rings animation — tap to toggle") {
+    RingAnimationPreview()
 }
 #endif
