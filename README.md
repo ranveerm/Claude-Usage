@@ -52,11 +52,11 @@ In DEBUG builds, the popover settings menu has a **Reset & Re-onboard** button t
 If you need to do it from the terminal (e.g. the app isn't running):
 
 ```bash
-security delete-generic-password -s "com.ranveer.VibeYourRings" -a "sessionKey" 2>/dev/null
-security delete-generic-password -s "com.ranveer.VibeYourRings" -a "cfClearance" 2>/dev/null
-security delete-generic-password -s "com.ranveer.VibeYourRings" -a "organizationId" 2>/dev/null
-defaults delete com.ranveer.VibeYourRings 2>/dev/null
-rm -rf "$HOME/Library/WebKit/com.ranveer.VibeYourRings" 2>/dev/null
+security delete-generic-password -s "com.ranveer.ClaudeYourRings" -a "sessionKey" 2>/dev/null
+security delete-generic-password -s "com.ranveer.ClaudeYourRings" -a "cfClearance" 2>/dev/null
+security delete-generic-password -s "com.ranveer.ClaudeYourRings" -a "organizationId" 2>/dev/null
+defaults delete com.ranveer.ClaudeYourRings 2>/dev/null
+rm -rf "$HOME/Library/WebKit/com.ranveer.ClaudeYourRings" 2>/dev/null
 ```
 
 ### Previews
