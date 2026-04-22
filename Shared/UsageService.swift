@@ -62,7 +62,7 @@ final class UsageService {
                 organizationId = first.uuid
             } catch {
                 let msg = error.localizedDescription
-                return UsageData(error: msg, needsLogin: isCloudflareError(msg))
+                return UsageData(error: msg, needsLogin: Self.isCloudflareError(msg))
             }
         }
 
@@ -113,7 +113,9 @@ final class UsageService {
         return try JSONDecoder().decode([Organization].self, from: data)
     }
 
-    private func parseUsageResponse(_ data: Data) -> UsageData {
+    /// Marked `internal` (not `private`) so tests can exercise the pure
+    /// JSON→UsageData mapping without going through the network.
+    func parseUsageResponse(_ data: Data) -> UsageData {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             return UsageData(error: "Failed to parse response")
         }
@@ -207,7 +209,9 @@ final class UsageService {
         }
     }
 
-    private func isCloudflareError(_ message: String) -> Bool {
+    /// Marked `internal` so tests can assert detection rules without
+    /// spinning up the network stack.
+    static func isCloudflareError(_ message: String) -> Bool {
         message.contains("Just a moment") || message.contains("cf-ray") || message.contains("403")
     }
 }

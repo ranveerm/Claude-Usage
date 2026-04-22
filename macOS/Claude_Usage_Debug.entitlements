@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	    Debug-only entitlements for the macOS app.
+
+	    Sandbox is intentionally OFF here so the XCTest bundle — which is
+	    injected into the running app's process — can write snapshot
+	    baselines back out to the project source tree under __Snapshots__/.
+	    A sandboxed host sees that path as outside its container and the
+	    writes fail with "You don't have permission to save the file".
+
+	    Release builds continue to use macOS/Claude_Usage.entitlements,
+	    which keeps the App Sandbox and Hardened Runtime required for the
+	    App Store. Keep the two files in sync for everything *other than*
+	    the sandbox key.
+	-->
+	<key>com.apple.security.network.client</key>
+	<true/>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.com.ranveer.ClaudeYourRings</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.ranveer.ClaudeYourRings.shared</string>
+	</array>
+	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
+	<string>$(TeamIdentifierPrefix)com.ranveer.ClaudeYourRings</string>
+</dict>
+</plist>

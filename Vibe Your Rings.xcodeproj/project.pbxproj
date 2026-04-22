@@ -33,6 +33,8 @@
 		88CDE0EF179CA43F154AADF6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 28FF1F9E522A27B21E6BBFE9 /* Assets.xcassets */; };
 		9497EA397BA661E77C4CEE15 /* UsageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DF0533D82BA7540D8026E6 /* UsageViews.swift */; };
 		9EA73940916554AA49AE6BD3 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
+		A34B1B9D2F98C95800FB8DE3 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = A34B1B9C2F98C95800FB8DE3 /* SnapshotTesting */; };
+		A34B1B9F2F98C98900FB8DE3 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = A34B1B9E2F98C98900FB8DE3 /* SnapshotTesting */; };
 		A3DEF1762F94512A008B9DA4 /* Icon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A3DEF1752F94512A008B9DA4 /* Icon.icon */; };
 		A3DEF1772F94512A008B9DA4 /* Icon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A3DEF1752F94512A008B9DA4 /* Icon.icon */; };
 		A3DEF1782F94512A008B9DA4 /* Icon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A3DEF1752F94512A008B9DA4 /* Icon.icon */; };
@@ -42,28 +44,42 @@
 		A6127CBE60225E6B8D8CDE19 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
 		A64510FA5C2410016399D4AA /* WelcomeWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6BC06A53EAEDBEC50D7992 /* WelcomeWindowController.swift */; };
 		AA7740F1C84E2A0F4E420F1A /* Vibe Your Rings Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D785AA8DBDEC7C2C001ABBDB /* Vibe Your Rings Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		BBBB111111111111111A0001 /* Vibe Your Rings Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0872308317299AF9E5D1861A /* Vibe Your Rings Watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AAAA111111111111111A0001 /* UsageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2067667D40685B11CF39FFB /* UsageData.swift */; };
 		AAAA111111111111111A0002 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
 		AAAA111111111111111A0003 /* ConcentricCirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AECB6850F4359F607BCEDF3 /* ConcentricCirclesView.swift */; };
 		AAAA111111111111111A0004 /* UsageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DF0533D82BA7540D8026E6 /* UsageViews.swift */; };
+		BBBB111111111111111A0001 /* Vibe Your Rings Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0872308317299AF9E5D1861A /* Vibe Your Rings Watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BF2E1FDCED3B62B918FC5843 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A8C96E203B54080374D251 /* AppDelegate.swift */; };
 		C5B66ED363AC4EA757D8F97A /* ConcentricCirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AECB6850F4359F607BCEDF3 /* ConcentricCirclesView.swift */; };
 		CC1D31340D3EE47408DB2C7A /* UsageWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A5A02CDA21267D6A3989DD /* UsageWidget.swift */; };
+		CCCC111111111111111C0002 /* WatchConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCCC111111111111111C0001 /* WatchConnectivity.framework */; };
+		CCCC111111111111111C0003 /* WatchConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCCC111111111111111C0001 /* WatchConnectivity.framework */; };
 		D7FE341FFD1874880375679E /* ConcentricCirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AECB6850F4359F607BCEDF3 /* ConcentricCirclesView.swift */; };
 		DB0ACF2FDAF3FB27CBA81139 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CD593410A7FA0056686A880A /* Assets.xcassets */; };
-		E7333982B68D38D1F7E7A1A3 /* WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B951864C3A8F03CC1E55132 /* WatchApp.swift */; };
-		FA0559F1FA91CB9BA7091F4F /* UsageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DF0533D82BA7540D8026E6 /* UsageViews.swift */; };
-		FEA240232F12D0BABEFB8108 /* ConcentricCirclesRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFDC3AB7273D072DFF03B526 /* ConcentricCirclesRenderer.swift */; };
-		CCCC111111111111111C0002 /* WatchConnectivity.framework in Frameworks (Watch) */ = {isa = PBXBuildFile; fileRef = CCCC111111111111111C0001 /* WatchConnectivity.framework */; };
-		CCCC111111111111111C0003 /* WatchConnectivity.framework in Frameworks (iOS) */ = {isa = PBXBuildFile; fileRef = CCCC111111111111111C0001 /* WatchConnectivity.framework */; };
 		DDDD111111111111111D0003 /* WatchSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD111111111111111D0001 /* WatchSender.swift */; };
 		DDDD111111111111111D0004 /* WatchReceiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDDD111111111111111D0002 /* WatchReceiver.swift */; };
-		EEEE111111111111111E0002 /* SignOutSignal.swift in Sources (iOS) */ = {isa = PBXBuildFile; fileRef = EEEE111111111111111E0001 /* SignOutSignal.swift */; };
-		EEEE111111111111111E0003 /* SignOutSignal.swift in Sources (macOS) */ = {isa = PBXBuildFile; fileRef = EEEE111111111111111E0001 /* SignOutSignal.swift */; };
+		E7333982B68D38D1F7E7A1A3 /* WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B951864C3A8F03CC1E55132 /* WatchApp.swift */; };
+		EEEE111111111111111E0002 /* SignOutSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE111111111111111E0001 /* SignOutSignal.swift */; };
+		EEEE111111111111111E0003 /* SignOutSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE111111111111111E0001 /* SignOutSignal.swift */; };
+		FA0559F1FA91CB9BA7091F4F /* UsageViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62DF0533D82BA7540D8026E6 /* UsageViews.swift */; };
+		FEA240232F12D0BABEFB8108 /* ConcentricCirclesRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFDC3AB7273D072DFF03B526 /* ConcentricCirclesRenderer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A34B1B892F98C81B00FB8DE3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E353528F24EE79536AA3DE7E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6049FF0A4DC1C84AC59D91C9;
+			remoteInfo = "Vibe Your Rings iOS";
+		};
+		A34B1B962F98C84200FB8DE3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E353528F24EE79536AA3DE7E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 34C14271ADFBB6396601B624;
+			remoteInfo = "Vibe Your Rings";
+		};
 		A3DEF18B2F9458D4008B9DA4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E353528F24EE79536AA3DE7E /* Project object */;
@@ -88,17 +104,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		BBBB111111111111111A0002 /* Embed Watch Content */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
-			dstSubfolderSpec = 16;
-			files = (
-				BBBB111111111111111A0001 /* Vibe Your Rings Watch.app in Embed Watch Content */,
-			);
-			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		3EC11FA340087B7B26104177 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -119,6 +124,17 @@
 				A3DEF18D2F9458D4008B9DA4 /* Vibe Your Rings Watch WidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BBBB111111111111111A0002 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				BBBB111111111111111A0001 /* Vibe Your Rings Watch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -144,6 +160,8 @@
 		8A4C94EDB128C54D9B0F1E4C /* Claude_Usage_Watch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage_Watch.entitlements; sourceTree = "<group>"; };
 		907B23A66F81990524E3D27E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		98DE101EEA7D5873F7AF4FB5 /* Vibe Your Rings iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vibe Your Rings iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A34B1B852F98C81B00FB8DE3 /* Vibe Your Rings iOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Vibe Your Rings iOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A34B1B922F98C84200FB8DE3 /* Vibe Your Rings macOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Vibe Your Rings macOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3DEF1752F94512A008B9DA4 /* Icon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Icon.icon; sourceTree = "<group>"; };
 		A3DEF17D2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vibe Your Rings Watch WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3DEF17F2F9458D2008B9DA4 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -153,34 +171,44 @@
 		BFC9C0F89785681B5B5ACD3E /* iOSLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSLoginView.swift; sourceTree = "<group>"; };
 		C2A720BA3398B9C3B3193D15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C5075BCD92F3235F0B45B45E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		CCCC111111111111111C0001 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = System/Library/Frameworks/WatchConnectivity.framework; sourceTree = SDKROOT; };
 		CD593410A7FA0056686A880A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D785AA8DBDEC7C2C001ABBDB /* Vibe Your Rings Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vibe Your Rings Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DDDD111111111111111D0001 /* WatchSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSender.swift; sourceTree = "<group>"; };
+		DDDD111111111111111D0002 /* WatchReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchReceiver.swift; sourceTree = "<group>"; };
 		E2067667D40685B11CF39FFB /* UsageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageData.swift; sourceTree = "<group>"; };
 		E252F6DA8F781F92E73CBA72 /* Claude_UsageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Claude_UsageApp.swift; sourceTree = "<group>"; };
 		E6A8C96E203B54080374D251 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		EE6BC06A53EAEDBEC50D7992 /* WelcomeWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeWindowController.swift; sourceTree = "<group>"; };
-		F365ECED4F04C6605F294732 /* Claude_Usage_Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage_Widget.entitlements; sourceTree = "<group>"; };
-		CCCC111111111111111C0001 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = System/Library/Frameworks/WatchConnectivity.framework; sourceTree = SDKROOT; };
-		DDDD111111111111111D0001 /* WatchSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSender.swift; sourceTree = "<group>"; };
-		DDDD111111111111111D0002 /* WatchReceiver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchReceiver.swift; sourceTree = "<group>"; };
 		EEEE111111111111111E0001 /* SignOutSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignOutSignal.swift; sourceTree = "<group>"; };
+		F365ECED4F04C6605F294732 /* Claude_Usage_Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage_Widget.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		AAAA111111111111111E0001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		AAAA111111111111111E0001 /* Exceptions for "Vibe Your Rings Watch Widget" folder in "Vibe Your Rings Watch WidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Info.plist",
+				Info.plist,
 			);
 			target = A3DEF17C2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		A34B1B862F98C81B00FB8DE3 /* Vibe Your Rings iOS Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Vibe Your Rings iOS Tests";
+			sourceTree = "<group>";
+		};
+		A34B1B932F98C84200FB8DE3 /* Vibe Your Rings macOS Tests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Vibe Your Rings macOS Tests";
+			sourceTree = "<group>";
+		};
 		A3DEF1832F9458D2008B9DA4 /* Vibe Your Rings Watch Widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				AAAA111111111111111E0001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+				AAAA111111111111111E0001 /* Exceptions for "Vibe Your Rings Watch Widget" folder in "Vibe Your Rings Watch WidgetExtension" target */,
 			);
 			path = "Vibe Your Rings Watch Widget";
 			sourceTree = "<group>";
@@ -188,6 +216,22 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		A34B1B822F98C81B00FB8DE3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A34B1B9D2F98C95800FB8DE3 /* SnapshotTesting in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A34B1B8F2F98C84200FB8DE3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A34B1B9F2F98C98900FB8DE3 /* SnapshotTesting in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A3DEF17A2F9458D2008B9DA4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -197,19 +241,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CCCC111111111111111C0004 /* Frameworks (Watch) */ = {
+		CCCC111111111111111C0004 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CCCC111111111111111C0002 /* WatchConnectivity.framework in Frameworks (Watch) */,
+				CCCC111111111111111C0002 /* WatchConnectivity.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		CCCC111111111111111C0005 /* Frameworks (iOS) */ = {
+		CCCC111111111111111C0005 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CCCC111111111111111C0003 /* WatchConnectivity.framework in Frameworks (iOS) */,
+				CCCC111111111111111C0003 /* WatchConnectivity.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,8 +318,18 @@
 				D785AA8DBDEC7C2C001ABBDB /* Vibe Your Rings Widget.appex */,
 				120E4BF5343E91F316E0B0B7 /* Vibe Your Rings.app */,
 				A3DEF17D2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension.appex */,
+				A34B1B852F98C81B00FB8DE3 /* Vibe Your Rings iOS Tests.xctest */,
+				A34B1B922F98C84200FB8DE3 /* Vibe Your Rings macOS Tests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A34B1B792F98C49300FB8DE3 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				CCCC111111111111111C0001 /* WatchConnectivity.framework */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		A3DEF17E2F9458D2008B9DA4 /* Frameworks */ = {
@@ -296,9 +350,12 @@
 				01EFDD37D73FA4F11F6F49E6 /* Watch */,
 				70268C00EB30A47299AC3C7F /* Widget */,
 				A3DEF1832F9458D2008B9DA4 /* Vibe Your Rings Watch Widget */,
+				A34B1B862F98C81B00FB8DE3 /* Vibe Your Rings iOS Tests */,
+				A34B1B932F98C84200FB8DE3 /* Vibe Your Rings macOS Tests */,
 				A3DEF17E2F9458D2008B9DA4 /* Frameworks */,
 				916840461552EBEA1FCFAE1C /* Products */,
 				A3DEF1752F94512A008B9DA4 /* Icon.icon */,
+				A34B1B792F98C49300FB8DE3 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -344,7 +401,7 @@
 			buildConfigurationList = A4C996038335253F166EBA8C /* Build configuration list for PBXNativeTarget "Vibe Your Rings iOS" */;
 			buildPhases = (
 				3D8B5B64CB5D2E4D43D3269F /* Sources */,
-				CCCC111111111111111C0005 /* Frameworks (iOS) */,
+				CCCC111111111111111C0005 /* Frameworks */,
 				C7FD0BBF7AB489717E4C8230 /* Resources */,
 				3EC11FA340087B7B26104177 /* Embed Foundation Extensions */,
 				BBBB111111111111111A0002 /* Embed Watch Content */,
@@ -361,6 +418,54 @@
 			productName = "Vibe Your Rings iOS";
 			productReference = 98DE101EEA7D5873F7AF4FB5 /* Vibe Your Rings iOS.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A34B1B842F98C81B00FB8DE3 /* Vibe Your Rings iOS Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A34B1B8D2F98C81B00FB8DE3 /* Build configuration list for PBXNativeTarget "Vibe Your Rings iOS Tests" */;
+			buildPhases = (
+				A34B1B812F98C81B00FB8DE3 /* Sources */,
+				A34B1B822F98C81B00FB8DE3 /* Frameworks */,
+				A34B1B832F98C81B00FB8DE3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A34B1B8A2F98C81B00FB8DE3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A34B1B862F98C81B00FB8DE3 /* Vibe Your Rings iOS Tests */,
+			);
+			name = "Vibe Your Rings iOS Tests";
+			packageProductDependencies = (
+				A34B1B9C2F98C95800FB8DE3 /* SnapshotTesting */,
+			);
+			productName = "Vibe Your Rings iOSTests";
+			productReference = A34B1B852F98C81B00FB8DE3 /* Vibe Your Rings iOS Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A34B1B912F98C84200FB8DE3 /* Vibe Your Rings macOS Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A34B1B982F98C84200FB8DE3 /* Build configuration list for PBXNativeTarget "Vibe Your Rings macOS Tests" */;
+			buildPhases = (
+				A34B1B8E2F98C84200FB8DE3 /* Sources */,
+				A34B1B8F2F98C84200FB8DE3 /* Frameworks */,
+				A34B1B902F98C84200FB8DE3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A34B1B972F98C84200FB8DE3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A34B1B932F98C84200FB8DE3 /* Vibe Your Rings macOS Tests */,
+			);
+			name = "Vibe Your Rings macOS Tests";
+			packageProductDependencies = (
+				A34B1B9E2F98C98900FB8DE3 /* SnapshotTesting */,
+			);
+			productName = "Vibe Your Rings macOS Tests";
+			productReference = A34B1B922F98C84200FB8DE3 /* Vibe Your Rings macOS Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		A3DEF17C2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension */ = {
 			isa = PBXNativeTarget;
@@ -389,7 +494,7 @@
 			buildConfigurationList = 55AF612F0CB1FA698FCBDD55 /* Build configuration list for PBXNativeTarget "Vibe Your Rings Watch" */;
 			buildPhases = (
 				DB3D6DC55F44992FEAE4DF28 /* Sources */,
-				CCCC111111111111111C0004 /* Frameworks (Watch) */,
+				CCCC111111111111111C0004 /* Frameworks */,
 				AD1F5BDBEFB63CA6EF4F1432 /* Resources */,
 				A3DEF18E2F9458D4008B9DA4 /* Embed Foundation Extensions */,
 			);
@@ -440,6 +545,14 @@
 						DevelopmentTeam = 29F59849NR;
 						ProvisioningStyle = Automatic;
 					};
+					A34B1B842F98C81B00FB8DE3 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 6049FF0A4DC1C84AC59D91C9;
+					};
+					A34B1B912F98C84200FB8DE3 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 34C14271ADFBB6396601B624;
+					};
 					A3DEF17C2F9458D2008B9DA4 = {
 						CreatedOnToolsVersion = 26.3;
 						LastSwiftMigration = 2630;
@@ -463,6 +576,9 @@
 			);
 			mainGroup = D2F0F93A6F378ACE57CF34B6;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A34B1B9B2F98C95800FB8DE3 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 916840461552EBEA1FCFAE1C /* Products */;
 			projectDirPath = "";
@@ -473,11 +589,27 @@
 				D9EF71E15778C98B8EEC8CF8 /* Vibe Your Rings Widget */,
 				6049FF0A4DC1C84AC59D91C9 /* Vibe Your Rings iOS */,
 				A3DEF17C2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension */,
+				A34B1B842F98C81B00FB8DE3 /* Vibe Your Rings iOS Tests */,
+				A34B1B912F98C84200FB8DE3 /* Vibe Your Rings macOS Tests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		A34B1B832F98C81B00FB8DE3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A34B1B902F98C84200FB8DE3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A3DEF17B2F9458D2008B9DA4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -542,7 +674,7 @@
 				61B25766728EC3D12216B40D /* iOSApp.swift in Sources */,
 				01792DC534BC72187F931F28 /* iOSLoginView.swift in Sources */,
 				DDDD111111111111111D0003 /* WatchSender.swift in Sources */,
-				EEEE111111111111111E0002 /* SignOutSignal.swift in Sources (iOS) */,
+				EEEE111111111111111E0002 /* SignOutSignal.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -562,7 +694,21 @@
 				5A9264B5DABD712A304CE347 /* UsageService.swift in Sources */,
 				FA0559F1FA91CB9BA7091F4F /* UsageViews.swift in Sources */,
 				A64510FA5C2410016399D4AA /* WelcomeWindowController.swift in Sources */,
-				EEEE111111111111111E0003 /* SignOutSignal.swift in Sources (macOS) */,
+				EEEE111111111111111E0003 /* SignOutSignal.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A34B1B812F98C81B00FB8DE3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A34B1B8E2F98C84200FB8DE3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -598,6 +744,16 @@
 			isa = PBXTargetDependency;
 			target = D9EF71E15778C98B8EEC8CF8 /* Vibe Your Rings Widget */;
 			targetProxy = E9B00783FBF549D59E8060DB /* PBXContainerItemProxy */;
+		};
+		A34B1B8A2F98C81B00FB8DE3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6049FF0A4DC1C84AC59D91C9 /* Vibe Your Rings iOS */;
+			targetProxy = A34B1B892F98C81B00FB8DE3 /* PBXContainerItemProxy */;
+		};
+		A34B1B972F98C84200FB8DE3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 34C14271ADFBB6396601B624 /* Vibe Your Rings */;
+			targetProxy = A34B1B962F98C84200FB8DE3 /* PBXContainerItemProxy */;
 		};
 		A3DEF18C2F9458D4008B9DA4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -762,10 +918,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Icon;
-				CODE_SIGN_ENTITLEMENTS = macOS/Claude_Usage.entitlements;
+				CODE_SIGN_ENTITLEMENTS = macOS/Claude_Usage_Debug.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -804,6 +960,123 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		A34B1B8B2F98C81B00FB8DE3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 29F59849NR;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vibe Your Rings iOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vibe Your Rings iOS";
+			};
+			name = Debug;
+		};
+		A34B1B8C2F98C81B00FB8DE3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 29F59849NR;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vibe Your Rings iOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vibe Your Rings iOS";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A34B1B992F98C84200FB8DE3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 29F59849NR;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-macOS-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vibe Your Rings.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vibe Your Rings";
+			};
+			name = Debug;
+		};
+		A34B1B9A2F98C84200FB8DE3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 29F59849NR;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-macOS-Tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Vibe Your Rings.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Vibe Your Rings";
+			};
+			name = Release;
 		};
 		A3DEF18F2F9458D4008B9DA4 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1004,6 +1277,24 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		A34B1B8D2F98C81B00FB8DE3 /* Build configuration list for PBXNativeTarget "Vibe Your Rings iOS Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A34B1B8B2F98C81B00FB8DE3 /* Debug */,
+				A34B1B8C2F98C81B00FB8DE3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A34B1B982F98C84200FB8DE3 /* Build configuration list for PBXNativeTarget "Vibe Your Rings macOS Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A34B1B992F98C84200FB8DE3 /* Debug */,
+				A34B1B9A2F98C84200FB8DE3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		A3DEF1922F9458D4008B9DA4 /* Build configuration list for PBXNativeTarget "Vibe Your Rings Watch WidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1050,6 +1341,30 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A34B1B9B2F98C95800FB8DE3 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
+			requirement = {
+				kind = exactVersion;
+				version = 1.19.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A34B1B9C2F98C95800FB8DE3 /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A34B1B9B2F98C95800FB8DE3 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+		A34B1B9E2F98C98900FB8DE3 /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A34B1B9B2F98C95800FB8DE3 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E353528F24EE79536AA3DE7E /* Project object */;
 }

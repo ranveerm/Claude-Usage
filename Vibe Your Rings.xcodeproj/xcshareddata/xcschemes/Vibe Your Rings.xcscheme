@@ -37,6 +37,17 @@
          </BuildableReference>
       </MacroExpansion>
       <Testables>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A34B1B912F98C84200FB8DE3"
+               BuildableName = "Vibe Your Rings macOS Tests.xctest"
+               BlueprintName = "Vibe Your Rings macOS Tests"
+               ReferencedContainer = "container:Vibe Your Rings.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
