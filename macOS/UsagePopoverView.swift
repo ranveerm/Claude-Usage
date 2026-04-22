@@ -313,6 +313,12 @@ struct UsagePopoverView: View {
 
     @State private var showDebugInfo = false
     @State private var showSignOutConfirmation = false
+    /// Captured from the environment so the gear button can open the
+    /// Settings scene directly — `SettingsLink`'s imperative counterpart.
+    /// Same action is re-registered with `SettingsCoordinator` via
+    /// `.captureSettingsOpener()` below so AppKit (the right-click menu)
+    /// can invoke it too.
+    @Environment(\.openSettings) private var openSettings
 
     init(
         usageData: UsageData,
@@ -345,6 +351,10 @@ struct UsagePopoverView: View {
         .padding(10)
         .frame(width: 300)
         .background(.thickMaterial)
+        // Park the SwiftUI `openSettings` action on the shared coordinator
+        // so the AppKit right-click menu can reach it. Fires on every
+        // on-appear of the popover; registration is idempotent.
+        .captureSettingsOpener()
     }
 
     // MARK: - Usage content (shown when logged in and data is available)
@@ -397,6 +407,19 @@ struct UsagePopoverView: View {
                 }
                 .buttonStyle(.borderless)
                 .help("Refresh")
+
+                // Settings sits between Refresh and Sign Out — same visual
+                // weight as the other footer icons, same help tooltip
+                // convention. Opens the macOS SwiftUI Settings scene via
+                // the `openSettings` environment action (the macOS 14+
+                // replacement for `showSettingsWindow:`).
+                Button { openSettings() } label: {
+                    Image(systemName: "gearshape")
+                        .font(.caption)
+                        .foregroundColor(.white)
+                }
+                .buttonStyle(.borderless)
+                .help("Settings")
 
                 Button(action: { showSignOutConfirmation = true }) {
                     Image(systemName: "rectangle.portrait.and.arrow.right")

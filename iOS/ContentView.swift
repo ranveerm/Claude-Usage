@@ -4,6 +4,7 @@ import WidgetKit
 struct ContentView: View {
     @State private var usageData = UsageData()
     @State private var showLogin = false
+    @State private var showSettings = false
     @State private var isLoading = false
     @State private var transition: SessionTransition?
     @State private var transitionDismissTask: Task<Void, Never>?
@@ -47,14 +48,25 @@ struct ContentView: View {
                 // confusing — it looks like a sign-in affordance.
                 if isSignedIn {
                     ToolbarItem(placement: .topBarTrailing) {
+                        // "More actions" menu replaces the old person.circle
+                        // (which read as a sign-in affordance). Settings and
+                        // Sign Out live here together — Settings opens a
+                        // sheet, Sign Out is destructive and uses the system
+                        // confirmation style from the sheet's own binding.
                         Menu {
+                            Button {
+                                showSettings = true
+                            } label: {
+                                Label("Settings", systemImage: "gearshape")
+                            }
+                            Divider()
                             Button(role: .destructive) {
                                 signOut()
                             } label: {
                                 Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                             }
                         } label: {
-                            Image(systemName: "person.circle")
+                            Image(systemName: "ellipsis.circle")
                                 .imageScale(.large)
                         }
                     }
@@ -91,6 +103,12 @@ struct ContentView: View {
                 showTransition(.signedIn(remote: false))
                 Task { await fetchData() }
             }
+        }
+        // Settings lives in a sheet rather than a push so it feels like a
+        // modal side-trip; NavigationStack inside gives us the title bar +
+        // Done button the user expects on iOS modals.
+        .sheet(isPresented: $showSettings) {
+            NavigationStack { SettingsView() }
         }
         // Brief centred overlay that confirms a sign-in or sign-out, then
         // fades itself out. Non-interactive — just acknowledgement. See the
@@ -164,6 +182,10 @@ struct ContentView: View {
             SignOutSignal.markSignedOut()
         }
         UsageService.shared.clearCredentials()
+        // Wipe notification dedup state so a subsequent sign-in (possibly a
+        // different account) doesn't inherit the previous user's "already
+        // fired for this reset window" records.
+        NotificationManager.shared.resetState()
 
         publishSignedOutState()
 
@@ -275,6 +297,15 @@ struct ContentView: View {
             SharedDefaults.save(data)
             WatchSender.shared.send(data)
             WidgetCenter.shared.reloadAllTimelines()
+            // Fire any notifications the new data now qualifies for. The
+            // manager is a no-op when the user has notifications disabled,
+            // so this is cheap to call unconditionally.
+            Task {
+                await NotificationManager.shared.evaluateAndPost(
+                    data: data,
+                    settings: NotificationSettings.shared
+                )
+            }
         }
     }
 }

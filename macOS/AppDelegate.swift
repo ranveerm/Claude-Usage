@@ -151,6 +151,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(NSMenuItem.separator())
         #endif
 
+        // Settings opens the SwiftUI `Settings` scene. Visible in the
+        // right-click menu so users can reach it even when signed out (the
+        // main popover's gear icon only exists on the signed-in layout).
+        let settingsItem = NSMenuItem(title: "Settings…",
+                                      action: #selector(openSettingsFromMenu),
+                                      keyEquivalent: "")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
+        menu.addItem(NSMenuItem.separator())
+
         // Route through our own selector so macOS doesn't auto-attach an
         // SF Symbol next to the title (it decorates standard Apple actions
         // like NSApplication.terminate(_:)).
@@ -167,6 +177,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func handleQuit() {
         NSApp.terminate(nil)
+    }
+
+    /// Opens the SwiftUI `Settings` scene programmatically. Also used by
+    /// the popover's gear button via `openSettings()`.
+    @objc private func openSettingsFromMenu() {
+        openSettings()
+    }
+
+    /// Bring the Settings window to front.
+    ///
+    /// macOS 14 deprecated the `showSettingsWindow:` selector path and now
+    /// prints "Please use SettingsLink for opening the Settings scene." and
+    /// no-ops when sent from AppKit. The replacement (`openSettings`
+    /// environment action) is SwiftUI-only, so we go via
+    /// `SettingsCoordinator` — the popover's root view captures the action
+    /// from its environment and parks it on the coordinator, letting us
+    /// call it synchronously from here.
+    func openSettings() {
+        // Close the popover so the Settings window doesn't open underneath
+        // it (and so the transient popover's own dismiss doesn't fire
+        // while we're mid-activation).
+        popover.performClose(nil)
+        removeEventMonitor()
+
+        NSApp.activate(ignoringOtherApps: true)
+        SettingsCoordinator.shared.open()
     }
 
     #if DEBUG
@@ -264,6 +300,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             SignOutSignal.markSignedOut()
         }
         UsageService.shared.clearCredentials()
+        // Clear the per-(ring, kind) "already fired" records so a subsequent
+        // sign-in doesn't inherit the previous user's state.
+        NotificationManager.shared.resetState()
 
         // Stamp the cached payload as "signed out" so the watch and any
         // companion widgets switch to a sign-in prompt instead of rendering
@@ -327,6 +366,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.usageData = data
             self.statusItem.button?.image = self.renderIcon()
             self.updatePopoverContent()
+            // Fire any threshold/pace notifications the new payload
+            // qualifies for. No-op when notifications are disabled.
+            if data.error == nil && !data.needsLogin {
+                await NotificationManager.shared.evaluateAndPost(
+                    data: data,
+                    settings: NotificationSettings.shared
+                )
+            }
             // Intentionally do NOT auto-call showLogin() here. If the user
             // has signed out (or their session expired) while the app is
             // running, updatePopoverContent() will swap in LoginPromptView
