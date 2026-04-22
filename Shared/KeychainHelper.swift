@@ -2,14 +2,14 @@ import Foundation
 import Security
 
 enum KeychainHelper {
-    private static let service = "com.ranveer.VibeYourRings"
+    private static let service = "com.ranveer.ClaudeYourRings"
 
     // All platforms use the same iCloud-synced shared access group so that
     // credentials written on one device are visible on all others, and a
     // sign-out deletion propagates everywhere automatically.
     // The access group is declared in each target's entitlements under
     // keychain-access-groups, which suppresses the macOS authorisation prompt.
-    private static let accessGroup = "29F59849NR.com.ranveer.VibeYourRings.shared"
+    private static let accessGroup = "29F59849NR.com.ranveer.ClaudeYourRings.shared"
 
     private static func baseQuery(key: String) -> [String: Any] {
         [

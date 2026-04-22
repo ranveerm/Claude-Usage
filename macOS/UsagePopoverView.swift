@@ -33,7 +33,7 @@ struct KeychainDebugView: View {
                 .padding(.bottom, 10)
 
             // ── Keychain ──────────────────────────────────────────
-            sectionHeader("Keychain  ·  service: com.ranveer.VibeYourRings")
+            sectionHeader("Keychain  ·  service: com.ranveer.ClaudeYourRings")
 
             keychainRow("sessionKey",     value: sessionKey)
             keychainRow("cfClearance",    value: cfClearance)
@@ -49,7 +49,7 @@ struct KeychainDebugView: View {
             Divider().padding(.vertical, 8)
 
             // ── UserDefaults (App Group suite) ────────────────────
-            sectionHeader("UserDefaults  ·  group.com.ranveer.VibeYourRings")
+            sectionHeader("UserDefaults  ·  group.com.ranveer.ClaudeYourRings")
 
             if let usage = cachedUsage {
                 let refreshed = usage.lastRefreshed.map {
