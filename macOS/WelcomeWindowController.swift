@@ -74,7 +74,7 @@ private struct WelcomeView: View {
             .padding(.top, 24)
 
             VStack(spacing: 6) {
-                Text("Welcome to Claude Your Rings")
+                Text("Welcome to Vibe Your Rings")
                     .font(.title2).bold()
                 Text("Your Claude usage, always one glance away.")
                     .font(.subheadline)

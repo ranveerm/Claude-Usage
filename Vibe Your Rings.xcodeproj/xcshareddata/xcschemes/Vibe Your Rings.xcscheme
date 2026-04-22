@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "34C14271ADFBB6396601B624"
-               BuildableName = "Claude Your Rings.app"
-               BlueprintName = "Claude Your Rings"
-               ReferencedContainer = "container:Claude Your Rings.xcodeproj">
+               BuildableName = "Vibe Your Rings.app"
+               BlueprintName = "Vibe Your Rings"
+               ReferencedContainer = "container:Vibe Your Rings.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -31,9 +31,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "34C14271ADFBB6396601B624"
-            BuildableName = "Claude Your Rings.app"
-            BlueprintName = "Claude Your Rings"
-            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
+            BuildableName = "Vibe Your Rings.app"
+            BlueprintName = "Vibe Your Rings"
+            ReferencedContainer = "container:Vibe Your Rings.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -54,9 +54,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "34C14271ADFBB6396601B624"
-            BuildableName = "Claude Your Rings.app"
-            BlueprintName = "Claude Your Rings"
-            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
+            BuildableName = "Vibe Your Rings.app"
+            BlueprintName = "Vibe Your Rings"
+            ReferencedContainer = "container:Vibe Your Rings.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -71,9 +71,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "34C14271ADFBB6396601B624"
-            BuildableName = "Claude Your Rings.app"
-            BlueprintName = "Claude Your Rings"
-            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
+            BuildableName = "Vibe Your Rings.app"
+            BlueprintName = "Vibe Your Rings"
+            ReferencedContainer = "container:Vibe Your Rings.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

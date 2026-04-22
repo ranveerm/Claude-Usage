@@ -83,14 +83,14 @@ private let previewEntry = UsageEntry(date: .now, input: CircleRendererInput(
 #endif
 
 struct UsageWidget: Widget {
-    let kind = "com.ranveer.ClaudeYourRings.widget"
+    let kind = "com.ranveer.VibeYourRings.widget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: UsageTimelineProvider()) { entry in
             UsageWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Claude Your Rings")
+        .configurationDisplayName("Vibe Your Rings")
         .description("See your Claude usage rings at a glance.")
         .supportedFamilies([.systemSmall])
     }

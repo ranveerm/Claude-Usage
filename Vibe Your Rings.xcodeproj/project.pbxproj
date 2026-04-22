@@ -38,11 +38,11 @@
 		A3DEF1782F94512A008B9DA4 /* Icon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A3DEF1752F94512A008B9DA4 /* Icon.icon */; };
 		A3DEF1802F9458D2008B9DA4 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3DEF17F2F9458D2008B9DA4 /* WidgetKit.framework */; };
 		A3DEF1822F9458D2008B9DA4 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3DEF1812F9458D2008B9DA4 /* SwiftUI.framework */; };
-		A3DEF18D2F9458D4008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A3DEF17D2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A3DEF18D2F9458D4008B9DA4 /* Vibe Your Rings Watch WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A3DEF17D2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A6127CBE60225E6B8D8CDE19 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
 		A64510FA5C2410016399D4AA /* WelcomeWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6BC06A53EAEDBEC50D7992 /* WelcomeWindowController.swift */; };
-		AA7740F1C84E2A0F4E420F1A /* Claude Your Rings Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D785AA8DBDEC7C2C001ABBDB /* Claude Your Rings Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		BBBB111111111111111A0001 /* Claude Your Rings Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0872308317299AF9E5D1861A /* Claude Your Rings Watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		AA7740F1C84E2A0F4E420F1A /* Vibe Your Rings Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D785AA8DBDEC7C2C001ABBDB /* Vibe Your Rings Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BBBB111111111111111A0001 /* Vibe Your Rings Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0872308317299AF9E5D1861A /* Vibe Your Rings Watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AAAA111111111111111A0001 /* UsageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2067667D40685B11CF39FFB /* UsageData.swift */; };
 		AAAA111111111111111A0002 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFACA71C7F66D153CFC7715 /* SharedDefaults.swift */; };
 		AAAA111111111111111A0003 /* ConcentricCirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AECB6850F4359F607BCEDF3 /* ConcentricCirclesView.swift */; };
@@ -69,21 +69,21 @@
 			containerPortal = E353528F24EE79536AA3DE7E /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A3DEF17C2F9458D2008B9DA4;
-			remoteInfo = "Claude Your Rings Watch WidgetExtension";
+			remoteInfo = "Vibe Your Rings Watch WidgetExtension";
 		};
 		BBBB111111111111111A0003 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E353528F24EE79536AA3DE7E /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = C97218F7F974488344AFEE83;
-			remoteInfo = "Claude Your Rings Watch";
+			remoteInfo = "Vibe Your Rings Watch";
 		};
 		E9B00783FBF549D59E8060DB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E353528F24EE79536AA3DE7E /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = D9EF71E15778C98B8EEC8CF8;
-			remoteInfo = "Claude Your Rings Widget";
+			remoteInfo = "Vibe Your Rings Widget";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -94,7 +94,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				BBBB111111111111111A0001 /* Claude Your Rings Watch.app in Embed Watch Content */,
+				BBBB111111111111111A0001 /* Vibe Your Rings Watch.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -105,7 +105,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				AA7740F1C84E2A0F4E420F1A /* Claude Your Rings Widget.appex in Embed Foundation Extensions */,
+				AA7740F1C84E2A0F4E420F1A /* Vibe Your Rings Widget.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -116,7 +116,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				A3DEF18D2F9458D4008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex in Embed Foundation Extensions */,
+				A3DEF18D2F9458D4008B9DA4 /* Vibe Your Rings Watch WidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -124,8 +124,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0872308317299AF9E5D1861A /* Claude Your Rings Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Claude Your Rings Watch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		120E4BF5343E91F316E0B0B7 /* Claude Your Rings.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Claude Your Rings.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0872308317299AF9E5D1861A /* Vibe Your Rings Watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vibe Your Rings Watch.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		120E4BF5343E91F316E0B0B7 /* Vibe Your Rings.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vibe Your Rings.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		28FF1F9E522A27B21E6BBFE9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2C29CE515E428743F4DEC43F /* WatchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
 		31BDA17F873696646D7F9A0B /* Claude_Usage_iOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage_iOS.entitlements; sourceTree = "<group>"; };
@@ -143,9 +143,9 @@
 		7D8071F779789219DA59E299 /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		8A4C94EDB128C54D9B0F1E4C /* Claude_Usage_Watch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage_Watch.entitlements; sourceTree = "<group>"; };
 		907B23A66F81990524E3D27E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		98DE101EEA7D5873F7AF4FB5 /* Claude Your Rings iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Claude Your Rings iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		98DE101EEA7D5873F7AF4FB5 /* Vibe Your Rings iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Vibe Your Rings iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3DEF1752F94512A008B9DA4 /* Icon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Icon.icon; sourceTree = "<group>"; };
-		A3DEF17D2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Claude Your Rings Watch WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A3DEF17D2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vibe Your Rings Watch WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A3DEF17F2F9458D2008B9DA4 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		A3DEF1812F9458D2008B9DA4 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		A41BD7189CBAB0D61A33F3D3 /* Claude_Usage.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage.entitlements; sourceTree = "<group>"; };
@@ -154,7 +154,7 @@
 		C2A720BA3398B9C3B3193D15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C5075BCD92F3235F0B45B45E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		CD593410A7FA0056686A880A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		D785AA8DBDEC7C2C001ABBDB /* Claude Your Rings Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Claude Your Rings Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D785AA8DBDEC7C2C001ABBDB /* Vibe Your Rings Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Vibe Your Rings Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2067667D40685B11CF39FFB /* UsageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageData.swift; sourceTree = "<group>"; };
 		E252F6DA8F781F92E73CBA72 /* Claude_UsageApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Claude_UsageApp.swift; sourceTree = "<group>"; };
 		E6A8C96E203B54080374D251 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -172,17 +172,17 @@
 			membershipExceptions = (
 				"Info.plist",
 			);
-			target = A3DEF17C2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension */;
+			target = A3DEF17C2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A3DEF1832F9458D2008B9DA4 /* Claude Your Rings Watch Widget */ = {
+		A3DEF1832F9458D2008B9DA4 /* Vibe Your Rings Watch Widget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				AAAA111111111111111E0001 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
 			);
-			path = "Claude Your Rings Watch Widget";
+			path = "Vibe Your Rings Watch Widget";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -269,11 +269,11 @@
 		916840461552EBEA1FCFAE1C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				98DE101EEA7D5873F7AF4FB5 /* Claude Your Rings iOS.app */,
-				0872308317299AF9E5D1861A /* Claude Your Rings Watch.app */,
-				D785AA8DBDEC7C2C001ABBDB /* Claude Your Rings Widget.appex */,
-				120E4BF5343E91F316E0B0B7 /* Claude Your Rings.app */,
-				A3DEF17D2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex */,
+				98DE101EEA7D5873F7AF4FB5 /* Vibe Your Rings iOS.app */,
+				0872308317299AF9E5D1861A /* Vibe Your Rings Watch.app */,
+				D785AA8DBDEC7C2C001ABBDB /* Vibe Your Rings Widget.appex */,
+				120E4BF5343E91F316E0B0B7 /* Vibe Your Rings.app */,
+				A3DEF17D2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -295,7 +295,7 @@
 				2FB366BC4A0AE63545606415 /* Shared */,
 				01EFDD37D73FA4F11F6F49E6 /* Watch */,
 				70268C00EB30A47299AC3C7F /* Widget */,
-				A3DEF1832F9458D2008B9DA4 /* Claude Your Rings Watch Widget */,
+				A3DEF1832F9458D2008B9DA4 /* Vibe Your Rings Watch Widget */,
 				A3DEF17E2F9458D2008B9DA4 /* Frameworks */,
 				916840461552EBEA1FCFAE1C /* Products */,
 				A3DEF1752F94512A008B9DA4 /* Icon.icon */,
@@ -321,9 +321,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		34C14271ADFBB6396601B624 /* Claude Your Rings */ = {
+		34C14271ADFBB6396601B624 /* Vibe Your Rings */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F33ECF7CC704C2834754BAA1 /* Build configuration list for PBXNativeTarget "Claude Your Rings" */;
+			buildConfigurationList = F33ECF7CC704C2834754BAA1 /* Build configuration list for PBXNativeTarget "Vibe Your Rings" */;
 			buildPhases = (
 				83FD3E8616015BA1D8F4747D /* Sources */,
 				DB31AE340B902281897897D9 /* Resources */,
@@ -332,16 +332,16 @@
 			);
 			dependencies = (
 			);
-			name = "Claude Your Rings";
+			name = "Vibe Your Rings";
 			packageProductDependencies = (
 			);
-			productName = "Claude Your Rings";
-			productReference = 120E4BF5343E91F316E0B0B7 /* Claude Your Rings.app */;
+			productName = "Vibe Your Rings";
+			productReference = 120E4BF5343E91F316E0B0B7 /* Vibe Your Rings.app */;
 			productType = "com.apple.product-type.application";
 		};
-		6049FF0A4DC1C84AC59D91C9 /* Claude Your Rings iOS */ = {
+		6049FF0A4DC1C84AC59D91C9 /* Vibe Your Rings iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A4C996038335253F166EBA8C /* Build configuration list for PBXNativeTarget "Claude Your Rings iOS" */;
+			buildConfigurationList = A4C996038335253F166EBA8C /* Build configuration list for PBXNativeTarget "Vibe Your Rings iOS" */;
 			buildPhases = (
 				3D8B5B64CB5D2E4D43D3269F /* Sources */,
 				CCCC111111111111111C0005 /* Frameworks (iOS) */,
@@ -355,16 +355,16 @@
 				4B9F6766A8A317823BA950AA /* PBXTargetDependency */,
 				BBBB111111111111111A0004 /* PBXTargetDependency */,
 			);
-			name = "Claude Your Rings iOS";
+			name = "Vibe Your Rings iOS";
 			packageProductDependencies = (
 			);
-			productName = "Claude Your Rings iOS";
-			productReference = 98DE101EEA7D5873F7AF4FB5 /* Claude Your Rings iOS.app */;
+			productName = "Vibe Your Rings iOS";
+			productReference = 98DE101EEA7D5873F7AF4FB5 /* Vibe Your Rings iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
-		A3DEF17C2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension */ = {
+		A3DEF17C2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A3DEF1922F9458D4008B9DA4 /* Build configuration list for PBXNativeTarget "Claude Your Rings Watch WidgetExtension" */;
+			buildConfigurationList = A3DEF1922F9458D4008B9DA4 /* Build configuration list for PBXNativeTarget "Vibe Your Rings Watch WidgetExtension" */;
 			buildPhases = (
 				A3DEF1792F9458D2008B9DA4 /* Sources */,
 				A3DEF17A2F9458D2008B9DA4 /* Frameworks */,
@@ -375,18 +375,18 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A3DEF1832F9458D2008B9DA4 /* Claude Your Rings Watch Widget */,
+				A3DEF1832F9458D2008B9DA4 /* Vibe Your Rings Watch Widget */,
 			);
-			name = "Claude Your Rings Watch WidgetExtension";
+			name = "Vibe Your Rings Watch WidgetExtension";
 			packageProductDependencies = (
 			);
-			productName = "Claude Your Rings Watch WidgetExtension";
-			productReference = A3DEF17D2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension.appex */;
+			productName = "Vibe Your Rings Watch WidgetExtension";
+			productReference = A3DEF17D2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		C97218F7F974488344AFEE83 /* Claude Your Rings Watch */ = {
+		C97218F7F974488344AFEE83 /* Vibe Your Rings Watch */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 55AF612F0CB1FA698FCBDD55 /* Build configuration list for PBXNativeTarget "Claude Your Rings Watch" */;
+			buildConfigurationList = 55AF612F0CB1FA698FCBDD55 /* Build configuration list for PBXNativeTarget "Vibe Your Rings Watch" */;
 			buildPhases = (
 				DB3D6DC55F44992FEAE4DF28 /* Sources */,
 				CCCC111111111111111C0004 /* Frameworks (Watch) */,
@@ -398,16 +398,16 @@
 			dependencies = (
 				A3DEF18C2F9458D4008B9DA4 /* PBXTargetDependency */,
 			);
-			name = "Claude Your Rings Watch";
+			name = "Vibe Your Rings Watch";
 			packageProductDependencies = (
 			);
-			productName = "Claude Your Rings Watch";
-			productReference = 0872308317299AF9E5D1861A /* Claude Your Rings Watch.app */;
+			productName = "Vibe Your Rings Watch";
+			productReference = 0872308317299AF9E5D1861A /* Vibe Your Rings Watch.app */;
 			productType = "com.apple.product-type.application";
 		};
-		D9EF71E15778C98B8EEC8CF8 /* Claude Your Rings Widget */ = {
+		D9EF71E15778C98B8EEC8CF8 /* Vibe Your Rings Widget */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AD1D81BF9D891396AF313968 /* Build configuration list for PBXNativeTarget "Claude Your Rings Widget" */;
+			buildConfigurationList = AD1D81BF9D891396AF313968 /* Build configuration list for PBXNativeTarget "Vibe Your Rings Widget" */;
 			buildPhases = (
 				39F81C72ABC225EDC87426AC /* Sources */,
 			);
@@ -415,11 +415,11 @@
 			);
 			dependencies = (
 			);
-			name = "Claude Your Rings Widget";
+			name = "Vibe Your Rings Widget";
 			packageProductDependencies = (
 			);
-			productName = "Claude Your Rings Widget";
-			productReference = D785AA8DBDEC7C2C001ABBDB /* Claude Your Rings Widget.appex */;
+			productName = "Vibe Your Rings Widget";
+			productReference = D785AA8DBDEC7C2C001ABBDB /* Vibe Your Rings Widget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -454,7 +454,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E2CD1EA3EC637595D704DE09 /* Build configuration list for PBXProject "Claude Your Rings" */;
+			buildConfigurationList = E2CD1EA3EC637595D704DE09 /* Build configuration list for PBXProject "Vibe Your Rings" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -468,11 +468,11 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				34C14271ADFBB6396601B624 /* Claude Your Rings */,
-				C97218F7F974488344AFEE83 /* Claude Your Rings Watch */,
-				D9EF71E15778C98B8EEC8CF8 /* Claude Your Rings Widget */,
-				6049FF0A4DC1C84AC59D91C9 /* Claude Your Rings iOS */,
-				A3DEF17C2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension */,
+				34C14271ADFBB6396601B624 /* Vibe Your Rings */,
+				C97218F7F974488344AFEE83 /* Vibe Your Rings Watch */,
+				D9EF71E15778C98B8EEC8CF8 /* Vibe Your Rings Widget */,
+				6049FF0A4DC1C84AC59D91C9 /* Vibe Your Rings iOS */,
+				A3DEF17C2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -596,17 +596,17 @@
 /* Begin PBXTargetDependency section */
 		4B9F6766A8A317823BA950AA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = D9EF71E15778C98B8EEC8CF8 /* Claude Your Rings Widget */;
+			target = D9EF71E15778C98B8EEC8CF8 /* Vibe Your Rings Widget */;
 			targetProxy = E9B00783FBF549D59E8060DB /* PBXContainerItemProxy */;
 		};
 		A3DEF18C2F9458D4008B9DA4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A3DEF17C2F9458D2008B9DA4 /* Claude Your Rings Watch WidgetExtension */;
+			target = A3DEF17C2F9458D2008B9DA4 /* Vibe Your Rings Watch WidgetExtension */;
 			targetProxy = A3DEF18B2F9458D4008B9DA4 /* PBXContainerItemProxy */;
 		};
 		BBBB111111111111111A0004 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C97218F7F974488344AFEE83 /* Claude Your Rings Watch */;
+			target = C97218F7F974488344AFEE83 /* Vibe Your Rings Watch */;
 			targetProxy = BBBB111111111111111A0003 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -630,7 +630,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.ClaudeYourRings;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.VibeYourRings;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 			};
@@ -646,7 +646,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.ClaudeYourRings.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.VibeYourRings.widget;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -729,7 +729,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.ClaudeYourRings.widget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.VibeYourRings.widget;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -752,7 +752,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.ClaudeYourRings;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.VibeYourRings;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -776,7 +776,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.ClaudeYourRings;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.VibeYourRings;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 			};
@@ -799,7 +799,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.ClaudeYourRings;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.VibeYourRings;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -813,7 +813,7 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = "Claude Your Rings Watch Widget/Claude_Usage_WatchWidget.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Vibe Your Rings Watch Widget/Claude_Usage_WatchWidget.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = 29F59849NR;
@@ -823,7 +823,7 @@
 					"$(inherited)",
 				);
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Claude Your Rings Watch Widget/Info.plist";
+				INFOPLIST_FILE = "Vibe Your Rings Watch Widget/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -832,7 +832,7 @@
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.ClaudeYourRings.watchkitapp.Claude-Your-Rings-Watch-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.VibeYourRings.watchkitapp.Claude-Your-Rings-Watch-Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -856,13 +856,13 @@
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = "Claude Your Rings Watch Widget/Claude_Usage_WatchWidget.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Vibe Your Rings Watch Widget/Claude_Usage_WatchWidget.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "Claude Your Rings Watch Widget/Info.plist";
+				INFOPLIST_FILE = "Vibe Your Rings Watch Widget/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -871,7 +871,7 @@
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0.2;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.ClaudeYourRings.watchkitapp.Claude-Your-Rings-Watch-Widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.VibeYourRings.watchkitapp.Claude-Your-Rings-Watch-Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -894,8 +894,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.ranveer.ClaudeYourRings;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.ClaudeYourRings.watchkitapp;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.ranveer.VibeYourRings;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.VibeYourRings.watchkitapp;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -984,8 +984,8 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.ranveer.ClaudeYourRings;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.ClaudeYourRings.watchkitapp;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.ranveer.VibeYourRings;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ranveer.VibeYourRings.watchkitapp;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
@@ -995,7 +995,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		55AF612F0CB1FA698FCBDD55 /* Build configuration list for PBXNativeTarget "Claude Your Rings Watch" */ = {
+		55AF612F0CB1FA698FCBDD55 /* Build configuration list for PBXNativeTarget "Vibe Your Rings Watch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FEB33953CED294A9575D6E1D /* Debug */,
@@ -1004,7 +1004,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		A3DEF1922F9458D4008B9DA4 /* Build configuration list for PBXNativeTarget "Claude Your Rings Watch WidgetExtension" */ = {
+		A3DEF1922F9458D4008B9DA4 /* Build configuration list for PBXNativeTarget "Vibe Your Rings Watch WidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A3DEF18F2F9458D4008B9DA4 /* Debug */,
@@ -1013,7 +1013,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		A4C996038335253F166EBA8C /* Build configuration list for PBXNativeTarget "Claude Your Rings iOS" */ = {
+		A4C996038335253F166EBA8C /* Build configuration list for PBXNativeTarget "Vibe Your Rings iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A1ED08B9DBBBFAF6D700677 /* Debug */,
@@ -1022,7 +1022,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		AD1D81BF9D891396AF313968 /* Build configuration list for PBXNativeTarget "Claude Your Rings Widget" */ = {
+		AD1D81BF9D891396AF313968 /* Build configuration list for PBXNativeTarget "Vibe Your Rings Widget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5F1B71B7018D4D7862293285 /* Debug */,
@@ -1031,7 +1031,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		E2CD1EA3EC637595D704DE09 /* Build configuration list for PBXProject "Claude Your Rings" */ = {
+		E2CD1EA3EC637595D704DE09 /* Build configuration list for PBXProject "Vibe Your Rings" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EF17FB5F5FBF740310089092 /* Debug */,
@@ -1040,7 +1040,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		F33ECF7CC704C2834754BAA1 /* Build configuration list for PBXNativeTarget "Claude Your Rings" */ = {
+		F33ECF7CC704C2834754BAA1 /* Build configuration list for PBXNativeTarget "Vibe Your Rings" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				95A991D24A6401AB6DE98627 /* Debug */,

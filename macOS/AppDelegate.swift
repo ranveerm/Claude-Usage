@@ -154,7 +154,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Route through our own selector so macOS doesn't auto-attach an
         // SF Symbol next to the title (it decorates standard Apple actions
         // like NSApplication.terminate(_:)).
-        let quitItem = NSMenuItem(title: "Quit \u{201C}Claude Your Rings\u{201D}",
+        let quitItem = NSMenuItem(title: "Quit \u{201C}Vibe Your Rings\u{201D}",
                                   action: #selector(handleQuit),
                                   keyEquivalent: "")
         quitItem.target = self

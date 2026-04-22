@@ -37,7 +37,7 @@ struct ContentView: View {
                 .padding()
             }
             .refreshable { await fetchData() }
-            .navigationTitle("Claude Your Rings")
+            .navigationTitle("Vibe Your Rings")
             // Use inline title to avoid a large-title layout-state bug that
             // left-clips the title after a fullScreenCover dismiss.
             .navigationBarTitleDisplayMode(.inline)
@@ -413,7 +413,7 @@ private struct ContentViewPreview: View {
                 }
                 .padding()
             }
-            .navigationTitle("Claude Your Rings")
+            .navigationTitle("Vibe Your Rings")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Image(systemName: "person.circle")
@@ -461,7 +461,7 @@ private struct LoginStatePreview: View {
                     .padding(.top, 40)
                     .padding()
             }
-            .navigationTitle("Claude Your Rings")
+            .navigationTitle("Vibe Your Rings")
             .navigationBarTitleDisplayMode(.inline)
         }
     }

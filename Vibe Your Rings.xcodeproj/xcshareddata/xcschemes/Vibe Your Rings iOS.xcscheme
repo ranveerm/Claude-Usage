@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "2630"
-   version = "1.3">
+   wasCreatedForAppExtension = "YES"
+   version = "2.0">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
@@ -14,10 +15,24 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "C97218F7F974488344AFEE83"
-               BuildableName = "Claude Your Rings Watch.app"
-               BlueprintName = "Claude Your Rings Watch"
-               ReferencedContainer = "container:Claude Your Rings.xcodeproj">
+               BlueprintIdentifier = "D9EF71E15778C98B8EEC8CF8"
+               BuildableName = "Vibe Your Rings Widget.appex"
+               BlueprintName = "Vibe Your Rings Widget"
+               ReferencedContainer = "container:Vibe Your Rings.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "6049FF0A4DC1C84AC59D91C9"
+               BuildableName = "Vibe Your Rings iOS.app"
+               BlueprintName = "Vibe Your Rings iOS"
+               ReferencedContainer = "container:Vibe Your Rings.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -30,10 +45,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C97218F7F974488344AFEE83"
-            BuildableName = "Claude Your Rings Watch.app"
-            BlueprintName = "Claude Your Rings Watch"
-            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
+            BlueprintIdentifier = "D9EF71E15778C98B8EEC8CF8"
+            BuildableName = "Vibe Your Rings Widget.appex"
+            BlueprintName = "Vibe Your Rings Widget"
+            ReferencedContainer = "container:Vibe Your Rings.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -41,22 +56,24 @@
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
-      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
-      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      selectedDebuggerIdentifier = ""
+      selectedLauncherIdentifier = "Xcode.IDEFoundation.Launcher.PosixSpawn"
       launchStyle = "0"
+      askForAppToLaunch = "Yes"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
-      allowLocationSimulation = "YES">
+      allowLocationSimulation = "YES"
+      launchAutomaticallySubstyle = "2">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C97218F7F974488344AFEE83"
-            BuildableName = "Claude Your Rings Watch.app"
-            BlueprintName = "Claude Your Rings Watch"
-            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
+            BlueprintIdentifier = "D9EF71E15778C98B8EEC8CF8"
+            BuildableName = "Vibe Your Rings Widget.appex"
+            BlueprintName = "Vibe Your Rings Widget"
+            ReferencedContainer = "container:Vibe Your Rings.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -70,10 +87,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "C97218F7F974488344AFEE83"
-            BuildableName = "Claude Your Rings Watch.app"
-            BlueprintName = "Claude Your Rings Watch"
-            ReferencedContainer = "container:Claude Your Rings.xcodeproj">
+            BlueprintIdentifier = "D9EF71E15778C98B8EEC8CF8"
+            BuildableName = "Vibe Your Rings Widget.appex"
+            BlueprintName = "Vibe Your Rings Widget"
+            ReferencedContainer = "container:Vibe Your Rings.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

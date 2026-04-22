@@ -8,13 +8,13 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.ranveer.ClaudeYourRings</string>
+		<string>group.com.ranveer.VibeYourRings</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)com.ranveer.ClaudeYourRings.shared</string>
+		<string>$(AppIdentifierPrefix)com.ranveer.VibeYourRings.shared</string>
 	</array>
 	<key>com.apple.developer.ubiquity-kvstore-identifier</key>
-	<string>$(TeamIdentifierPrefix)com.ranveer.ClaudeYourRings</string>
+	<string>$(TeamIdentifierPrefix)com.ranveer.VibeYourRings</string>
 </dict>
 </plist>

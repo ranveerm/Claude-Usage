@@ -88,7 +88,7 @@ struct WatchComplicationView: View {
 // MARK: - Widget definition
 
 struct WatchComplication: Widget {
-    let kind = "com.ranveer.ClaudeYourRings.watch.complication"
+    let kind = "com.ranveer.VibeYourRings.watch.complication"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: WatchUsageProvider()) { entry in
