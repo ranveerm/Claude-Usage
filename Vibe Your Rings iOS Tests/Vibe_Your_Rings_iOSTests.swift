@@ -150,6 +150,21 @@ final class RingSnapshotTests: XCTestCase {
         )), as: .image)
     }
 
+    // Pro tier: middle (Sonnet) ring renders in grey to signal the metric
+    // isn't applicable, while outer (session) and inner (all models) remain
+    // orange. Catches regressions in the palette threading through ringLayer.
+    func testRings_proTierGreyedMiddle() {
+        assertSnapshot(of: ringsView(CircleRendererInput(
+            sessionProgress:       0.40,
+            sonnetProgress:        0,      // unused when !sonnetApplicable
+            allModelsProgress:     0.55,
+            sessionTimeProgress:   0.35,
+            sonnetTimeProgress:    0,
+            allModelsTimeProgress: 0.45,
+            sonnetApplicable:      false
+        )), as: .image)
+    }
+
     // MARK: Helper
 
     private func ringsView(_ input: CircleRendererInput) -> UIView {

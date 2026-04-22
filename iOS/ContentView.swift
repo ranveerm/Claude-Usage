@@ -124,7 +124,8 @@ struct ContentView: View {
                 UsageRowView(label: "Sonnet Weekly",
                              utilization: usageData.sonnetWeeklyUtilization,
                              resetsAt: usageData.sonnetWeeklyResetsAt,
-                             systemImage: "calendar")
+                             systemImage: "calendar",
+                             isApplicable: usageData.sonnetWeeklyApplicable)
                 Divider()
                 UsageRowView(label: "All Models Weekly",
                              utilization: usageData.allModelsWeeklyUtilization,
@@ -343,6 +344,14 @@ struct TransitionOverlay: View {
 // MARK: - Preview
 
 #if DEBUG
+/// The two subscription tiers the preview can mock. Pro omits the
+/// Sonnet-weekly metric; Max has all three.
+private enum PreviewTier: String, CaseIterable, Identifiable {
+    case max = "Max"
+    case pro = "Pro"
+    var id: String { rawValue }
+}
+
 private struct ContentViewPreview: View {
     @State private var sessionUsage: Double = 0.69
     @State private var sonnetUsage: Double = 0.33
@@ -350,6 +359,7 @@ private struct ContentViewPreview: View {
     @State private var sessionTime: Double = 0.42
     @State private var sonnetTime: Double = 0.60
     @State private var allModelsTime: Double = 0.55
+    @State private var tier: PreviewTier = .max
 
     private func resetsAt(timeProgress: Double, period: TimeInterval) -> Date {
         Date().addingTimeInterval((1.0 - timeProgress) * period)
@@ -359,8 +369,10 @@ private struct ContentViewPreview: View {
         UsageData(
             sessionUtilization:         sessionUsage   * 100,
             sessionResetsAt:            resetsAt(timeProgress: sessionTime,   period: 5 * 3600),
-            sonnetWeeklyUtilization:    sonnetUsage    * 100,
-            sonnetWeeklyResetsAt:       resetsAt(timeProgress: sonnetTime,    period: 7 * 86400),
+            sonnetWeeklyUtilization:    tier == .pro ? 0 : sonnetUsage * 100,
+            sonnetWeeklyResetsAt:       tier == .pro ? nil
+                                                     : resetsAt(timeProgress: sonnetTime, period: 7 * 86400),
+            sonnetWeeklyApplicable:     tier == .max,
             allModelsWeeklyUtilization: allModelsUsage * 100,
             allModelsWeeklyResetsAt:    resetsAt(timeProgress: allModelsTime, period: 7 * 86400),
             lastRefreshed:              Date()
@@ -384,7 +396,8 @@ private struct ContentViewPreview: View {
                         UsageRowView(label: "Sonnet Weekly",
                                      utilization: mockData.sonnetWeeklyUtilization,
                                      resetsAt: mockData.sonnetWeeklyResetsAt,
-                                     systemImage: "calendar")
+                                     systemImage: "calendar",
+                                     isApplicable: mockData.sonnetWeeklyApplicable)
                         Divider()
                         UsageRowView(label: "All Models Weekly",
                                      utilization: mockData.allModelsWeeklyUtilization,
@@ -399,12 +412,23 @@ private struct ContentViewPreview: View {
 
                     Divider()
 
+                    // Tier picker sits just above the sliders so it's the
+                    // first thing you reach for when verifying the Pro-tier
+                    // greyed-out rendering.
+                    Picker("Account tier", selection: $tier) {
+                        ForEach(PreviewTier.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal)
+
                     VStack(spacing: 10) {
                         sliderRow("Session Usage",    value: $sessionUsage)
                         sliderRow("Session Time",     value: $sessionTime)
                         Divider()
                         sliderRow("Sonnet Usage",     value: $sonnetUsage)
+                            .disabled(tier == .pro)
                         sliderRow("Sonnet Time",      value: $sonnetTime)
+                            .disabled(tier == .pro)
                         Divider()
                         sliderRow("All Models Usage", value: $allModelsUsage)
                         sliderRow("All Models Time",  value: $allModelsTime)

@@ -24,6 +24,8 @@ import SwiftUI
 struct ConcentricCirclesView: View {
     let input: CircleRendererInput
 
+    @Environment(\.colorScheme) private var colorScheme
+
     /// SF symbol names overlaid at the 12 o'clock position of each ring.
     /// Pass `nil` to hide for that ring.
     var outerIcon:  String? = "calendar.day.timeline.left"
@@ -48,10 +50,15 @@ struct ConcentricCirclesView: View {
                           usage: input.sessionProgress,
                           time:  input.sessionTimeProgress)
 
+                // Middle ring (Sonnet): rendered in grey rather than orange
+                // for Pro-tier users, who don't have this metric. The ring
+                // itself still reads as "there's a quota here", but its
+                // dimmed colouring matches the "N/A" treatment in the list.
                 ringLayer(centerLineRadius: midR, lineWidth: lineWidth,
                           iconSize: iconSize, iconName: middleIcon,
-                          usage: input.sonnetProgress,
-                          time:  input.sonnetTimeProgress)
+                          usage: input.sonnetApplicable ? input.sonnetProgress : 0,
+                          time:  input.sonnetApplicable ? input.sonnetTimeProgress : 0,
+                          palette: input.sonnetApplicable ? .orange : .grey)
 
                 ringLayer(centerLineRadius: innerR, lineWidth: lineWidth,
                           iconSize: iconSize, iconName: innerIcon,
@@ -65,6 +72,12 @@ struct ConcentricCirclesView: View {
 
     // MARK: - Ring construction
 
+    /// Colour scheme for a single ring. Per-ring override lets the middle
+    /// ring dim to grey for Pro-tier users where the metric isn't applicable.
+    enum Palette {
+        case orange, grey
+    }
+
     @ViewBuilder
     private func ringLayer(
         centerLineRadius r: CGFloat,
@@ -72,7 +85,8 @@ struct ConcentricCirclesView: View {
         iconSize: CGFloat,
         iconName: String?,
         usage: Double,
-        time: Double
+        time: Double,
+        palette: Palette = .orange
     ) -> some View {
         // Frame the Circle so its stroke's centre-line coincides with `r`.
         // A Circle inscribed in a `(diameter, diameter)` frame has path
@@ -86,10 +100,14 @@ struct ConcentricCirclesView: View {
         let isOvershoot = usageClamped > timeClamped && timeClamped > 0
         let cutExtent: CGFloat = isOvershoot ? timeClamped : 0
 
+        let trackColor = palette == .grey ? greyTrack  : Self.trackOrange
+        let timeColor  = palette == .grey ? greyFaded  : Self.fadedOrange
+        let usageColor = palette == .grey ? greySolid  : Self.anthropicOrange
+
         ZStack {
             // 1. Track — faint full circle.
             Circle()
-                .stroke(Self.trackOrange, lineWidth: lw)
+                .stroke(trackColor, lineWidth: lw)
                 .frame(width: diameter, height: diameter)
 
             // 2. Time capsule — drawn first so the (possibly-cut) usage
@@ -99,7 +117,7 @@ struct ConcentricCirclesView: View {
                 .trim(from: 0, to: timeClamped)
                 .rotation(.degrees(-90))
                 .stroke(
-                    Self.fadedOrange,
+                    timeColor,
                     style: StrokeStyle(lineWidth: lw, lineCap: .round)
                 )
                 .frame(width: diameter, height: diameter)
@@ -122,7 +140,7 @@ struct ConcentricCirclesView: View {
                     .trim(from: 0, to: usageClamped)
                     .rotation(.degrees(-90))
                     .stroke(
-                        Self.anthropicOrange,
+                        usageColor,
                         style: StrokeStyle(lineWidth: lw, lineCap: .round)
                     )
                     .frame(width: diameter, height: diameter)
@@ -143,7 +161,7 @@ struct ConcentricCirclesView: View {
             if let iconName {
                 Image(systemName: iconName)
                     .font(.system(size: iconSize))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(iconColor(for: palette))
                     .offset(y: -r)
             }
         }
@@ -154,4 +172,25 @@ struct ConcentricCirclesView: View {
     static let anthropicOrange = Color(red: 0xDA / 255.0, green: 0x77 / 255.0, blue: 0x56 / 255.0)
     private static let trackOrange = anthropicOrange.opacity(0.2)
     private static let fadedOrange = anthropicOrange.opacity(0.35)
+
+    // Grey palette — adaptive so the disabled ring stays legible on both
+    // light and dark backgrounds. In light mode the ring is near-white so it
+    // reads as "empty/inactive"; in dark mode it stays a subtle secondary grey.
+    private var greySolid: Color {
+        colorScheme == .dark ? Color.secondary : Color(white: 0.78)
+    }
+    private var greyFaded: Color {
+        colorScheme == .dark ? Color.secondary.opacity(0.30) : Color(white: 0.86)
+    }
+    private var greyTrack: Color {
+        colorScheme == .dark ? Color.secondary.opacity(0.15) : Color(white: 0.91)
+    }
+
+    /// Icon colour for the 12 o'clock glyph. Orange rings always use white;
+    /// grey rings flip to near-black in light mode so the glyph is readable
+    /// against the near-white ring surface.
+    private func iconColor(for palette: Palette) -> Color {
+        guard palette == .grey else { return .white }
+        return colorScheme == .dark ? .white : Color(white: 0.15)
+    }
 }

@@ -15,7 +15,8 @@ func circleInput(from data: UsageData) -> CircleRendererInput {
         allModelsProgress: data.allModelsWeeklyUtilization / 100.0,
         sessionTimeProgress: timeElapsed(resetsAt: data.sessionResetsAt, period: 5 * 3600),
         sonnetTimeProgress: timeElapsed(resetsAt: data.sonnetWeeklyResetsAt, period: 7 * 86400),
-        allModelsTimeProgress: timeElapsed(resetsAt: data.allModelsWeeklyResetsAt, period: 7 * 86400)
+        allModelsTimeProgress: timeElapsed(resetsAt: data.allModelsWeeklyResetsAt, period: 7 * 86400),
+        sonnetApplicable: data.sonnetWeeklyApplicable
     )
 }
 
@@ -27,31 +28,46 @@ struct UsageRowView: View {
     let resetsAt: Date?
     /// Optional SF symbol shown to the left as a subtle ring legend indicator.
     var systemImage: String? = nil
+    /// When `false`, the row is rendered in a dimmed grey state with "N/A"
+    /// instead of a percentage, for tiers where this particular metric
+    /// isn't exposed by the API (e.g. Pro users have no Sonnet-weekly limit).
+    /// Defaults to `true` so existing call sites are unaffected.
+    var isApplicable: Bool = true
 
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
             if let systemImage {
                 Image(systemName: systemImage)
                     .font(.caption)
-                    .foregroundStyle(ConcentricCirclesView.anthropicOrange.opacity(0.8))
+                    .foregroundStyle(iconTint)
                     .frame(width: 14)
             }
             VStack(alignment: .leading, spacing: 1) {
                 HStack {
                     Text(label)
                         .font(.caption)
+                        .foregroundStyle(isApplicable ? .primary : .secondary)
                     Spacer()
-                    Text(String(format: "%.0f%%", utilization))
+                    Text(isApplicable ? String(format: "%.0f%%", utilization) : "N/A")
                         .font(.caption)
                         .monospacedDigit()
+                        .foregroundStyle(isApplicable ? .primary : .secondary)
                 }
-                if let resets = resetsAt {
+                // When not applicable there's no reset date anyway, and even
+                // if one snuck through we'd rather suppress it than imply
+                // this metric is ticking down.
+                if isApplicable, let resets = resetsAt {
                     Text("resets \(resets.formatted(.relative(presentation: .named)))")
                         .font(.system(size: 9))
                         .foregroundColor(.secondary)
                 }
             }
         }
+        .opacity(isApplicable ? 1.0 : 0.65)
+    }
+
+    private var iconTint: Color {
+        isApplicable ? ConcentricCirclesView.anthropicOrange.opacity(0.8) : .secondary
     }
 }
 

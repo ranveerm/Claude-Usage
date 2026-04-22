@@ -134,11 +134,17 @@ final class UsageService {
         let weekly = parseLimit("seven_day")
         let sonnet = parseLimit("seven_day_sonnet")
 
+        // Pro tier responses omit `seven_day_sonnet` entirely; Max tier
+        // includes it (even at 0% utilisation). We key off presence of the
+        // block, not the numeric value, to tell the two apart.
+        let sonnetApplicable = (json["seven_day_sonnet"] as? [String: Any]) != nil
+
         return UsageData(
             sessionUtilization: session.utilization,
             sessionResetsAt: session.resetsAt,
             sonnetWeeklyUtilization: sonnet.utilization,
             sonnetWeeklyResetsAt: sonnet.resetsAt,
+            sonnetWeeklyApplicable: sonnetApplicable,
             allModelsWeeklyUtilization: weekly.utilization,
             allModelsWeeklyResetsAt: weekly.resetsAt,
             lastRefreshed: Date()

@@ -166,6 +166,14 @@ struct KeychainDebugView: View {
 // MARK: - Preview
 
 #if DEBUG
+/// The two subscription tiers the preview can mock. Pro omits the
+/// Sonnet-weekly metric; Max has all three.
+private enum PreviewTier: String, CaseIterable, Identifiable {
+    case max = "Max"
+    case pro = "Pro"
+    var id: String { rawValue }
+}
+
 private struct UsagePopoverPreview: View {
     @State private var sessionUsage: Double = 0.69
     @State private var sonnetUsage: Double = 0.33
@@ -173,6 +181,7 @@ private struct UsagePopoverPreview: View {
     @State private var sessionTime: Double = 0.42
     @State private var sonnetTime: Double = 0.60
     @State private var allModelsTime: Double = 0.55
+    @State private var tier: PreviewTier = .max
 
     var body: some View {
         VStack(spacing: 16) {
@@ -185,12 +194,24 @@ private struct UsagePopoverPreview: View {
 
             Divider()
 
+            // Tier picker sits above the sliders so it's the first thing
+            // you reach for when debugging Pro-specific rendering. Sliders
+            // for the Sonnet row are visually dimmed in Pro mode too,
+            // mirroring how the production UI treats the row.
+            Picker("Account tier", selection: $tier) {
+                ForEach(PreviewTier.allCases) { Text($0.rawValue).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+
             VStack(spacing: 10) {
                 sliderRow("Session Usage",     value: $sessionUsage)
                 sliderRow("Session Time",      value: $sessionTime)
                 Divider()
                 sliderRow("Sonnet Usage",      value: $sonnetUsage)
+                    .disabled(tier == .pro)
                 sliderRow("Sonnet Time",       value: $sonnetTime)
+                    .disabled(tier == .pro)
                 Divider()
                 sliderRow("All Models Usage",  value: $allModelsUsage)
                 sliderRow("All Models Time",   value: $allModelsTime)
@@ -205,8 +226,10 @@ private struct UsagePopoverPreview: View {
         UsageData(
             sessionUtilization:       sessionUsage    * 100,
             sessionResetsAt:          resetsAt(timeProgress: sessionTime,    period: 5 * 3600),
-            sonnetWeeklyUtilization:  sonnetUsage     * 100,
-            sonnetWeeklyResetsAt:     resetsAt(timeProgress: sonnetTime,     period: 7 * 86400),
+            sonnetWeeklyUtilization:  tier == .pro ? 0 : sonnetUsage * 100,
+            sonnetWeeklyResetsAt:     tier == .pro ? nil
+                                                   : resetsAt(timeProgress: sonnetTime, period: 7 * 86400),
+            sonnetWeeklyApplicable:   tier == .max,
             allModelsWeeklyUtilization: allModelsUsage * 100,
             allModelsWeeklyResetsAt:  resetsAt(timeProgress: allModelsTime,  period: 7 * 86400),
             lastRefreshed:            Date()
@@ -341,7 +364,8 @@ struct UsagePopoverView: View {
                     UsageRowView(label: "Sonnet Weekly",
                                  utilization: usageData.sonnetWeeklyUtilization,
                                  resetsAt: usageData.sonnetWeeklyResetsAt,
-                                 systemImage: "calendar")
+                                 systemImage: "calendar",
+                                 isApplicable: usageData.sonnetWeeklyApplicable)
                     UsageRowView(label: "All Models Weekly",
                                  utilization: usageData.allModelsWeeklyUtilization,
                                  resetsAt: usageData.allModelsWeeklyResetsAt,

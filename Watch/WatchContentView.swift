@@ -68,7 +68,8 @@ private struct DetailPage: View {
                     label: "Sonnet Weekly",
                     utilization: data.sonnetWeeklyUtilization,
                     resetsAt: data.sonnetWeeklyResetsAt,
-                    systemImage: "calendar"
+                    systemImage: "calendar",
+                    isApplicable: data.sonnetWeeklyApplicable
                 )
                 Divider()
                 UsageRowView(

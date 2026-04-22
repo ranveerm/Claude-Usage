@@ -104,6 +104,40 @@ final class UsageServiceLogicTests: XCTestCase {
         XCTAssertEqual(result.sessionUtilization, 0)
     }
 
+    // MARK: Pro vs Max tier detection
+
+    func testParseUsageResponse_maxTier_hasSonnetApplicable() throws {
+        // Max tier: `seven_day_sonnet` block is present (even at 0%).
+        let json = """
+        {
+          "five_hour":        { "utilization": 10.0 },
+          "seven_day":        { "utilization": 5.0 },
+          "seven_day_sonnet": { "utilization": 0.0 }
+        }
+        """.data(using: .utf8)!
+
+        let result = UsageService.shared.parseUsageResponse(json)
+        XCTAssertTrue(result.sonnetWeeklyApplicable,
+            "Presence of seven_day_sonnet implies a Max subscription.")
+    }
+
+    func testParseUsageResponse_proTier_marksSonnetNotApplicable() throws {
+        // Pro tier: the API omits `seven_day_sonnet` entirely.
+        let json = """
+        {
+          "five_hour": { "utilization": 30.0 },
+          "seven_day": { "utilization": 12.0 }
+        }
+        """.data(using: .utf8)!
+
+        let result = UsageService.shared.parseUsageResponse(json)
+        XCTAssertFalse(result.sonnetWeeklyApplicable,
+            "Absent seven_day_sonnet is the signal for a Pro subscription.")
+        // And the utilisation falls back to 0 so existing consumers that
+        // read the Double field (widget, complication) don't crash.
+        XCTAssertEqual(result.sonnetWeeklyUtilization, 0)
+    }
+
     // MARK: isCloudflareError
 
     func testIsCloudflareError_detectsKnownMarkers() {
@@ -181,6 +215,24 @@ final class PopoverSnapshotTests: XCTestCase {
     func testPopover_empty() {
         assertSnapshot(of: hosted(makePopover(state: .empty),
                                   size: CGSize(width: 320, height: 160)),
+                       as: .image)
+    }
+
+    // Pro tier: Sonnet weekly metric isn't available. The middle ring
+    // should render grey and the "Sonnet Weekly" list row should read "N/A"
+    // in a dimmed style rather than "0%".
+    func testPopover_proTier() {
+        var data = makeUsageData()
+        data.sonnetWeeklyUtilization = 0
+        data.sonnetWeeklyResetsAt = nil
+        data.sonnetWeeklyApplicable = false
+        let view = UsagePopoverView(
+            usageData: data,
+            isConfigured: true,
+            onRefresh: {},
+            onLogin: {}
+        )
+        assertSnapshot(of: hosted(view, size: CGSize(width: 320, height: 160)),
                        as: .image)
     }
 
