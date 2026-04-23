@@ -6,7 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private let popover = NSPopover()
     private var refreshTimer: Timer?
-    private var usageData = UsageData()
+    private var usageData = SharedDefaults.load() ?? UsageData()
     private var hostingController: NSHostingController<UsagePopoverView>!
     private var eventMonitor: Any?
 
