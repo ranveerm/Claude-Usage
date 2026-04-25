@@ -11,7 +11,7 @@ enum UsageRing: String, CaseIterable {
     /// Human-readable label used in notification copy.
     var label: String {
         switch self {
-        case .session:   return "Session (5h)"
+        case .session:   return "Current Session"
         case .sonnet:    return "Sonnet weekly"
         case .allModels: return "All-models weekly"
         }
@@ -62,18 +62,35 @@ struct PendingNotification: Equatable {
 struct NotificationState: Codable, Equatable {
     private var firedFor: [String: Date] = [:]
 
-    mutating func markFired(ring: UsageRing, kind: AlertKind, resetsAt: Date?) {
+    /// - Parameters:
+    ///   - usageBucket: For pace alerts, pass `Int(utilization / 20)` so each
+    ///     20% segment (0–19, 20–39, …) gets its own dedup slot. Omit (nil)
+    ///     for threshold alerts, which fire once per window regardless of level.
+    mutating func markFired(ring: UsageRing, kind: AlertKind, resetsAt: Date?, usageBucket: Int? = nil) {
         guard let resetsAt else { return }
-        firedFor[Self.key(ring, kind)] = resetsAt
+        firedFor[Self.key(ring, kind, bucket: usageBucket)] = Self.normalise(resetsAt)
     }
 
-    func hasFired(ring: UsageRing, kind: AlertKind, for resetsAt: Date?) -> Bool {
+    func hasFired(ring: UsageRing, kind: AlertKind, for resetsAt: Date?, usageBucket: Int? = nil) -> Bool {
         guard let resetsAt else { return false }
-        return firedFor[Self.key(ring, kind)] == resetsAt
+        return firedFor[Self.key(ring, kind, bucket: usageBucket)] == Self.normalise(resetsAt)
     }
 
-    private static func key(_ ring: UsageRing, _ kind: AlertKind) -> String {
-        "\(ring.rawValue).\(kind.rawValue)"
+    private static func key(_ ring: UsageRing, _ kind: AlertKind, bucket: Int? = nil) -> String {
+        if let bucket {
+            return "\(ring.rawValue).\(kind.rawValue).b\(bucket)"
+        }
+        return "\(ring.rawValue).\(kind.rawValue)"
+    }
+
+    /// Round to the nearest minute to absorb server-side timestamp jitter.
+    /// The server recomputes `resetsAt` as "now + remaining" on every request,
+    /// so two fetches within the same window produce slightly different Dates.
+    /// Rounding to the minute ensures exact equality holds across fetches
+    /// while still detecting a genuine window rollover (≥ 1 minute apart).
+    static func normalise(_ date: Date) -> Date {
+        let t = date.timeIntervalSinceReferenceDate
+        return Date(timeIntervalSinceReferenceDate: (t / 60).rounded() * 60)
     }
 }
 
@@ -113,16 +130,19 @@ enum NotificationEvaluator {
                     usagePercent: utilization,
                     resetsAt: resetsAt,
                     title: "\(ring.label) at \(Int(utilization.rounded()))%",
-                    body: "You've crossed your \(Int(settings.thresholdPercent))% threshold for this window."
+                    body: timeRemainingString(resetsAt: resetsAt, now: now)
                 ))
                 state.markFired(ring: ring, kind: .threshold, resetsAt: resetsAt)
             }
 
             // --- Pace rule ---
+            // Dedup by 20% bucket so alerts at 63% and 75% count as the same
+            // event, but crossing into 80% (bucket 4) fires a fresh alert.
+            let paceBucket = Int(utilization / 20)
             if settings.paceAlertEnabled(for: ring),
                let timeProgress = timeProgress(resetsAt: resetsAt, period: ring.periodSeconds, now: now),
                utilization / 100.0 > timeProgress,
-               !state.hasFired(ring: ring, kind: .pace, for: resetsAt)
+               !state.hasFired(ring: ring, kind: .pace, for: resetsAt, usageBucket: paceBucket)
             {
                 let timePct = Int((timeProgress * 100).rounded())
                 out.append(PendingNotification(
@@ -130,10 +150,10 @@ enum NotificationEvaluator {
                     kind: .pace,
                     usagePercent: utilization,
                     resetsAt: resetsAt,
-                    title: "\(ring.label) — pace alert",
-                    body: "Usage is at \(Int(utilization.rounded()))% with only \(timePct)% of the window elapsed."
+                    title: "\(ring.label) at \(Int(utilization.rounded()))% — pace alert",
+                    body: timeRemainingString(resetsAt: resetsAt, now: now)
                 ))
-                state.markFired(ring: ring, kind: .pace, resetsAt: resetsAt)
+                state.markFired(ring: ring, kind: .pace, resetsAt: resetsAt, usageBucket: paceBucket)
             }
         }
 
@@ -155,6 +175,25 @@ enum NotificationEvaluator {
         case .session:   return data.sessionResetsAt
         case .sonnet:    return data.sonnetWeeklyResetsAt
         case .allModels: return data.allModelsWeeklyResetsAt
+        }
+    }
+
+    /// Human-readable countdown used as the notification body for all alert
+    /// kinds. Examples: "Resets in 4h 23m", "Resets in 45m", "Resets soon".
+    private static func timeRemainingString(resetsAt: Date?, now: Date) -> String {
+        guard let resetsAt else { return "Resets soon" }
+        let remaining = resetsAt.timeIntervalSince(now)
+        guard remaining > 60 else { return "Resets soon" }
+        let totalMinutes = Int(remaining / 60)
+        let days    = totalMinutes / (60 * 24)
+        let hours   = (totalMinutes % (60 * 24)) / 60
+        let minutes = totalMinutes % 60
+        if days > 0 {
+            return hours > 0 ? "Resets in \(days)d \(hours)h" : "Resets in \(days)d"
+        } else if hours > 0 {
+            return minutes > 0 ? "Resets in \(hours)h \(minutes)m" : "Resets in \(hours)h"
+        } else {
+            return "Resets in \(minutes)m"
         }
     }
 

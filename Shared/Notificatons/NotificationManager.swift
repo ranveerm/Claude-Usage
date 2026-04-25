@@ -62,10 +62,13 @@ final class NotificationManager {
             // an additional entitlement and break through Focus).
             content.interruptionLevel = .active
 
-            // Identifier keyed on reset date so the same alert can re-fire
-            // in a fresh window (the dedup state prevents repeats *within*
-            // a window, but a new window legitimately re-qualifies).
-            let id = "\(alert.ring.rawValue).\(alert.kind.rawValue).\(alert.resetsAt?.timeIntervalSince1970 ?? 0)"
+            // Identifier is keyed on ring, kind, normalised reset date, and
+            // (for pace alerts) the 20% usage bucket. This matches the dedup
+            // key structure in NotificationState so the OS-level identifier is
+            // stable across fetches within the same bucket/window combination.
+            let normalisedResets = alert.resetsAt.map { NotificationState.normalise($0) }
+            let bucketSuffix = alert.kind == .pace ? ".b\(Int(alert.usagePercent / 20))" : ""
+            let id = "\(alert.ring.rawValue).\(alert.kind.rawValue)\(bucketSuffix).\(normalisedResets?.timeIntervalSince1970 ?? 0)"
             let request = UNNotificationRequest(identifier: id, content: content, trigger: nil)
             try? await center.add(request)
         }
