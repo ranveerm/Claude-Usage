@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 
 @main
 struct ClaudeUsageiOSApp: App {
@@ -13,6 +14,14 @@ struct ClaudeUsageiOSApp: App {
         // background (see `.onChange` below) so we don't queue up a slot
         // before the user has ever opened the app.
         BackgroundRefresh.register()
+
+        // TipKit — surfaces the "Try Demo" affordance on the sign-in
+        // screen (DemoModeTip). `.automatic` honours the system's
+        // display-frequency rules and persists state across launches.
+        if #available(iOS 17.0, *) {
+            try? Tips.configure([.displayFrequency(.immediate),
+                                 .datastoreLocation(.applicationDefault)])
+        }
     }
 
     var body: some Scene {

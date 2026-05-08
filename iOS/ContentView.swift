@@ -23,7 +23,13 @@ struct ContentView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     if usageData.needsLogin || !isConfigured {
-                        LoginPromptView(onLogin: { showLogin = true })
+                        LoginPromptView(
+                            onLogin: { showLogin = true },
+                            onDemoMode: {
+                                UsageService.shared.enterDemoMode()
+                                Task { await fetchData() }
+                            }
+                        )
                             .padding(.top, 40)
                     } else if let error = usageData.error {
                         ErrorDisplayView(error: error, onRetry: { Task { await fetchData() } }, onReLogin: {
@@ -550,7 +556,7 @@ private struct LoginStatePreview: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                LoginPromptView(onLogin: {})
+                LoginPromptView(onLogin: {}, onDemoMode: {})
                     .padding(.top, 40)
                     .padding()
             }

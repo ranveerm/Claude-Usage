@@ -27,7 +27,22 @@ final class UsageService {
         }
     }
 
-    var isConfigured: Bool { !sessionKey.isEmpty }
+    /// Demo mode bypasses the network entirely and serves a hand-picked
+    /// `UsageData` fixture from `fetchUsage()`. Exists primarily so App
+    /// Store reviewers (and curious users without an Anthropic account)
+    /// can evaluate the UI without going through Claude.ai's web sign-in.
+    /// Stored in UserDefaults — it isn't a credential, so the keychain
+    /// indirection doesn't apply.
+    var isDemoMode: Bool {
+        get { UserDefaults.standard.bool(forKey: Self.demoModeKey) }
+        set { UserDefaults.standard.set(newValue, forKey: Self.demoModeKey) }
+    }
+    private static let demoModeKey = "demoMode"
+
+    /// `isConfigured` is what gates the LoginPromptView vs. the usage
+    /// display. Demo mode counts as configured so the rings render without
+    /// a real session.
+    var isConfigured: Bool { !sessionKey.isEmpty || isDemoMode }
 
     private init() {}
 
@@ -35,13 +50,24 @@ final class UsageService {
         self.sessionKey = sessionKey
         self.cfClearance = cfClearance
         self.organizationId = ""
+        // Real sign-in always wins over demo mode.
+        isDemoMode = false
         SignOutSignal.markSignedIn()
+    }
+
+    /// Flips the app into demo mode and primes the shared cache so the
+    /// watch and any widgets pick up the fixture immediately. No KVS
+    /// broadcast — demo mode is a per-device toggle, not a synced state.
+    func enterDemoMode() {
+        isDemoMode = true
+        SharedDefaults.save(Self.demoFixture())
     }
 
     func clearCredentials() {
         sessionKey = ""
         cfClearance = ""
         organizationId = ""
+        isDemoMode = false
         // Intentionally does NOT call SignOutSignal.markSignedOut().
         // Broadcasting is the job of the *explicit* sign-out call sites
         // (menu button / confirmation dialog). A reaction to a remote
@@ -49,6 +75,12 @@ final class UsageService {
     }
 
     func fetchUsage() async -> UsageData {
+        // Demo mode short-circuits the network. The fixture is regenerated
+        // each call so reset timestamps stay relative to "now" — handy when
+        // the reviewer leaves the app open between checks.
+        if isDemoMode {
+            return Self.demoFixture()
+        }
         guard isConfigured else {
             return UsageData(needsLogin: true)
         }
@@ -267,5 +299,29 @@ final class UsageService {
     /// spinning up the network stack.
     static func isCloudflareError(_ message: String) -> Bool {
         message.contains("Just a moment") || message.contains("cf-ray") || message.contains("403")
+    }
+
+    /// Hand-picked demo fixture used when `isDemoMode` is on. Numbers are
+    /// chosen to exercise every visual state simultaneously: a partly-used
+    /// 5-hour session, a moderately-used weekly all-models budget, a low
+    /// Sonnet-weekly bar (Max tier), and a low Claude Design bar — so the
+    /// reviewer sees the full range of rings and the design progress bar
+    /// in a single screen. Reset timestamps are anchored to `Date()` so
+    /// the "resets in …" hints stay sensible across launches.
+    static func demoFixture() -> UsageData {
+        let now = Date()
+        return UsageData(
+            sessionUtilization: 42,
+            sessionResetsAt: now.addingTimeInterval(2.5 * 3600),
+            sonnetWeeklyUtilization: 33,
+            sonnetWeeklyResetsAt: now.addingTimeInterval(4 * 86400),
+            sonnetWeeklyApplicable: true,
+            allModelsWeeklyUtilization: 51,
+            allModelsWeeklyResetsAt: now.addingTimeInterval(4 * 86400),
+            designWeeklyUtilization: 18,
+            designWeeklyResetsAt: now.addingTimeInterval(4 * 86400),
+            designWeeklyApplicable: true,
+            lastRefreshed: now
+        )
     }
 }

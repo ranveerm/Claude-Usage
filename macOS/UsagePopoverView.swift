@@ -328,6 +328,9 @@ struct UsagePopoverView: View {
     let onRefresh: () -> Void
     let onLogin: () -> Void
     let onSignOut: () -> Void
+    /// Demo-mode entry — flips `UsageService.isDemoMode` on and triggers
+    /// a refresh so the rings populate from the fixture immediately.
+    let onDemoMode: () -> Void
     /// Debug-only reset handler. Only non-nil in DEBUG builds, via AppDelegate.
     let onDebugReset: (() -> Void)?
 
@@ -346,6 +349,7 @@ struct UsagePopoverView: View {
         onRefresh: @escaping () -> Void,
         onLogin: @escaping () -> Void,
         onSignOut: @escaping () -> Void = {},
+        onDemoMode: @escaping () -> Void = {},
         onDebugReset: (() -> Void)? = nil
     ) {
         self.usageData = usageData
@@ -353,13 +357,14 @@ struct UsagePopoverView: View {
         self.onRefresh = onRefresh
         self.onLogin = onLogin
         self.onSignOut = onSignOut
+        self.onDemoMode = onDemoMode
         self.onDebugReset = onDebugReset
     }
 
     var body: some View {
         VStack(spacing: 12) {
             if usageData.needsLogin || !isConfigured {
-                LoginPromptView(onLogin: onLogin)
+                LoginPromptView(onLogin: onLogin, onDemoMode: onDemoMode)
             } else if let error = usageData.error {
                 ErrorDisplayView(error: error, onRetry: onRefresh, onReLogin: {
                     onSignOut()

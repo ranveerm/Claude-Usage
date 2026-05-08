@@ -410,6 +410,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             onRefresh: { [weak self] in self?.refreshData() },
             onLogin: { [weak self] in self?.showLogin() },
             onSignOut: { [weak self] in self?.signOut() },
+            onDemoMode: { [weak self] in
+                UsageService.shared.enterDemoMode()
+                self?.refreshData()
+            },
             onDebugReset: debugReset
         )
     }

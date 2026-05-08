@@ -1,4 +1,36 @@
 import SwiftUI
+import TipKit
+
+// MARK: - TipKit tips
+
+/// Surfaces the "Try Demo Mode" button to anyone who lands on the sign-in
+/// screen — including App Store reviewers, who Apple specifically asks us
+/// to give a way of evaluating the app without an Anthropic account. The
+/// tip is keyed off `Events.signInScreenShown` so it appears the first
+/// time the LoginPromptView is presented and dismisses itself once the
+/// user interacts (or after Apple's default `maxDisplayCount`).
+@available(iOS 17.0, macOS 14.0, *)
+struct DemoModeTip: Tip {
+    /// Bumped each time `LoginPromptView` appears.
+    static let signInShown = Event(id: "signInScreenShown")
+
+    var title: Text {
+        Text("Try Demo Mode")
+    }
+
+    var message: Text? {
+        Text("No Anthropic account? Tap **Try Demo** to explore the app with sample usage data.")
+    }
+
+    var image: Image? {
+        Image(systemName: "wand.and.stars")
+    }
+
+    var rules: [Rule] {
+        // Show after the sign-in screen has appeared at least once.
+        [#Rule(Self.signInShown) { $0.donations.count >= 1 }]
+    }
+}
 
 /// Fraction of the period that has elapsed (0.0–1.0).
 func timeElapsed(resetsAt: Date?, period: TimeInterval) -> Double {
@@ -171,6 +203,15 @@ struct UsageProgressBarView: View {
 
 struct LoginPromptView: View {
     let onLogin: () -> Void
+    /// Optional — when supplied, surfaces a "Try Demo" secondary button
+    /// that flips the app into mock-data mode. Required by App Review
+    /// (Guideline 2.1(a)) so reviewers can evaluate the UI without going
+    /// through Claude.ai's web sign-in.
+    var onDemoMode: (() -> Void)? = nil
+
+    /// Single instance of the TipKit tip so it survives re-renders.
+    @available(iOS 17.0, macOS 14.0, *)
+    private static let demoTip = DemoModeTip()
 
     var body: some View {
         VStack(spacing: 12) {
@@ -185,8 +226,38 @@ struct LoginPromptView: View {
                 .multilineTextAlignment(.center)
             Button("Sign In") { onLogin() }
                 .buttonStyle(.borderedProminent)
+
+            if let onDemoMode {
+                demoButton(onDemoMode)
+            }
         }
         .padding(.vertical, 8)
+        .task {
+            if #available(iOS 17.0, macOS 14.0, *) {
+                // Donate the event so the tip's display rule can fire next
+                // time the view appears.
+                await DemoModeTip.signInShown.donate()
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func demoButton(_ onDemoMode: @escaping () -> Void) -> some View {
+        let base = Button("Try Demo", action: onDemoMode)
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+
+        // `popoverTip` only exists on iOS / macOS; the shared file is also
+        // compiled into the watch target where the modifier is unavailable.
+        #if os(iOS) || os(macOS)
+        if #available(iOS 17.0, macOS 14.0, *) {
+            base.popoverTip(Self.demoTip)
+        } else {
+            base
+        }
+        #else
+        base
+        #endif
     }
 }
 
