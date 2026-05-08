@@ -80,6 +80,9 @@ final class UsageLogicTests_iOS: XCTestCase {
             sonnetWeeklyResetsAt: Date(timeIntervalSince1970: 1_700_500_000),
             allModelsWeeklyUtilization: 55,
             allModelsWeeklyResetsAt: Date(timeIntervalSince1970: 1_701_000_000),
+            designWeeklyUtilization: 66,
+            designWeeklyResetsAt: Date(timeIntervalSince1970: 1_701_500_000),
+            designWeeklyApplicable: true,
             lastRefreshed: Date(timeIntervalSince1970: 1_699_900_000),
             error: nil,
             needsLogin: false
@@ -89,6 +92,8 @@ final class UsageLogicTests_iOS: XCTestCase {
         XCTAssertEqual(decoded.sessionUtilization, 33)
         XCTAssertEqual(decoded.sonnetWeeklyUtilization, 44)
         XCTAssertEqual(decoded.allModelsWeeklyUtilization, 55)
+        XCTAssertEqual(decoded.designWeeklyUtilization, 66)
+        XCTAssertTrue(decoded.designWeeklyApplicable)
     }
 }
 

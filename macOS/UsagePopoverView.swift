@@ -178,10 +178,15 @@ private struct UsagePopoverPreview: View {
     @State private var sessionUsage: Double = 0.69
     @State private var sonnetUsage: Double = 0.33
     @State private var allModelsUsage: Double = 0.42
+    @State private var designUsage: Double = 0.55
     @State private var sessionTime: Double = 0.42
     @State private var sonnetTime: Double = 0.60
     @State private var allModelsTime: Double = 0.55
+    @State private var designTime: Double = 0.50
     @State private var tier: PreviewTier = .max
+    /// Toggles the Anthropic Labs design block. When `false` the row should
+    /// render greyed-out as N/A — same path Pro takes for the Sonnet row.
+    @State private var hasDesignAccess: Bool = true
 
     var body: some View {
         VStack(spacing: 16) {
@@ -215,6 +220,13 @@ private struct UsagePopoverPreview: View {
                 Divider()
                 sliderRow("All Models Usage",  value: $allModelsUsage)
                 sliderRow("All Models Time",   value: $allModelsTime)
+                Divider()
+                Toggle("Has Design access", isOn: $hasDesignAccess)
+                    .font(.caption)
+                sliderRow("Design Usage",      value: $designUsage)
+                    .disabled(!hasDesignAccess)
+                sliderRow("Design Time",       value: $designTime)
+                    .disabled(!hasDesignAccess)
             }
             .padding(.horizontal)
         }
@@ -232,6 +244,11 @@ private struct UsagePopoverPreview: View {
             sonnetWeeklyApplicable:   tier == .max,
             allModelsWeeklyUtilization: allModelsUsage * 100,
             allModelsWeeklyResetsAt:  resetsAt(timeProgress: allModelsTime,  period: 7 * 86400),
+            designWeeklyUtilization:  hasDesignAccess ? designUsage * 100 : 0,
+            designWeeklyResetsAt:     hasDesignAccess
+                                      ? resetsAt(timeProgress: designTime, period: 7 * 86400)
+                                      : nil,
+            designWeeklyApplicable:   hasDesignAccess,
             lastRefreshed:            Date()
         )
     }
@@ -268,6 +285,9 @@ private struct PopoverOnBackground: View {
                     sonnetWeeklyResetsAt: Date().addingTimeInterval(0.4 * 7 * 86400),
                     allModelsWeeklyUtilization: 25,
                     allModelsWeeklyResetsAt: Date().addingTimeInterval(0.45 * 7 * 86400),
+                    designWeeklyUtilization: 38,
+                    designWeeklyResetsAt: Date().addingTimeInterval(0.5 * 7 * 86400),
+                    designWeeklyApplicable: true,
                     lastRefreshed: Date()
                 ),
                 isConfigured: true,
@@ -275,7 +295,7 @@ private struct PopoverOnBackground: View {
                 onLogin: {}
             )
         }
-        .frame(width: 380, height: 220)
+        .frame(width: 380, height: 260)
     }
 }
 
@@ -382,6 +402,18 @@ struct UsagePopoverView: View {
                                  systemImage: "shippingbox")
                 }
             }
+
+            // Claude Design (Anthropic Labs) — separate weekly quota that
+            // doesn't fit the concentric-ring metaphor. Renders as a full-
+            // width horizontal bar below the ring/row block so it's visually
+            // distinct without competing for the same affordance.
+            UsageProgressBarView(label: "Claude Design",
+                                 utilization: usageData.designWeeklyUtilization,
+                                 resetsAt: usageData.designWeeklyResetsAt,
+                                 systemImage: "paintbrush.pointed.fill",
+                                 isApplicable: usageData.designWeeklyApplicable,
+                                 timeProgress: timeElapsed(resetsAt: usageData.designWeeklyResetsAt,
+                                                           period: 7 * 86400))
 
             Divider()
 

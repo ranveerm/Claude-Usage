@@ -152,6 +152,18 @@ struct ContentView: View {
             }
             .padding(.horizontal)
 
+            // Claude Design (Anthropic Labs) — separate weekly quota, no ring
+            // mapping. Shown as a horizontal bar to set it apart visually
+            // from the ring-backed rows above.
+            UsageProgressBarView(label: "Claude Design",
+                                 utilization: usageData.designWeeklyUtilization,
+                                 resetsAt: usageData.designWeeklyResetsAt,
+                                 systemImage: "paintbrush.pointed.fill",
+                                 isApplicable: usageData.designWeeklyApplicable,
+                                 timeProgress: timeElapsed(resetsAt: usageData.designWeeklyResetsAt,
+                                                           period: 7 * 86400))
+                .padding(.horizontal)
+
             if let refreshed = usageData.lastRefreshed {
                 Text("Updated \(refreshed.formatted(.relative(presentation: .named)))")
                     .font(.caption2)
@@ -387,10 +399,15 @@ private struct ContentViewPreview: View {
     @State private var sessionUsage: Double = 0.69
     @State private var sonnetUsage: Double = 0.33
     @State private var allModelsUsage: Double = 0.42
+    @State private var designUsage: Double = 0.55
     @State private var sessionTime: Double = 0.42
     @State private var sonnetTime: Double = 0.60
     @State private var allModelsTime: Double = 0.55
+    @State private var designTime: Double = 0.50
     @State private var tier: PreviewTier = .max
+    /// Whether the API response includes the Anthropic Labs design block.
+    /// Toggling exercises the greyed-out "N/A" rendering path.
+    @State private var hasDesignAccess: Bool = true
 
     private func resetsAt(timeProgress: Double, period: TimeInterval) -> Date {
         Date().addingTimeInterval((1.0 - timeProgress) * period)
@@ -406,6 +423,11 @@ private struct ContentViewPreview: View {
             sonnetWeeklyApplicable:     tier == .max,
             allModelsWeeklyUtilization: allModelsUsage * 100,
             allModelsWeeklyResetsAt:    resetsAt(timeProgress: allModelsTime, period: 7 * 86400),
+            designWeeklyUtilization:    hasDesignAccess ? designUsage * 100 : 0,
+            designWeeklyResetsAt:       hasDesignAccess
+                                        ? resetsAt(timeProgress: designTime, period: 7 * 86400)
+                                        : nil,
+            designWeeklyApplicable:     hasDesignAccess,
             lastRefreshed:              Date()
         )
     }
@@ -437,6 +459,15 @@ private struct ContentViewPreview: View {
                     }
                     .padding(.horizontal)
 
+                    UsageProgressBarView(label: "Claude Design",
+                                         utilization: mockData.designWeeklyUtilization,
+                                         resetsAt: mockData.designWeeklyResetsAt,
+                                         systemImage: "paintbrush.pointed.fill",
+                                         isApplicable: mockData.designWeeklyApplicable,
+                                         timeProgress: timeElapsed(resetsAt: mockData.designWeeklyResetsAt,
+                                                                   period: 7 * 86400))
+                        .padding(.horizontal)
+
                     Text("Updated just now")
                         .font(.caption2)
                         .foregroundColor(.secondary)
@@ -463,6 +494,13 @@ private struct ContentViewPreview: View {
                         Divider()
                         sliderRow("All Models Usage", value: $allModelsUsage)
                         sliderRow("All Models Time",  value: $allModelsTime)
+                        Divider()
+                        Toggle("Has Design access", isOn: $hasDesignAccess)
+                            .font(.caption)
+                        sliderRow("Design Usage",     value: $designUsage)
+                            .disabled(!hasDesignAccess)
+                        sliderRow("Design Time",      value: $designTime)
+                            .disabled(!hasDesignAccess)
                     }
                     .padding(.horizontal)
                 }

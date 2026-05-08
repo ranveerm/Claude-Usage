@@ -120,6 +120,15 @@ final class UsageService {
             return UsageData(error: "Failed to parse response")
         }
 
+        #if DEBUG
+        // One-shot debugging aid: dump the raw response and any top-level
+        // keys we don't currently consume. Lets us spot newly-added fields
+        // (Claude Design, future labs releases, anything else) without
+        // having to MITM the connection. Logs once per fetch on every
+        // DEBUG build — no-op in Release.
+        Self.logUnconsumedKeys(json: json, raw: data)
+        #endif
+
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
 
@@ -138,6 +147,17 @@ final class UsageService {
         // includes it (even at 0% utilisation). We key off presence of the
         // block, not the numeric value, to tell the two apart.
         let sonnetApplicable = (json["seven_day_sonnet"] as? [String: Any]) != nil
+        // Claude Design surfaces under its internal code name `omelette` in
+        // the API response (the payload is full of similar codenames —
+        // `iguana_necktie`, `tangelo`, etc. — that map to unannounced or
+        // labs features). We try the codename first and fall back to the
+        // public-facing names in case Anthropic eventually renames the key.
+        let designBlock = (json["seven_day_omelette"] as? [String: Any])
+                       ?? (json["seven_day_design"] as? [String: Any])
+                       ?? (json["seven_day_claude_design"] as? [String: Any])
+                       ?? (json["claude_design"] as? [String: Any])
+        let designUtil = (designBlock?["utilization"] as? Double) ?? 0
+        let designReset = (designBlock?["resets_at"] as? String).flatMap { formatter.date(from: $0) }
 
         return UsageData(
             sessionUtilization: session.utilization,
@@ -147,9 +167,37 @@ final class UsageService {
             sonnetWeeklyApplicable: sonnetApplicable,
             allModelsWeeklyUtilization: weekly.utilization,
             allModelsWeeklyResetsAt: weekly.resetsAt,
+            designWeeklyUtilization: designUtil,
+            designWeeklyResetsAt: designReset,
+            designWeeklyApplicable: true,
             lastRefreshed: Date()
         )
     }
+
+    #if DEBUG
+    /// Prints any top-level JSON keys the parser doesn't currently read,
+    /// plus a pretty-printed dump of the full payload. Run once per fetch in
+    /// DEBUG builds so we can spot newly-added fields (Claude Design quotas,
+    /// future Anthropic Labs metrics) without having to MITM TLS traffic.
+    private static func logUnconsumedKeys(json: [String: Any], raw: Data) {
+        let known: Set<String> = [
+            "five_hour", "seven_day", "seven_day_sonnet",
+            // Claude Design — internal codename plus possible future renames.
+            "seven_day_omelette", "seven_day_design",
+            "seven_day_claude_design", "claude_design",
+        ]
+        let unread = json.keys.filter { !known.contains($0) }.sorted()
+        if !unread.isEmpty {
+            print("[UsageService] Unread keys in /usage response: \(unread)")
+        }
+        if let pretty = try? JSONSerialization.data(
+            withJSONObject: json, options: [.prettyPrinted, .sortedKeys]
+        ),
+           let str = String(data: pretty, encoding: .utf8) {
+            print("[UsageService] /usage payload:\n\(str)")
+        }
+    }
+    #endif
 
     private func applyHeaders(to request: inout URLRequest) {
         Self.applyHeaders(to: &request, sessionKey: sessionKey, cfClearance: cfClearance)

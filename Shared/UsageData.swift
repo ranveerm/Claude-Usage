@@ -13,6 +13,21 @@ struct UsageData: Codable {
     var sonnetWeeklyApplicable: Bool = true
     var allModelsWeeklyUtilization: Double = 0
     var allModelsWeeklyResetsAt: Date?
+    /// Claude Design (Anthropic Labs) is metered separately from chat/Claude
+    /// Code on a weekly cycle. The API field isn't officially documented yet
+    /// (the help article notes Design "doesn't support audit logs or usage
+    /// tracking yet"); the parser speculatively reads `seven_day_design` and
+    /// sets `designWeeklyApplicable = false` when the block is absent — same
+    /// graceful-degrade pattern Sonnet uses on Pro accounts.
+    var designWeeklyUtilization: Double = 0
+    var designWeeklyResetsAt: Date?
+    /// Optimistically defaults to `true` so the bar renders even when the
+    /// API response omits the design block. Anthropic's help article notes
+    /// Design "doesn't support audit logs or usage tracking yet", so we'd
+    /// rather show 0% honestly than hide the row behind an N/A. The parser
+    /// keeps it at `true` regardless of field presence; only an explicit
+    /// signal from elsewhere (future work) would set it `false`.
+    var designWeeklyApplicable: Bool = true
     var lastRefreshed: Date?
     var error: String?
     var needsLogin: Bool = false

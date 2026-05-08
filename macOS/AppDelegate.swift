@@ -363,6 +363,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func refreshData() {
         Task { @MainActor in
             let data = await UsageService.shared.fetchUsage()
+            // Transient errors (network not yet re-established after wake
+            // from sleep, brief Cloudflare challenge, etc.) often arrive as
+            // either `data.error != nil` or even `needsLogin: true` when the
+            // 403 body looks like a CF challenge. Discarding these when we
+            // already have valid data on screen prevents the popover from
+            // briefly flipping to LoginPromptView before the next refresh
+            // recovers — the same guard the iOS app already applies.
+            if data.error != nil, self.usageData.lastRefreshed != nil {
+                return
+            }
             self.usageData = data
             self.statusItem.button?.image = self.renderIcon()
             self.updatePopoverContent()

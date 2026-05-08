@@ -71,6 +71,102 @@ struct UsageRowView: View {
     }
 }
 
+// MARK: - Horizontal progress bar (Claude Design)
+
+/// Horizontal progress-bar variant of `UsageRowView`. Used for Claude Design
+/// usage, which gets its own visual treatment since it's a separate-from-chat
+/// quota that doesn't map onto the concentric rings.
+///
+/// The bar uses the same colour palette as the concentric rings:
+/// `anthropicOrange` for the fill and `anthropicOrange.opacity(0.2)` for the
+/// track. The optional SF symbol is overlaid at the leading edge of the track,
+/// mirroring how ring arcs carry their own visual weight at the start point.
+///
+/// Layout:
+///   `Label  ·  X%`
+///   `[icon|=====fill===|--------track--------]`
+///   `resets …`                     (when applicable)
+struct UsageProgressBarView: View {
+    let label: String
+    let utilization: Double
+    let resetsAt: Date?
+    var systemImage: String? = nil
+    var isApplicable: Bool = true
+    /// Fraction of the quota period that has elapsed (0–1). Rendered as a
+    /// faded arc behind the solid usage fill, matching the ring treatment.
+    var timeProgress: Double = 0
+
+    /// Matches the visual weight of the ring strokes when rendered at a
+    /// typical popover width (~240 pt). Adjust if the rings' `lineWidth`
+    /// formula (`dim * 0.13`) ever changes for the popover layout.
+    private let barHeight: CGFloat = 14
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            // Label · reset hint · percentage — all on one header row so the
+            // reset cadence sits visually distinct from the ring rows below.
+            HStack(spacing: 4) {
+                Text(label)
+                    .font(.caption)
+                    .foregroundStyle(isApplicable ? .primary : .secondary)
+                if isApplicable, let resets = resetsAt {
+                    Text("·")
+                        .font(.system(size: 9))
+                        .foregroundColor(.secondary)
+                    Text("resets \(resets.formatted(.relative(presentation: .named)))")
+                        .font(.system(size: 9))
+                        .foregroundColor(.secondary)
+                }
+                Spacer()
+                Text(isApplicable ? String(format: "%.0f%%", utilization) : "N/A")
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(isApplicable ? .primary : .secondary)
+            }
+
+            // Custom capsule bar styled to match the ring palette.
+            // Width is capped at 90 % of the available row so it doesn't
+            // visually crowd the trailing edge.
+            GeometryReader { geo in
+                let usageFraction = min(max(utilization  / 100.0, 0), 1)
+                let timeFraction  = min(max(timeProgress,          0), 1)
+
+                ZStack(alignment: .leading) {
+                    // Track — same as ring unfilled arc
+                    Capsule()
+                        .fill(ConcentricCirclesView.anthropicOrange.opacity(0.2))
+
+                    // Time-elapsed fill — same faded layer the rings use
+                    if isApplicable && timeFraction > 0 {
+                        Capsule()
+                            .fill(ConcentricCirclesView.anthropicOrange.opacity(0.35))
+                            .frame(width: geo.size.width * timeFraction)
+                    }
+
+                    // Usage fill — same as ring solid arc; drawn on top so it
+                    // covers the faded time layer when usage has outrun time.
+                    if isApplicable {
+                        Capsule()
+                            .fill(ConcentricCirclesView.anthropicOrange)
+                            .frame(width: geo.size.width * usageFraction)
+                    }
+
+                    // Icon at the leading edge, overlaid on whatever is behind it
+                    if let systemImage {
+                        Image(systemName: systemImage)
+                            .font(.system(size: barHeight * 0.55, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.9))
+                            .padding(.leading, 6)
+                    }
+                }
+                .frame(height: barHeight)
+            }
+            .frame(height: barHeight)
+        }
+        .opacity(isApplicable ? 1.0 : 0.65)
+    }
+}
+
 // MARK: - Login Prompt
 
 struct LoginPromptView: View {
