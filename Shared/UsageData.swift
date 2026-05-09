@@ -31,6 +31,12 @@ struct UsageData: Codable {
     var lastRefreshed: Date?
     var error: String?
     var needsLogin: Bool = false
+    /// `true` when the failure is a network-layer error (no connectivity,
+    /// connection lost, timeout) rather than an auth / server error. The UI
+    /// uses this to show an "Offline" recovery screen with Retry / Sign Out
+    /// instead of immediately routing to the login flow.
+    /// Defaults to `false` so cached payloads decode safely.
+    var isNetworkError: Bool = false
 }
 
 struct CircleRendererInput: Equatable {

@@ -6,6 +6,8 @@ struct ContentView: View {
     @State private var showLogin = false
     @State private var showSettings = false
     @State private var isLoading = false
+    @State private var isRefreshing = false
+    @State private var refreshTask: Task<Void, Never>?
     @State private var transition: SessionTransition?
     @State private var transitionDismissTask: Task<Void, Never>?
     @Environment(\.scenePhase) private var scenePhase
@@ -22,7 +24,10 @@ struct ContentView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    if usageData.needsLogin || !isConfigured {
+                    if isRefreshing {
+                        RefreshingView()
+                            .padding(.top, 40)
+                    } else if usageData.needsLogin || !isConfigured {
                         LoginPromptView(
                             onLogin: { showLogin = true },
                             onDemoMode: {
@@ -31,6 +36,12 @@ struct ContentView: View {
                             }
                         )
                             .padding(.top, 40)
+                    } else if usageData.isNetworkError {
+                        OfflineView(
+                            onRetry: { Task { await fetchData() } },
+                            onSignOut: { signOut() }
+                        )
+                        .padding(.top, 40)
                     } else if let error = usageData.error {
                         ErrorDisplayView(error: error, onRetry: { Task { await fetchData() } }, onReLogin: {
                             UsageService.shared.clearCredentials()
@@ -281,49 +292,95 @@ struct ContentView: View {
 
     private func fetchData() async {
         guard isConfigured else { return }
+
+        // Cancel any in-flight retry loop before starting fresh (e.g. user
+        // pulls to refresh while a retry loop is running).
+        refreshTask?.cancel()
+
         isLoading = true
         let data = await UsageService.shared.fetchUsage()
         isLoading = false
 
-        // Auth failure: surface it so the body swaps in LoginPromptView,
-        // but don't auto-present the WebView sheet — user should tap to
-        // sign in explicitly. Also propagate the signed-out state
-        // downstream so the widget and watch don't keep rendering rings
-        // from the last successful fetch.
-        if data.needsLogin {
+        // Happy path — accept immediately.
+        if data.error == nil && !data.needsLogin {
+            isRefreshing = false
+            acceptData(data)
+            return
+        }
+
+        // Confirmed auth failure with no prior successful session — surface
+        // it directly; don't start a retry loop.
+        if data.needsLogin && !UsageService.shared.lastKnownSignedIn {
+            isRefreshing = false
             usageData = data
             publishSignedOutState()
             return
         }
 
-        // Transient errors (e.g. network not yet re-established after screen unlock):
-        // silently discard if we already have valid data on screen
-        if data.error != nil, usageData.lastRefreshed != nil {
+        // If the user was last known to be signed in, enter the "Refreshing
+        // Data" state and retry for up to 25 seconds before drawing any
+        // conclusions. This covers iPhone/iPad screen-unlock and other brief
+        // network-not-ready windows.
+        guard UsageService.shared.lastKnownSignedIn else {
+            isRefreshing = false
+            usageData = data
             return
         }
 
+        isRefreshing = true
+
+        let innerTask = Task { @MainActor in
+            var lastData = data
+            for delay: Duration in [.seconds(2), .seconds(5), .seconds(10), .seconds(8)] {
+                if Task.isCancelled { return }
+                try? await Task.sleep(for: delay)
+                if Task.isCancelled { return }
+
+                let retryData = await UsageService.shared.fetchUsage()
+                lastData = retryData
+
+                if retryData.error == nil && !retryData.needsLogin {
+                    isRefreshing = false
+                    acceptData(retryData)
+                    return
+                }
+            }
+
+            // 25 seconds elapsed — draw a conclusion.
+            isRefreshing = false
+            if lastData.isNetworkError {
+                // Network still down — show offline view, keep session intact.
+                usageData = lastData
+            } else if lastData.needsLogin {
+                // Auth failure confirmed — clear credentials.
+                usageData = lastData
+                publishSignedOutState()
+            } else {
+                usageData = lastData
+            }
+        }
+        refreshTask = innerTask
+    }
+
+    /// Applies a successful fetch: animates rings, updates downstream
+    /// consumers (widget, watch), and fires notifications.
+    private func acceptData(_ data: UsageData) {
         // Animate the ring fill: the `Circle().trim` inside
         // ConcentricCirclesView is Shape-animatable, so wrapping the state
         // change in `withAnimation` makes SwiftUI interpolate the trim
         // values over the duration — producing the "rings fill in from the
-        // top" effect on cold boot as well as ease transitions on later
-        // refreshes.
+        // top" effect on cold boot as well as ease transitions on later refreshes.
         withAnimation(.easeInOut(duration: 0.6)) {
             usageData = data
         }
-        if data.error == nil {
-            SharedDefaults.save(data)
-            WatchSender.shared.send(data)
-            WidgetCenter.shared.reloadAllTimelines()
-            // Fire any notifications the new data now qualifies for. The
-            // manager is a no-op when the user has notifications disabled,
-            // so this is cheap to call unconditionally.
-            Task {
-                await NotificationManager.shared.evaluateAndPost(
-                    data: data,
-                    settings: NotificationSettings.shared
-                )
-            }
+        SharedDefaults.save(data)
+        WatchSender.shared.send(data)
+        WidgetCenter.shared.reloadAllTimelines()
+        Task {
+            await NotificationManager.shared.evaluateAndPost(
+                data: data,
+                settings: NotificationSettings.shared
+            )
         }
     }
 }

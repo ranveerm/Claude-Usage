@@ -44,6 +44,18 @@ final class UsageService {
     /// a real session.
     var isConfigured: Bool { !sessionKey.isEmpty || isDemoMode }
 
+    /// Persisted flag that records whether the user was last known to be
+    /// signed in with valid data. Set `true` after every successful fetch;
+    /// set `false` when credentials are explicitly cleared. The UI uses
+    /// this to decide whether a failed refresh is a "phantom sign-out"
+    /// worth retrying (show a spinner) or a genuine first-time sign-in
+    /// screen (show the login prompt immediately).
+    var lastKnownSignedIn: Bool {
+        get { UserDefaults.standard.bool(forKey: Self.lastKnownSignedInKey) }
+        set { UserDefaults.standard.set(newValue, forKey: Self.lastKnownSignedInKey) }
+    }
+    private static let lastKnownSignedInKey = "lastKnownSignedIn"
+
     private init() {}
 
     func saveCredentials(sessionKey: String, cfClearance: String) {
@@ -68,6 +80,7 @@ final class UsageService {
         cfClearance = ""
         organizationId = ""
         isDemoMode = false
+        lastKnownSignedIn = false
         // Intentionally does NOT call SignOutSignal.markSignedOut().
         // Broadcasting is the job of the *explicit* sign-out call sites
         // (menu button / confirmation dialog). A reaction to a remote
@@ -123,9 +136,14 @@ final class UsageService {
             }
             let result = parseUsageResponse(data)
             SharedDefaults.save(result)
+            lastKnownSignedIn = true
             return result
         } catch {
-            return UsageData(error: error.localizedDescription)
+            // Distinguish network-layer failures (no connectivity, connection
+            // lost, timed out) from auth / server errors. The UI uses this to
+            // show an "Offline" recovery screen instead of the login prompt.
+            let isNet = Self.isNetworkLayerError(error)
+            return UsageData(error: error.localizedDescription, isNetworkError: isNet)
         }
     }
 
@@ -299,6 +317,28 @@ final class UsageService {
     /// spinning up the network stack.
     static func isCloudflareError(_ message: String) -> Bool {
         message.contains("Just a moment") || message.contains("cf-ray") || message.contains("403")
+    }
+
+    /// Returns `true` when the error originates in the network transport
+    /// layer — no connectivity, connection reset, DNS failure, timeout —
+    /// rather than from an auth or server response. The UI uses this to
+    /// show an "Offline" recovery screen instead of routing to login when
+    /// the session is almost certainly still valid.
+    static func isNetworkLayerError(_ error: Error) -> Bool {
+        guard let urlError = error as? URLError else { return false }
+        switch urlError.code {
+        case .notConnectedToInternet,
+             .networkConnectionLost,
+             .timedOut,
+             .cannotConnectToHost,
+             .cannotFindHost,
+             .dnsLookupFailed,
+             .dataNotAllowed,
+             .internationalRoamingOff:
+            return true
+        default:
+            return false
+        }
     }
 
     /// Hand-picked demo fixture used when `isDemoMode` is on. Numbers are

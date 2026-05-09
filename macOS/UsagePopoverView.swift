@@ -333,6 +333,11 @@ struct UsagePopoverView: View {
     let onDemoMode: () -> Void
     /// Debug-only reset handler. Only non-nil in DEBUG builds, via AppDelegate.
     let onDebugReset: (() -> Void)?
+    /// When `true` the popover is in a transient "checking" state — it has a
+    /// previous successful session but the last fetch failed. Shows
+    /// `RefreshingView` instead of `LoginPromptView` so the user can see that
+    /// the app is actively retrying rather than thinking they've been signed out.
+    let isRefreshing: Bool
 
     @State private var showDebugInfo = false
     @State private var showSignOutConfirmation = false
@@ -350,7 +355,8 @@ struct UsagePopoverView: View {
         onLogin: @escaping () -> Void,
         onSignOut: @escaping () -> Void = {},
         onDemoMode: @escaping () -> Void = {},
-        onDebugReset: (() -> Void)? = nil
+        onDebugReset: (() -> Void)? = nil,
+        isRefreshing: Bool = false
     ) {
         self.usageData = usageData
         self.isConfigured = isConfigured
@@ -359,12 +365,17 @@ struct UsagePopoverView: View {
         self.onSignOut = onSignOut
         self.onDemoMode = onDemoMode
         self.onDebugReset = onDebugReset
+        self.isRefreshing = isRefreshing
     }
 
     var body: some View {
         VStack(spacing: 12) {
-            if usageData.needsLogin || !isConfigured {
+            if isRefreshing {
+                RefreshingView()
+            } else if usageData.needsLogin || !isConfigured {
                 LoginPromptView(onLogin: onLogin, onDemoMode: onDemoMode)
+            } else if usageData.isNetworkError {
+                OfflineView(onRetry: onRefresh, onSignOut: onSignOut)
             } else if let error = usageData.error {
                 ErrorDisplayView(error: error, onRetry: onRefresh, onReLogin: {
                     onSignOut()

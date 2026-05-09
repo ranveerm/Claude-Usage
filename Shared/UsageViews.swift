@@ -261,6 +261,60 @@ struct LoginPromptView: View {
     }
 }
 
+// MARK: - Refreshing View
+
+/// Shown in place of the rings/login screen while the app is in the middle of
+/// its 25-second confirmation window — it has a past successful session but the
+/// current fetch failed. Replaces the old transient-error silencer: instead of
+/// silently swallowing errors and keeping stale rings on screen, we show an
+/// explicit "we're checking" state so the user always knows what's happening.
+struct RefreshingView: View {
+    var body: some View {
+        VStack(spacing: 12) {
+            ProgressView()
+                .controlSize(.large)
+            Text("Refreshing Data")
+                .font(.headline)
+            Text("Reconnecting…")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 8)
+    }
+}
+
+// MARK: - Offline View
+
+/// Shown when the 25-second retry window expires and the last failure was a
+/// network-layer error (no connectivity, connection reset, timeout). Gives the
+/// user explicit Retry and Sign Out options rather than routing them to the
+/// login screen when their session is almost certainly still valid.
+struct OfflineView: View {
+    let onRetry: () -> Void
+    let onSignOut: () -> Void
+
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(systemName: "wifi.slash")
+                .font(.largeTitle)
+                .foregroundColor(.secondary)
+            Text("No Connection")
+                .font(.headline)
+            Text("Unable to reach Claude. Check your internet connection and try again.")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+            HStack(spacing: 12) {
+                Button("Retry", action: onRetry)
+                    .buttonStyle(.borderedProminent)
+                Button("Sign Out", action: onSignOut)
+                    .buttonStyle(.bordered)
+            }
+        }
+        .padding(.vertical, 8)
+    }
+}
+
 // MARK: - Error View
 
 struct ErrorDisplayView: View {

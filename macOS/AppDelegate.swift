@@ -9,6 +9,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var usageData = SharedDefaults.load() ?? UsageData()
     private var hostingController: NSHostingController<UsagePopoverView>!
     private var eventMonitor: Any?
+    /// Non-nil while the app is in its 25-second retry window after a failed
+    /// fetch — used to show `RefreshingView` and cancel any superseded retry.
+    private var refreshTask: Task<Void, Never>?
+    /// Mirrors the popover's `isRefreshing` state so `makePopoverView()` can
+    /// pass it through without the Task capturing `self` in a cycle.
+    private var isRefreshing = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
@@ -361,35 +367,88 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Data
 
     private func refreshData() {
-        Task { @MainActor in
+        // Cancel any in-flight retry loop before starting a fresh one —
+        // e.g. the 5-minute timer fires while a manual refresh is mid-retry.
+        refreshTask?.cancel()
+
+        refreshTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+
             let data = await UsageService.shared.fetchUsage()
-            // Transient errors (network not yet re-established after wake
-            // from sleep, brief Cloudflare challenge, etc.) often arrive as
-            // either `data.error != nil` or even `needsLogin: true` when the
-            // 403 body looks like a CF challenge. Discarding these when we
-            // already have valid data on screen prevents the popover from
-            // briefly flipping to LoginPromptView before the next refresh
-            // recovers — the same guard the iOS app already applies.
-            if data.error != nil, self.usageData.lastRefreshed != nil {
+
+            // Happy path: valid data arrived immediately.
+            if data.error == nil && !data.needsLogin {
+                self.isRefreshing = false
+                self.acceptData(data)
                 return
             }
-            self.usageData = data
+
+            // If this device was last known to be signed in, enter the
+            // "Refreshing Data" spinner and retry for up to 25 seconds.
+            // This covers wake-from-sleep races where the network or
+            // Cloudflare CDN isn't ready yet — without this the popover
+            // would flash to LoginPromptView unnecessarily.
+            guard UsageService.shared.lastKnownSignedIn else {
+                // Never been successfully signed in on this device — surface
+                // the result directly (login screen or error).
+                self.isRefreshing = false
+                self.usageData = data
+                self.statusItem.button?.image = self.renderIcon()
+                self.updatePopoverContent()
+                return
+            }
+
+            // Show spinner immediately.
+            self.isRefreshing = true
+            self.updatePopoverContent()
+
+            // Retry schedule sums to ~25 seconds: 2 + 5 + 10 + 8 = 25 s.
+            var lastData = data
+            for delay: Duration in [.seconds(2), .seconds(5), .seconds(10), .seconds(8)] {
+                if Task.isCancelled { return }
+                try? await Task.sleep(for: delay)
+                if Task.isCancelled { return }
+
+                let retryData = await UsageService.shared.fetchUsage()
+                lastData = retryData
+
+                if retryData.error == nil && !retryData.needsLogin {
+                    self.isRefreshing = false
+                    self.acceptData(retryData)
+                    return
+                }
+            }
+
+            // 25 seconds elapsed — draw a conclusion.
+            self.isRefreshing = false
+            if lastData.isNetworkError {
+                // Network is still down — show the offline view. The session
+                // is almost certainly still valid; don't clear credentials.
+                self.usageData = lastData
+            } else {
+                // Auth failure confirmed (needsLogin or server error unrelated
+                // to connectivity). Clear credentials and show the login screen.
+                UsageService.shared.clearCredentials()
+                self.usageData = UsageData(needsLogin: true)
+            }
             self.statusItem.button?.image = self.renderIcon()
             self.updatePopoverContent()
-            // Fire any threshold/pace notifications the new payload
-            // qualifies for. No-op when notifications are disabled.
-            if data.error == nil && !data.needsLogin {
+        }
+    }
+
+    /// Accepts a successful fetch result: updates data, icon, and popover,
+    /// then fires any qualifying notifications.
+    private func acceptData(_ data: UsageData) {
+        usageData = data
+        statusItem.button?.image = renderIcon()
+        updatePopoverContent()
+        if data.error == nil && !data.needsLogin {
+            Task {
                 await NotificationManager.shared.evaluateAndPost(
                     data: data,
                     settings: NotificationSettings.shared
                 )
             }
-            // Intentionally do NOT auto-call showLogin() here. If the user
-            // has signed out (or their session expired) while the app is
-            // running, updatePopoverContent() will swap in LoginPromptView
-            // and the user can tap its "Sign In" button when ready. The
-            // login window is only auto-opened on app launch from
-            // applicationDidFinishLaunching.
         }
     }
 
@@ -414,7 +473,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 UsageService.shared.enterDemoMode()
                 self?.refreshData()
             },
-            onDebugReset: debugReset
+            onDebugReset: debugReset,
+            isRefreshing: isRefreshing
         )
     }
 
