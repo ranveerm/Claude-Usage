@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git tag *)",
+      "Bash(git push *)",
+      "Bash(xcrun simctl *)",
+      "Bash(xcrun xcresulttool *)",
+      "Bash(awk ' *)",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:support.claude.com)",
+      "WebSearch"
+    ]
+  }
+}

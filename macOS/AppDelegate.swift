@@ -422,14 +422,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // 25 seconds elapsed — draw a conclusion.
             self.isRefreshing = false
             if lastData.isNetworkError {
-                // Network is still down — show the offline view. The session
-                // is almost certainly still valid; don't clear credentials.
+                // Network is still down — show the offline view.
                 self.usageData = lastData
             } else {
-                // Auth failure confirmed (needsLogin or server error unrelated
-                // to connectivity). Clear credentials and show the login screen.
-                UsageService.shared.clearCredentials()
-                self.usageData = UsageData(needsLogin: true)
+                // A prolonged Cloudflare challenge after wake-from-sleep is
+                // indistinguishable from a genuine session expiry over a
+                // 25-second window. Never auto-clear credentials — only the
+                // user can sign out explicitly. Surface a plain error so the
+                // user can Retry (recovers silently if session is still valid)
+                // or Sign Out (their choice, not ours).
+                self.usageData = UsageData(error: "Couldn't refresh data. Your session may have expired.")
             }
             self.statusItem.button?.image = self.renderIcon()
             self.updatePopoverContent()

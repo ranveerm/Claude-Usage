@@ -321,7 +321,7 @@ struct OfflineView: View {
 struct ErrorDisplayView: View {
     let error: String
     let onRetry: () -> Void
-    let onReLogin: () -> Void
+    let onSignOut: () -> Void
 
     var body: some View {
         VStack(spacing: 8) {
@@ -332,10 +332,13 @@ struct ErrorDisplayView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
-            HStack {
+            HStack(spacing: 12) {
                 Button("Retry", action: onRetry)
-                Button("Sign In Again", action: onReLogin)
+                    .buttonStyle(.borderedProminent)
+                Button("Sign Out", action: onSignOut)
+                    .buttonStyle(.bordered)
             }
         }
+        .padding(.vertical, 8)
     }
 }

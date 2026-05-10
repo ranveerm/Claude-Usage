@@ -43,10 +43,9 @@ struct ContentView: View {
                         )
                         .padding(.top, 40)
                     } else if let error = usageData.error {
-                        ErrorDisplayView(error: error, onRetry: { Task { await fetchData() } }, onReLogin: {
-                            UsageService.shared.clearCredentials()
-                            showLogin = true
-                        })
+                        ErrorDisplayView(error: error,
+                                         onRetry: { Task { await fetchData() } },
+                                         onSignOut: { signOut() })
                         .padding(.top, 40)
                     } else {
                         usageContent
@@ -354,12 +353,14 @@ struct ContentView: View {
             if lastData.isNetworkError {
                 // Network still down — show offline view, keep session intact.
                 usageData = lastData
-            } else if lastData.needsLogin {
-                // Auth failure confirmed — clear credentials.
-                usageData = lastData
-                publishSignedOutState()
             } else {
-                usageData = lastData
+                // A Cloudflare challenge after screen-unlock is
+                // indistinguishable from a genuine session expiry over a
+                // 25-second window. Don't clear credentials — only the user
+                // can sign out explicitly. Surface a plain error so the user
+                // can Retry (recovers silently if session is still valid) or
+                // Sign Out (their choice, not ours).
+                usageData = UsageData(error: "Couldn't refresh data. Your session may have expired.")
             }
         }
         refreshTask = innerTask

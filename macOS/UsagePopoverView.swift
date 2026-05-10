@@ -377,9 +377,7 @@ struct UsagePopoverView: View {
             } else if usageData.isNetworkError {
                 OfflineView(onRetry: onRefresh, onSignOut: onSignOut)
             } else if let error = usageData.error {
-                ErrorDisplayView(error: error, onRetry: onRefresh, onReLogin: {
-                    onSignOut()
-                })
+                ErrorDisplayView(error: error, onRetry: onRefresh, onSignOut: onSignOut)
             } else {
                 usageView
             }
