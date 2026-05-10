@@ -127,11 +127,12 @@ struct UsageProgressBarView: View {
     /// Fraction of the quota period that has elapsed (0–1). Rendered as a
     /// faded arc behind the solid usage fill, matching the ring treatment.
     var timeProgress: Double = 0
-
-    /// Matches the visual weight of the ring strokes when rendered at a
-    /// typical popover width (~240 pt). Adjust if the rings' `lineWidth`
-    /// formula (`dim * 0.13`) ever changes for the popover layout.
-    private let barHeight: CGFloat = 14
+    /// Matches the visual weight of an individual ring stroke. Default of 14
+    /// is tuned for the macOS popover (rings are 100 pt → `dim * 0.13` ≈ 13).
+    /// iOS callers should pass the matching value for their ring frame
+    /// (e.g. 32 when the rings are sized at 250 pt) so the bar looks like
+    /// a fourth ring laid out flat rather than a thinner sibling element.
+    var barHeight: CGFloat = 14
 
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {

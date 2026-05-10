@@ -171,14 +171,17 @@ struct ContentView: View {
 
             // Claude Design (Anthropic Labs) — separate weekly quota, no ring
             // mapping. Shown as a horizontal bar to set it apart visually
-            // from the ring-backed rows above.
+            // from the ring-backed rows above. The bar height matches the
+            // individual ring stroke (rings are 250 pt × 0.13 ≈ 32 pt) so
+            // it reads as a fourth ring laid out flat.
             UsageProgressBarView(label: "Claude Design",
                                  utilization: usageData.designWeeklyUtilization,
                                  resetsAt: usageData.designWeeklyResetsAt,
                                  systemImage: "paintbrush.pointed.fill",
                                  isApplicable: usageData.designWeeklyApplicable,
                                  timeProgress: timeElapsed(resetsAt: usageData.designWeeklyResetsAt,
-                                                           period: 7 * 86400))
+                                                           period: 7 * 86400),
+                                 barHeight: 32)
                 .padding(.horizontal)
 
             if let refreshed = usageData.lastRefreshed {
@@ -528,7 +531,8 @@ private struct ContentViewPreview: View {
                                          systemImage: "paintbrush.pointed.fill",
                                          isApplicable: mockData.designWeeklyApplicable,
                                          timeProgress: timeElapsed(resetsAt: mockData.designWeeklyResetsAt,
-                                                                   period: 7 * 86400))
+                                                                   period: 7 * 86400),
+                                         barHeight: 32)
                         .padding(.horizontal)
 
                     Text("Updated just now")

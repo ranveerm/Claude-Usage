@@ -35,7 +35,7 @@ final class WelcomeWindowController: NSWindowController, NSWindowDelegate {
         let hosting = NSHostingController(rootView: root)
 
         let win = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 540),
+            contentRect: NSRect(x: 0, y: 0, width: 480, height: 340),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
@@ -71,54 +71,27 @@ private struct WelcomeView: View {
                 sessionTimeProgress: 0.5, sonnetTimeProgress: 0.55, allModelsTimeProgress: 0.5
             ))
             .frame(width: 140, height: 140)
-            .padding(.top, 24)
 
             VStack(spacing: 6) {
                 Text("Welcome to Vibe Your Rings")
                     .font(.title2).bold()
-                Text("Your Claude usage, always one glance away.")
+                Text("Monitor your Claude usage")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
+            .padding(.vertical)
 
-            VStack(alignment: .leading, spacing: 14) {
-                ringRow(color: 1.0, label: "Outer ring — current 5-hour session")
-                ringRow(color: 0.8, label: "Middle ring — Sonnet weekly quota")
-                ringRow(color: 0.6, label: "Inner ring — all-models weekly quota")
+            Button(action: onSignIn) {
+                Text("Sign In with Claude")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 4)
             }
-            .padding(.horizontal, 36)
-
-            Spacer(minLength: 0)
-
-            VStack(spacing: 8) {
-                Button(action: onSignIn) {
-                    Text("Sign In with Claude")
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4)
-                }
-                .keyboardShortcut(.defaultAction)
-                .controlSize(.large)
-
-                Text("Your sign-in stays on this Mac. No data leaves this device.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .padding(.horizontal, 36)
-            .padding(.bottom, 24)
+            .keyboardShortcut(.defaultAction)
+            .controlSize(.large)
         }
-        .frame(width: 480, height: 540)
-    }
-
-    private func ringRow(color: Double, label: String) -> some View {
-        HStack(spacing: 10) {
-            Circle()
-                .fill(Color(red: 0xDA / 255.0, green: 0x77 / 255.0, blue: 0x56 / 255.0).opacity(color))
-                .frame(width: 10, height: 10)
-            Text(label)
-                .font(.callout)
-                .foregroundColor(.primary)
-            Spacer()
-        }
+        .padding(.horizontal, 48)
+        .padding(.vertical, 32)
+        .frame(width: 480)
     }
 }
 
