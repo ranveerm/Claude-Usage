@@ -52,6 +52,23 @@ func circleInput(from data: UsageData) -> CircleRendererInput {
     )
 }
 
+// MARK: - Platform-adaptive fonts for list rows
+//
+// iOS has more screen real estate per row and a touch target to fill, so the
+// list text steps up one rung on the type scale. macOS uses the compact sizes
+// that fit inside the menu-bar popover.
+
+#if os(iOS)
+let rowLabelFont: Font = .subheadline
+let rowResetFont: Font = .footnote
+#elseif os(watchOS)
+let rowLabelFont: Font = .footnote
+let rowResetFont: Font = .caption
+#else // macOS
+let rowLabelFont: Font = .footnote
+let rowResetFont: Font = .caption
+#endif
+
 // MARK: - Shared Row View
 
 struct UsageRowView: View {
@@ -70,18 +87,18 @@ struct UsageRowView: View {
         HStack(alignment: .center, spacing: 10) {
             if let systemImage {
                 Image(systemName: systemImage)
-                    .font(.caption)
+                    .font(rowLabelFont)
                     .foregroundStyle(iconTint)
                     .frame(width: 14)
             }
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text(label)
-                        .font(.caption)
+                        .font(rowLabelFont)
                         .foregroundStyle(isApplicable ? .primary : .secondary)
                     Spacer()
                     Text(isApplicable ? String(format: "%.0f%%", utilization) : "N/A")
-                        .font(.caption)
+                        .font(rowLabelFont)
                         .monospacedDigit()
                         .foregroundStyle(isApplicable ? .primary : .secondary)
                 }
@@ -89,8 +106,8 @@ struct UsageRowView: View {
                 // if one snuck through we'd rather suppress it than imply
                 // this metric is ticking down.
                 if isApplicable, let resets = resetsAt {
-                    Text("resets \(resets.formatted(.relative(presentation: .named)))")
-                        .font(.system(size: 9))
+                    Text("Resets \(resets.formatted(.relative(presentation: .named)))")
+                        .font(rowResetFont)
                         .foregroundColor(.secondary)
                 }
             }
@@ -135,24 +152,24 @@ struct UsageProgressBarView: View {
     var barHeight: CGFloat = 14
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 7) {
             // Label · reset hint · percentage — all on one header row so the
             // reset cadence sits visually distinct from the ring rows below.
             HStack(spacing: 4) {
                 Text(label)
-                    .font(.caption)
+                    .font(rowLabelFont)
                     .foregroundStyle(isApplicable ? .primary : .secondary)
                 if isApplicable, let resets = resetsAt {
                     Text("·")
-                        .font(.system(size: 9))
+                        .font(rowResetFont)
                         .foregroundColor(.secondary)
-                    Text("resets \(resets.formatted(.relative(presentation: .named)))")
-                        .font(.system(size: 9))
+                    Text("Resets \(resets.formatted(.relative(presentation: .named)))")
+                        .font(rowResetFont)
                         .foregroundColor(.secondary)
                 }
                 Spacer()
                 Text(isApplicable ? String(format: "%.0f%%", utilization) : "N/A")
-                    .font(.caption)
+                    .font(rowLabelFont)
                     .monospacedDigit()
                     .foregroundStyle(isApplicable ? .primary : .secondary)
             }

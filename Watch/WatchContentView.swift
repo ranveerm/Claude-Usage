@@ -81,7 +81,7 @@ private struct DetailPage: View {
 
                 if let refreshed = data.lastRefreshed {
                     Text("Updated \(refreshed.formatted(.relative(presentation: .named)))")
-                        .font(.system(size: 9))
+                        .font(rowResetFont)
                         .foregroundColor(.secondary)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top, 4)

@@ -417,6 +417,8 @@ struct UsagePopoverView: View {
                 }
             }
 
+            Divider()
+
             // Claude Design (Anthropic Labs) — separate weekly quota that
             // doesn't fit the concentric-ring metaphor. Renders as a full-
             // width horizontal bar below the ring/row block so it's visually

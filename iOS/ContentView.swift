@@ -165,23 +165,22 @@ struct ContentView: View {
                              utilization: usageData.allModelsWeeklyUtilization,
                              resetsAt: usageData.allModelsWeeklyResetsAt,
                              systemImage: "shippingbox")
+                Divider()
+                // Claude Design (Anthropic Labs) — separate weekly quota, no ring
+                // mapping. Shown as a horizontal bar to set it apart visually
+                // from the ring-backed rows above. The bar height matches the
+                // individual ring stroke (rings are 250 pt × 0.13 ≈ 32 pt) so
+                // it reads as a fourth ring laid out flat.
+                UsageProgressBarView(label: "Claude Design",
+                                     utilization: usageData.designWeeklyUtilization,
+                                     resetsAt: usageData.designWeeklyResetsAt,
+                                     systemImage: "paintbrush.pointed.fill",
+                                     isApplicable: usageData.designWeeklyApplicable,
+                                     timeProgress: timeElapsed(resetsAt: usageData.designWeeklyResetsAt,
+                                                               period: 7 * 86400),
+                                     barHeight: 32)
             }
             .padding(.horizontal)
-
-            // Claude Design (Anthropic Labs) — separate weekly quota, no ring
-            // mapping. Shown as a horizontal bar to set it apart visually
-            // from the ring-backed rows above. The bar height matches the
-            // individual ring stroke (rings are 250 pt × 0.13 ≈ 32 pt) so
-            // it reads as a fourth ring laid out flat.
-            UsageProgressBarView(label: "Claude Design",
-                                 utilization: usageData.designWeeklyUtilization,
-                                 resetsAt: usageData.designWeeklyResetsAt,
-                                 systemImage: "paintbrush.pointed.fill",
-                                 isApplicable: usageData.designWeeklyApplicable,
-                                 timeProgress: timeElapsed(resetsAt: usageData.designWeeklyResetsAt,
-                                                           period: 7 * 86400),
-                                 barHeight: 32)
-                .padding(.horizontal)
 
             if let refreshed = usageData.lastRefreshed {
                 Text("Updated \(refreshed.formatted(.relative(presentation: .named)))")
@@ -523,18 +522,17 @@ private struct ContentViewPreview: View {
                                      utilization: mockData.allModelsWeeklyUtilization,
                                      resetsAt: mockData.allModelsWeeklyResetsAt,
                                      systemImage: "shippingbox")
+                        Divider()
+                        UsageProgressBarView(label: "Claude Design",
+                                             utilization: mockData.designWeeklyUtilization,
+                                             resetsAt: mockData.designWeeklyResetsAt,
+                                             systemImage: "paintbrush.pointed.fill",
+                                             isApplicable: mockData.designWeeklyApplicable,
+                                             timeProgress: timeElapsed(resetsAt: mockData.designWeeklyResetsAt,
+                                                                       period: 7 * 86400),
+                                             barHeight: 32)
                     }
                     .padding(.horizontal)
-
-                    UsageProgressBarView(label: "Claude Design",
-                                         utilization: mockData.designWeeklyUtilization,
-                                         resetsAt: mockData.designWeeklyResetsAt,
-                                         systemImage: "paintbrush.pointed.fill",
-                                         isApplicable: mockData.designWeeklyApplicable,
-                                         timeProgress: timeElapsed(resetsAt: mockData.designWeeklyResetsAt,
-                                                                   period: 7 * 86400),
-                                         barHeight: 32)
-                        .padding(.horizontal)
 
                     Text("Updated just now")
                         .font(.caption2)

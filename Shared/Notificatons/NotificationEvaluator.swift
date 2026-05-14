@@ -144,7 +144,6 @@ enum NotificationEvaluator {
                utilization / 100.0 > timeProgress,
                !state.hasFired(ring: ring, kind: .pace, for: resetsAt, usageBucket: paceBucket)
             {
-                let timePct = Int((timeProgress * 100).rounded())
                 out.append(PendingNotification(
                     ring: ring,
                     kind: .pace,
