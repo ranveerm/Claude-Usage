@@ -379,6 +379,7 @@ struct ContentView: View {
         SharedDefaults.save(data)
         WatchSender.shared.send(data)
         WidgetCenter.shared.reloadAllTimelines()
+        LiveActivityManager.shared.update(with: data)
         Task {
             await NotificationManager.shared.evaluateAndPost(
                 data: data,

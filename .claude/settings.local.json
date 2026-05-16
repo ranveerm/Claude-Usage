@@ -8,7 +8,10 @@
       "Bash(awk ' *)",
       "WebFetch(domain:www.anthropic.com)",
       "WebFetch(domain:support.claude.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(awk '/-- iOS 26\\\\.2/{flag=1; next} /^--/{flag=0} flag && /iPhone/ {print; exit}')",
+      "Bash(sed -i '' 's/MARKETING_VERSION = [0-9][0-9]*\\\\.[0-9][0-9]*\\\\.[0-9][0-9]*/MARKETING_VERSION = __TRACKED_VAR__/g' 'Vibe Your Rings.xcodeproj/project.pbxproj')",
+      "Bash(sed -i '' 's/CURRENT_PROJECT_VERSION = [0-9][0-9]*/CURRENT_PROJECT_VERSION = __TRACKED_VAR__/g' 'Vibe Your Rings.xcodeproj/project.pbxproj')"
     ]
   }
 }

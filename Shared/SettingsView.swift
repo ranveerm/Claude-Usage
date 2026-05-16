@@ -6,6 +6,9 @@ import UserNotifications
 /// chrome (navigation bar, window sizing) is added by the container.
 struct SettingsView: View {
     @ObservedObject private var settings = NotificationSettings.shared
+    #if os(iOS)
+    @ObservedObject private var liveActivitySettings = LiveActivitySettings.shared
+    #endif
     @State private var systemStatus: UNAuthorizationStatus = .notDetermined
     /// Controls the priming alert that appears the first time the user
     /// flips notifications on. Apple's HIG recommends warning the user
@@ -42,6 +45,13 @@ struct SettingsView: View {
                 thresholdSection
                 paceSection
             }
+
+            #if os(iOS)
+            // Live Activities are an iOS-only concept (ActivityKit isn't
+            // available on macOS). Hidden entirely from the macOS Settings
+            // pane rather than rendered disabled.
+            liveActivitiesSection
+            #endif
         }
         #if os(macOS)
         // macOS Settings scene doesn't provide a default size for Form-based
@@ -151,6 +161,29 @@ struct SettingsView: View {
             Text("Fires when a ring's usage outpaces the elapsed time in its reset window. For example, you're at 40% of your quota but only 20% of the window has passed. An early warning before you hit the absolute threshold.")
         }
     }
+
+    #if os(iOS)
+    /// Master switch + Dynamic Island metric picker. Off by default — see
+    /// `LiveActivitySettings`. Both controls fan out to `LiveActivityManager`
+    /// automatically (start/end on toggle, refresh in place on metric change).
+    @ViewBuilder
+    private var liveActivitiesSection: some View {
+        Section {
+            Toggle("Show Live Activities", isOn: $liveActivitySettings.enabled)
+            if liveActivitySettings.enabled {
+                Picker("Dynamic Island", selection: $liveActivitySettings.dynamicIslandMetric) {
+                    ForEach(DynamicIslandMetric.allCases) { metric in
+                        Text(metric.label).tag(metric)
+                    }
+                }
+            }
+        } header: {
+            Text("Live Activities")
+        } footer: {
+            Text("Shows your current Claude usage on the Lock Screen and in the Dynamic Island while a session is active. Choose which metric the Dynamic Island ring tracks. The activity ends automatically when the 5-hour window resets.")
+        }
+    }
+    #endif
 
     // MARK: - Auth helpers
 

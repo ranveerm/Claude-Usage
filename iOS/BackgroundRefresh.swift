@@ -70,6 +70,7 @@ enum BackgroundRefresh {
                 SharedDefaults.save(data)
                 WatchSender.shared.send(data)
                 WidgetCenter.shared.reloadAllTimelines()
+                await MainActor.run { LiveActivityManager.shared.update(with: data) }
                 await NotificationManager.shared.evaluateAndPost(
                     data: data,
                     settings: NotificationSettings.shared
