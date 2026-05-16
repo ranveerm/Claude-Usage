@@ -13,17 +13,36 @@ import Foundation
 /// - **Update**: called from both `ContentView.acceptData()` and the
 ///   `BGAppRefreshTask` background handler so the lock screen stays fresh.
 ///
-/// - **End**: when `sessionUtilization` drops to 0, or the payload carries
-///   an error or signed-out state.
+/// - **End**: when `sessionUtilization` drops to 0, the payload carries an
+///   error or signed-out state, or the percentage hasn't moved for
+///   `idleTimeout` — the user has stopped using Claude and the banner has
+///   nothing useful to add.
 @MainActor
 final class LiveActivityManager {
     static let shared = LiveActivityManager()
 
+    /// Dismiss the activity if the displayed percentage hasn't changed for
+    /// this long. Set at 10 minutes — a typical Claude reply burst moves
+    /// the bar by ≥1 %, so a flat percentage for 10 minutes is a reliable
+    /// signal the user has stepped away.
+    private static let idleTimeout: TimeInterval = 10 * 60
+
     private var currentActivity: Activity<ClaudeSessionAttributes>?
 
+    /// The wall-clock time at which we last saw the rounded session
+    /// percentage change. Reset on start, on every observed change, and
+    /// cleared on end. `nil` while no activity is running.
+    private var lastPercentChangeAt: Date?
+
     private init() {
-        // Adopt any activity that survived an app relaunch.
+        // Adopt any activity that survived an app relaunch. We can't
+        // reconstruct exactly when its percentage last moved, so treat
+        // adoption as a fresh observation — gives the user the full idle
+        // window before we'd dismiss something we just inherited.
         currentActivity = Activity<ClaudeSessionAttributes>.activities.first
+        if currentActivity != nil {
+            lastPercentChangeAt = Date()
+        }
     }
 
     /// Call after every successful fetch to keep the Live Activity in sync.
@@ -44,12 +63,27 @@ final class LiveActivityManager {
 
         if isActive {
             if let activity = currentActivity {
+                let previous = Int(activity.content.state.sessionUtilization.rounded())
+                let current  = Int(data.sessionUtilization.rounded())
+
+                if previous != current {
+                    // Percentage moved — user is actively using Claude.
+                    lastPercentChangeAt = Date()
+                } else if let last = lastPercentChangeAt,
+                          Date().timeIntervalSince(last) >= Self.idleTimeout {
+                    // No movement for the full idle window — dismiss the
+                    // banner rather than keep a flat percentage on screen.
+                    endAll()
+                    return
+                }
+
                 Task {
                     await activity.update(
                         ActivityContent(state: state, staleDate: data.sessionResetsAt)
                     )
                 }
             } else {
+                lastPercentChangeAt = Date()
                 start(state: state, resetsAt: data.sessionResetsAt)
             }
         } else {
@@ -83,6 +117,7 @@ final class LiveActivityManager {
         guard let activity = currentActivity else { return }
         let frozenState = activity.content.state
         currentActivity = nil
+        lastPercentChangeAt = nil
         Task {
             await activity.end(
                 ActivityContent(state: frozenState, staleDate: nil),
@@ -113,6 +148,7 @@ final class LiveActivityManager {
 
     private func endIfRunning(state: ClaudeSessionAttributes.ContentState) {
         guard let activity = currentActivity else { return }
+        lastPercentChangeAt = nil
         Task {
             await activity.end(
                 ActivityContent(state: state, staleDate: nil),
