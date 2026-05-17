@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only** — internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.1.1
+- Live Activity now actually disappears after 10 minutes of no usage change — previously it would dismiss but immediately restart on the next background refresh, making it look like nothing had happened
+
 ## 1.1.0
 - New **About** screen with an icon legend explaining every SF Symbol used across the app, widgets, and inline widget
 - New **Changelog** screen showing per-version feature additions, accessible from the same menu as Settings and Sign Out

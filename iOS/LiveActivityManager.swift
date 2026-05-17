@@ -34,6 +34,16 @@ final class LiveActivityManager {
     /// cleared on end. `nil` while no activity is running.
     private var lastPercentChangeAt: Date?
 
+    /// Rounded session percentage at which the manager last idle-ended an
+    /// activity. While this is set, `update(with:)` refuses to restart an
+    /// activity at the same percentage — otherwise the very next fetch
+    /// (foreground tick or BGAppRefreshTask) would silently re-create
+    /// what we just dismissed and the user would perceive the banner as
+    /// "never going away". Cleared when the percentage moves to a
+    /// different integer value (signalling real Claude usage has
+    /// resumed) or when the session resets / settings toggle off.
+    private var suppressedAtPercent: Int?
+
     private init() {
         // Adopt any activity that survived an app relaunch. We can't
         // reconstruct exactly when its percentage last moved, so treat
@@ -56,38 +66,56 @@ final class LiveActivityManager {
             return
         }
 
+        let currentPct = Int(data.sessionUtilization.rounded())
         let isActive = data.sessionUtilization > 0
                     && data.error == nil
                     && !data.needsLogin
+
+        // Session naturally ended (rollover, error, or signed out): tear
+        // down anything still running and clear suppression so the next
+        // session can start fresh.
+        if !isActive {
+            endIfRunning(state: contentState(from: data))
+            suppressedAtPercent = nil
+            return
+        }
+
+        // Idle-suppression gate. If we recently dismissed an activity due
+        // to inactivity, refuse to restart it at the same percentage.
+        // Only a real change in usage clears the suppression.
+        if let suppressed = suppressedAtPercent {
+            if currentPct == suppressed {
+                return
+            }
+            suppressedAtPercent = nil
+        }
+
         let state = contentState(from: data)
 
-        if isActive {
-            if let activity = currentActivity {
-                let previous = Int(activity.content.state.sessionUtilization.rounded())
-                let current  = Int(data.sessionUtilization.rounded())
+        if let activity = currentActivity {
+            let previous = Int(activity.content.state.sessionUtilization.rounded())
 
-                if previous != current {
-                    // Percentage moved — user is actively using Claude.
-                    lastPercentChangeAt = Date()
-                } else if let last = lastPercentChangeAt,
-                          Date().timeIntervalSince(last) >= Self.idleTimeout {
-                    // No movement for the full idle window — dismiss the
-                    // banner rather than keep a flat percentage on screen.
-                    endAll()
-                    return
-                }
-
-                Task {
-                    await activity.update(
-                        ActivityContent(state: state, staleDate: data.sessionResetsAt)
-                    )
-                }
-            } else {
+            if previous != currentPct {
+                // Percentage moved — user is actively using Claude.
                 lastPercentChangeAt = Date()
-                start(state: state, resetsAt: data.sessionResetsAt)
+            } else if let last = lastPercentChangeAt,
+                      Date().timeIntervalSince(last) >= Self.idleTimeout {
+                // No movement for the full idle window — dismiss the
+                // banner and remember the percentage so the next fetch
+                // doesn't immediately recreate it.
+                suppressedAtPercent = currentPct
+                endAll()
+                return
+            }
+
+            Task {
+                await activity.update(
+                    ActivityContent(state: state, staleDate: data.sessionResetsAt)
+                )
             }
         } else {
-            endIfRunning(state: state)
+            lastPercentChangeAt = Date()
+            start(state: state, resetsAt: data.sessionResetsAt)
         }
     }
 
@@ -98,9 +126,14 @@ final class LiveActivityManager {
     /// "your activity will appear next time we refresh".
     func applyEnabledChange() {
         if LiveActivitySettings.shared.enabled {
+            // Clear suppression on explicit re-enable — the user has just
+            // opted back in, so any in-flight idle-end shouldn't keep them
+            // from seeing the activity on the next fetch.
+            suppressedAtPercent = nil
             refreshFromCache()
         } else {
             endAll()
+            suppressedAtPercent = nil
         }
     }
 

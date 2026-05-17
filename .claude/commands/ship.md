@@ -103,26 +103,49 @@ available) the `.difference.png` paths. Do not proceed to the version bump.
 
 ## Phase 3 — Version bump
 
-**Skip this phase entirely if `/ship` was invoked with any argument**
-(e.g. `/ship --no-bump`, `/ship hotfix`, or any other trailing text).
-When skipped, proceed directly to Phase 4 (Commit) without modifying any
-version numbers and without creating a tag.
+The `/ship` argument controls which segment of the version is incremented.
+Accepted values:
 
-### Step 1 — Read the current version
+| Argument | Transform on `M.m.p` | Example |
+|----------|----------------------|---------|
+| `patch` (default) | `M.m.p` → `M.m.(p+1)` | `1.0.9` → `1.0.10` |
+| `minor` | `M.m.p` → `M.(m+1).0` | `1.0.9` → `1.1.0` |
+| `major` | `M.m.p` → `(M+1).0.0` | `1.0.9` → `2.0.0` |
+
+When the user passes no argument, default to `patch`. Anything that
+isn't one of the three accepted values is an error — stop and report
+without touching the project. The build number always increments by 1
+regardless of which segment is bumped.
+
+### Step 1 — Read current version + build, validate the argument
 
 ```bash
 CURRENT_VERSION=$(grep "MARKETING_VERSION" "Vibe Your Rings.xcodeproj/project.pbxproj" \
   | grep -oE "[0-9]+\.[0-9]+\.[0-9]+" | sort -uV | tail -1)
+CURRENT_BUILD=$(grep "CURRENT_PROJECT_VERSION" "Vibe Your Rings.xcodeproj/project.pbxproj" \
+  | grep -oE "[0-9]+" | sort -n | tail -1)
 ```
+
+Capture the bump segment from the `/ship` argument. If the user passed
+nothing, treat it as `patch`. Reject anything outside the allow-list.
 
 ### Step 2 — Compute the next version and build number
 
-Increment the patch segment of `CURRENT_VERSION` (e.g. `1.0.2` → `1.0.3`).
-
 ```bash
-CURRENT_BUILD=$(grep "CURRENT_PROJECT_VERSION" "Vibe Your Rings.xcodeproj/project.pbxproj" \
-  | grep -oE "[0-9]+" | sort -n | tail -1)
+MAJOR=$(echo "$CURRENT_VERSION" | cut -d. -f1)
+MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f2)
+PATCH=$(echo "$CURRENT_VERSION" | cut -d. -f3)
 NEXT_BUILD=$((CURRENT_BUILD + 1))
+
+case "$BUMP" in
+  patch) NEXT_VERSION="$MAJOR.$MINOR.$((PATCH + 1))" ;;
+  minor) NEXT_VERSION="$MAJOR.$((MINOR + 1)).0" ;;
+  major) NEXT_VERSION="$((MAJOR + 1)).0.0" ;;
+  *)
+    echo "Unknown bump segment: '$BUMP'. Use patch, minor, or major." >&2
+    exit 1
+    ;;
+esac
 ```
 
 ### Step 3 — Apply to project.pbxproj
@@ -150,9 +173,6 @@ grep -E "(MARKETING_VERSION|CURRENT_PROJECT_VERSION)" \
 Stop and report if any old value is still present.
 
 ## Phase 4 — Changelog
-
-**Skip this phase if Phase 3 was skipped** (no version bump → no
-changelog row to add).
 
 Two files must be updated in lockstep, because both drive different
 surfaces:
@@ -212,13 +232,10 @@ changelog need to tell the same story.
 ## Phase 5 — Commit
 
 1. Run in parallel: `git status`, `git diff HEAD`, `git log --oneline -8`.
-2. If the working tree is clean and no version bump was performed, there is
-   nothing to commit — skip to Phase 6.
-3. Pick emoji prefix(es) from the guide below based on what changed.
-   - Always include 🚀 when a version bump was performed.
-4. Stage specific files by name — never `git add -A` or `git add .`
-5. Commit using a HEREDOC. When a version bump was performed, include the
-   new version in the summary line:
+2. Pick emoji prefix(es) from the guide below based on what changed.
+   Always include 🚀 because the version bump in Phase 3 is unconditional.
+3. Stage specific files by name — never `git add -A` or `git add .`
+4. Commit using a HEREDOC, including the new version in the summary line:
    ```
    git commit -m "$(cat <<'EOF'
    🚀 <emoji(s)> Bump to X.Y.Z (build N); <summary of other changes>
@@ -246,8 +263,6 @@ changelog need to tell the same story.
 
 ## Phase 6 — Tag
 
-Only performed when a version bump was executed in Phase 3.
-
 Create an annotated tag so every App Store submission is traceable to a
 specific commit:
 
@@ -263,5 +278,5 @@ Push the branch and any new tag in one go:
 git push origin HEAD --tags
 ```
 
-`--tags` is a no-op when no tag was created (skipped phase), so it is safe
-to use unconditionally here.
+`--tags` pushes the freshly-created annotated tag alongside the branch
+in a single round trip.
