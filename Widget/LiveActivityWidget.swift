@@ -233,19 +233,28 @@ private struct LiveActivityBarRow: View {
                 let usageFraction = min(max(utilization / 100.0, 0), 1)
                 let timeFraction  = min(max(timeProgress,         0), 1)
 
+                // Every layer is translucent so the system's Liquid Glass
+                // banner background bleeds through, giving the bars an
+                // orange-tinted frosted-glass look that matches the rest
+                // of the iOS 26 lock-screen surface treatment.
+                //
+                // Opacities tuned so the three layers stay distinguishable
+                // (track < time < fill) while none of them block the glass
+                // entirely. The white text on top keeps its soft drop
+                // shadow so it stays legible across all three shades.
                 ZStack(alignment: .leading) {
                     Capsule()
-                        .fill(ConcentricCirclesView.anthropicOrange.opacity(0.2))
+                        .fill(ConcentricCirclesView.anthropicOrange.opacity(0.18))
 
                     if applicable && timeFraction > 0 {
                         Capsule()
-                            .fill(ConcentricCirclesView.anthropicOrange.opacity(0.35))
+                            .fill(ConcentricCirclesView.anthropicOrange.opacity(0.32))
                             .frame(width: geo.size.width * timeFraction)
                     }
 
                     if applicable {
                         Capsule()
-                            .fill(ConcentricCirclesView.anthropicOrange)
+                            .fill(ConcentricCirclesView.anthropicOrange.opacity(0.55))
                             .frame(width: geo.size.width * usageFraction)
                     }
                 }

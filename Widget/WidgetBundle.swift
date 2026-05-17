@@ -5,6 +5,7 @@ import SwiftUI
 struct ClaudeUsageWidgetBundle: WidgetBundle {
     var body: some Widget {
         UsageWidget()
+        UsageInlineWidget()
         UsageLiveActivity()
     }
 }
