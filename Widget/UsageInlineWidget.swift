@@ -78,7 +78,7 @@ struct InlineMetricIntent: WidgetConfigurationIntent {
         "Choose which Claude usage metric to show above the lock-screen clock."
     )
 
-    @Parameter(title: "Metric", default: .session)
+    @Parameter(title: "Metric", default: .allModelsWeekly)
     var metric: InlineMetric
 }
 
@@ -98,7 +98,7 @@ struct InlineUsageEntry: TimelineEntry {
 
 struct InlineTimelineProvider: AppIntentTimelineProvider {
     func placeholder(in context: Context) -> InlineUsageEntry {
-        InlineUsageEntry(date: .now, usage: nil, metric: .session)
+        InlineUsageEntry(date: .now, usage: nil, metric: .allModelsWeekly)
     }
 
     func snapshot(

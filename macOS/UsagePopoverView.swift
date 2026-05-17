@@ -341,6 +341,8 @@ struct UsagePopoverView: View {
 
     @State private var showDebugInfo = false
     @State private var showSignOutConfirmation = false
+    @State private var showAbout = false
+    @State private var showChangelog = false
     /// Captured from the environment so the gear button can open the
     /// Settings scene directly — `SettingsLink`'s imperative counterpart.
     /// Same action is re-registered with `SettingsCoordinator` via
@@ -468,6 +470,30 @@ struct UsagePopoverView: View {
                 }
                 .buttonStyle(.borderless)
                 .help("Settings")
+
+                // About — opens an icon legend in a sheet.
+                Button { showAbout = true } label: {
+                    Image(systemName: "info.circle")
+                        .font(.caption)
+                        .foregroundColor(.white)
+                }
+                .buttonStyle(.borderless)
+                .help("About")
+                .popover(isPresented: $showAbout) {
+                    AboutView()
+                }
+
+                // Changelog — list of feature additions per release.
+                Button { showChangelog = true } label: {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.caption)
+                        .foregroundColor(.white)
+                }
+                .buttonStyle(.borderless)
+                .help("Changelog")
+                .popover(isPresented: $showChangelog) {
+                    ChangelogView()
+                }
 
                 Button(action: { showSignOutConfirmation = true }) {
                     Image(systemName: "rectangle.portrait.and.arrow.right")

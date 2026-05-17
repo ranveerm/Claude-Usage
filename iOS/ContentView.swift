@@ -5,6 +5,8 @@ struct ContentView: View {
     @State private var usageData = UsageData()
     @State private var showLogin = false
     @State private var showSettings = false
+    @State private var showAbout = false
+    @State private var showChangelog = false
     @State private var isLoading = false
     @State private var isRefreshing = false
     @State private var refreshTask: Task<Void, Never>?
@@ -75,6 +77,16 @@ struct ContentView: View {
                             } label: {
                                 Label("Settings", systemImage: "gearshape")
                             }
+                            Button {
+                                showAbout = true
+                            } label: {
+                                Label("About", systemImage: "info.circle")
+                            }
+                            Button {
+                                showChangelog = true
+                            } label: {
+                                Label("Changelog", systemImage: "clock.arrow.circlepath")
+                            }
                             Divider()
                             Button(role: .destructive) {
                                 signOut()
@@ -125,6 +137,28 @@ struct ContentView: View {
         // Done button the user expects on iOS modals.
         .sheet(isPresented: $showSettings) {
             NavigationStack { SettingsView() }
+        }
+        // About and Changelog are read-only references; sheets feel right
+        // here too so the user can dismiss back to the rings.
+        .sheet(isPresented: $showAbout) {
+            NavigationStack {
+                AboutView()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { showAbout = false }
+                        }
+                    }
+            }
+        }
+        .sheet(isPresented: $showChangelog) {
+            NavigationStack {
+                ChangelogView()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Done") { showChangelog = false }
+                        }
+                    }
+            }
         }
         // Brief centred overlay that confirms a sign-in or sign-out, then
         // fades itself out. Non-interactive — just acknowledgement. See the

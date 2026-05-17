@@ -58,6 +58,8 @@
 		FFFF111111111111111F0014 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF111111111111111F0003 /* LiveActivityManager.swift */; };
 		FFFF111111111111111F0015 /* LiveActivitySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF111111111111111F0004 /* LiveActivitySettings.swift */; };
 		FFFF111111111111111F0016 /* UsageInlineWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF111111111111111F0005 /* UsageInlineWidget.swift */; };
+		FFFF111111111111111F0017 /* AboutChangelogViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF111111111111111F0006 /* AboutChangelogViews.swift */; };
+		FFFF111111111111111F0018 /* AboutChangelogViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF111111111111111F0006 /* AboutChangelogViews.swift */; };
 		BBBB111111111111111A0001 /* Vibe Your Rings Watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0872308317299AF9E5D1861A /* Vibe Your Rings Watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BF2E1FDCED3B62B918FC5843 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A8C96E203B54080374D251 /* AppDelegate.swift */; };
 		C5B66ED363AC4EA757D8F97A /* ConcentricCirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AECB6850F4359F607BCEDF3 /* ConcentricCirclesView.swift */; };
@@ -200,6 +202,7 @@
 		FFFF111111111111111F0003 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		FFFF111111111111111F0004 /* LiveActivitySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivitySettings.swift; sourceTree = "<group>"; };
 		FFFF111111111111111F0005 /* UsageInlineWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageInlineWidget.swift; sourceTree = "<group>"; };
+		FFFF111111111111111F0006 /* AboutChangelogViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutChangelogViews.swift; sourceTree = "<group>"; };
 		F365ECED4F04C6605F294732 /* Claude_Usage_Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage_Widget.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -341,6 +344,7 @@
 				5E7E3A791CA2AB8863C53101 /* UsageService.swift */,
 				62DF0533D82BA7540D8026E6 /* UsageViews.swift */,
 				A34B1BE42F99004E00FB8DE3 /* SettingsView.swift */,
+				FFFF111111111111111F0006 /* AboutChangelogViews.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -751,6 +755,7 @@
 				FFFF111111111111111F0012 /* LiveActivityAttributes.swift in Sources */,
 				FFFF111111111111111F0014 /* LiveActivityManager.swift in Sources */,
 				FFFF111111111111111F0015 /* LiveActivitySettings.swift in Sources */,
+				FFFF111111111111111F0017 /* AboutChangelogViews.swift in Sources */,
 				15CE708F177EBAD43EDD43FB /* ConcentricCirclesView.swift in Sources */,
 				045ED01433B290ED84979F07 /* ContentView.swift in Sources */,
 				010A799CF52B233D3706F902 /* KeychainHelper.swift in Sources */,
@@ -784,6 +789,7 @@
 				A34B1BEA2F9901B800FB8DE3 /* SettingsCoordinator.swift in Sources */,
 				A64510FA5C2410016399D4AA /* WelcomeWindowController.swift in Sources */,
 				EEEE111111111111111E0003 /* SignOutSignal.swift in Sources */,
+				FFFF111111111111111F0018 /* AboutChangelogViews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -932,7 +938,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 29F59849NR;
@@ -950,7 +956,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1059,7 +1065,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1069,7 +1075,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-iOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1091,13 +1097,13 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-iOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1119,7 +1125,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1129,7 +1135,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-macOS-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -1150,13 +1156,13 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-macOS-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -1179,7 +1185,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Vibe Your Rings Watch Widget/Claude_Usage_WatchWidget.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1195,7 +1201,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.ClaudeYourRings.watchkitapp.Claude-Your-Rings-Watch-Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1222,7 +1228,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Vibe Your Rings Watch Widget/Claude_Usage_WatchWidget.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1234,7 +1240,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.ClaudeYourRings.watchkitapp.Claude-Your-Rings-Watch-Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1302,7 +1308,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 16;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 29F59849NR;
@@ -1326,7 +1332,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.9;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
