@@ -26,6 +26,9 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.1.2", features: [
+            "Live Activity idle dismissal now survives across cold launches — when iOS terminates the suspended app to reclaim memory, the 10-minute timer keeps running rather than resetting to zero, so the banner actually goes away after you stop using Claude",
+        ]),
         ChangelogEntry(version: "1.1.1", features: [
             "Live Activity now actually disappears after 10 minutes of no usage change — previously it would dismiss but immediately restart on the next background refresh, making it look like nothing had happened",
         ]),

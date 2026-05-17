@@ -29,10 +29,32 @@ final class LiveActivityManager {
 
     private var currentActivity: Activity<ClaudeSessionAttributes>?
 
+    /// App-group defaults shared with the iOS app and the widget extension,
+    /// used to persist the idle-tracking timestamps. **Persistence is the
+    /// whole point** — iOS routinely kills suspended apps to reclaim
+    /// memory, and `BGAppRefreshTask` wakes a fresh process. If we kept
+    /// these as plain stored properties the timer would reset to zero on
+    /// every cold launch and the activity would never time out.
+    private let defaults: UserDefaults
+
     /// The wall-clock time at which we last saw the rounded session
     /// percentage change. Reset on start, on every observed change, and
-    /// cleared on end. `nil` while no activity is running.
-    private var lastPercentChangeAt: Date?
+    /// cleared on end. `nil` while no activity is running. **Persisted**
+    /// to the app group so the clock keeps ticking across process
+    /// terminations.
+    private var lastPercentChangeAt: Date? {
+        get {
+            let raw = defaults.double(forKey: Keys.lastPercentChangeAt)
+            return raw > 0 ? Date(timeIntervalSince1970: raw) : nil
+        }
+        set {
+            if let value = newValue {
+                defaults.set(value.timeIntervalSince1970, forKey: Keys.lastPercentChangeAt)
+            } else {
+                defaults.removeObject(forKey: Keys.lastPercentChangeAt)
+            }
+        }
+    }
 
     /// Rounded session percentage at which the manager last idle-ended an
     /// activity. While this is set, `update(with:)` refuses to restart an
@@ -42,17 +64,36 @@ final class LiveActivityManager {
     /// "never going away". Cleared when the percentage moves to a
     /// different integer value (signalling real Claude usage has
     /// resumed) or when the session resets / settings toggle off.
-    private var suppressedAtPercent: Int?
+    /// **Persisted** so suppression survives across cold launches.
+    private var suppressedAtPercent: Int? {
+        get { defaults.object(forKey: Keys.suppressedAtPercent) as? Int }
+        set {
+            if let value = newValue {
+                defaults.set(value, forKey: Keys.suppressedAtPercent)
+            } else {
+                defaults.removeObject(forKey: Keys.suppressedAtPercent)
+            }
+        }
+    }
 
     private init() {
-        // Adopt any activity that survived an app relaunch. We can't
-        // reconstruct exactly when its percentage last moved, so treat
-        // adoption as a fresh observation — gives the user the full idle
-        // window before we'd dismiss something we just inherited.
+        defaults = UserDefaults(suiteName: "group.com.ranveer.ClaudeYourRings") ?? .standard
+        // Adopt any activity that survived an app relaunch.
         currentActivity = Activity<ClaudeSessionAttributes>.activities.first
-        if currentActivity != nil {
+
+        // If we adopted an activity but the persisted timestamp is missing
+        // (first launch under this new build, or the persisted store was
+        // cleared) seed it to now. We *don't* overwrite an existing value
+        // — that's the whole point of persistence: the clock has to keep
+        // running even when the process didn't.
+        if currentActivity != nil, lastPercentChangeAt == nil {
             lastPercentChangeAt = Date()
         }
+    }
+
+    private enum Keys {
+        static let lastPercentChangeAt = "liveActivity.lastPercentChangeAt"
+        static let suppressedAtPercent = "liveActivity.suppressedAtPercent"
     }
 
     /// Call after every successful fetch to keep the Live Activity in sync.

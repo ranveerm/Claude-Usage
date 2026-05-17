@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only** — internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.1.2
+- Live Activity idle dismissal now survives across cold launches — when iOS terminates the suspended app to reclaim memory, the 10-minute timer keeps running rather than resetting to zero, so the banner actually goes away after you stop using Claude
+
 ## 1.1.1
 - Live Activity now actually disappears after 10 minutes of no usage change — previously it would dismiss but immediately restart on the next background refresh, making it look like nothing had happened
 
