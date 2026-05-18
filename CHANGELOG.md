@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only** — internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.1.4
+- Fixed the Claude Design horizontal progress bar so it always renders as a true capsule — both ends are now rounded at every fill level, the usage fill has a rounded trailing cap when it falls short of the time-progress fill, and very low usage values no longer produce a floating shape or a vertical pill
+
 ## 1.1.3
 - Home-screen and lock-screen widgets now refresh on their own schedule, fetching fresh usage directly from Claude when the system reloads them. Previously they only ever displayed whatever the iOS app had last cached, which meant the rings would appear static until you opened the app
 - Fixed a visual glitch in the horizontal progress bars where low percentages rendered as a floating circle in the middle of the bar instead of as a small sliver hugging the left curve

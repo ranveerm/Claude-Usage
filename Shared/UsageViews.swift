@@ -175,39 +175,74 @@ struct UsageProgressBarView: View {
             }
 
             // Custom capsule bar styled to match the ring palette.
-            // Width is capped at 90 % of the available row so it doesn't
-            // visually crowd the trailing edge.
-            GeometryReader { geo in
-                let usageFraction = min(max(utilization  / 100.0, 0), 1)
-                let timeFraction  = min(max(timeProgress,          0), 1)
+            //
+            // Layout strategy: the Capsule track is the layout-driving view —
+            // its width comes directly from the parent VStack, guaranteeing a
+            // true capsule shape. Fill layers are applied as overlays so that
+            // a GeometryReader inside the overlay reads the already-resolved
+            // capsule frame (avoiding the zero-width pitfall that affects a
+            // bare GeometryReader placed as a sibling in the VStack).
+            //
+            // Fill layers use `Rectangle` (not `Capsule`) so that at low
+            // fractions the shape hugs the leading curve instead of collapsing
+            // into a floating circle. The `clipShape(Capsule())` on the inner
+            // ZStack trims both ends of each fill to the capsule boundary.
+            let usageFraction = min(max(utilization / 100.0, 0), 1)
+            let timeFraction  = min(max(timeProgress,         0), 1)
 
-                // Fill layers use `Rectangle` (clipped to the outer capsule
-                // below) rather than `Capsule` themselves. A `Capsule`
-                // sized smaller than the bar's height collapses into a
-                // free-floating circle that doesn't hug the parent's left
-                // curvature; `Rectangle` + `.clipShape(Capsule())` gives a
-                // proper capsule-cap-shaped sliver at low fractions.
-                ZStack(alignment: .leading) {
-                    // Track — same as ring unfilled arc
-                    Capsule()
-                        .fill(ConcentricCirclesView.anthropicOrange.opacity(0.2))
+            Capsule()
+                .fill(ConcentricCirclesView.anthropicOrange.opacity(0.2))
+                .frame(height: barHeight)
+                // Fill layers — overlaid so the capsule track drives layout.
+                .overlay(alignment: .leading) {
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            // Time-elapsed fill — faded layer behind solid usage.
+                            // Same UnevenRoundedRectangle treatment as the usage
+                            // fill: zero leading radius (outer capsule clip owns
+                            // the left curve) and a clamped trailing radius so the
+                            // right cap is rounded without becoming a vertical pill.
+                            if isApplicable && timeFraction > 0 {
+                                let timeWidth = geo.size.width * timeFraction
+                                let timeTrailingR = min(barHeight / 2, timeWidth / 2)
+                                UnevenRoundedRectangle(
+                                    topLeadingRadius: 0,
+                                    bottomLeadingRadius: 0,
+                                    bottomTrailingRadius: timeTrailingR,
+                                    topTrailingRadius: timeTrailingR
+                                )
+                                .fill(ConcentricCirclesView.anthropicOrange.opacity(0.35))
+                                .frame(width: timeWidth, height: geo.size.height)
+                            }
 
-                    // Time-elapsed fill — same faded layer the rings use
-                    if isApplicable && timeFraction > 0 {
-                        Rectangle()
-                            .fill(ConcentricCirclesView.anthropicOrange.opacity(0.35))
-                            .frame(width: geo.size.width * timeFraction)
+                            // Usage fill — solid arc; drawn on top of time layer.
+                            // UnevenRoundedRectangle gives the fill a rounded
+                            // trailing cap (visible when usage < time progress)
+                            // while keeping the leading corners at zero so the
+                            // outer clipShape(Capsule()) is the sole authority
+                            // on the left-side curve. The trailing radius is
+                            // clamped to half the fill width so the shape never
+                            // becomes a vertical pill at very low fractions.
+                            if isApplicable {
+                                let fillWidth = geo.size.width * usageFraction
+                                let trailingR = min(barHeight / 2, fillWidth / 2)
+                                UnevenRoundedRectangle(
+                                    topLeadingRadius: 0,
+                                    bottomLeadingRadius: 0,
+                                    bottomTrailingRadius: trailingR,
+                                    topTrailingRadius: trailingR
+                                )
+                                .fill(ConcentricCirclesView.anthropicOrange)
+                                .frame(width: fillWidth, height: geo.size.height)
+                            }
+                        }
+                        .frame(width: geo.size.width, height: geo.size.height,
+                               alignment: .leading)
+                        .clipShape(Capsule())
                     }
-
-                    // Usage fill — same as ring solid arc; drawn on top so it
-                    // covers the faded time layer when usage has outrun time.
-                    if isApplicable {
-                        Rectangle()
-                            .fill(ConcentricCirclesView.anthropicOrange)
-                            .frame(width: geo.size.width * usageFraction)
-                    }
-
-                    // Icon at the leading edge, overlaid on whatever is behind it
+                }
+                // Icon overlay — sits on top of all fill layers
+                .overlay(alignment: .leading) {
                     if let systemImage {
                         Image(systemName: systemImage)
                             .font(.system(size: barHeight * 0.55, weight: .semibold))
@@ -215,10 +250,6 @@ struct UsageProgressBarView: View {
                             .padding(.leading, 6)
                     }
                 }
-                .frame(height: barHeight)
-                .clipShape(Capsule())
-            }
-            .frame(height: barHeight)
         }
         .opacity(isApplicable ? 1.0 : 0.65)
     }
