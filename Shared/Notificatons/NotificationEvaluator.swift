@@ -98,7 +98,7 @@ struct NotificationState: Codable, Equatable {
 
 /// Pure function layer: turns `(UsageData, Settings, State)` into a list of
 /// alerts to fire. No UserNotifications, no UserDefaults, no side effects
-/// except the in-out state — which makes this the unit-testable core.
+/// except the in-out state. This makes it the unit-testable core.
 enum NotificationEvaluator {
 
     static func evaluate(
@@ -149,7 +149,7 @@ enum NotificationEvaluator {
                     kind: .pace,
                     usagePercent: utilization,
                     resetsAt: resetsAt,
-                    title: "\(ring.label) at \(Int(utilization.rounded()))% — pace alert",
+                    title: "\(ring.label) at \(Int(utilization.rounded()))% - pace alert",
                     body: timeRemainingString(resetsAt: resetsAt, now: now)
                 ))
                 state.markFired(ring: ring, kind: .pace, resetsAt: resetsAt, usageBucket: paceBucket)
@@ -202,7 +202,7 @@ enum NotificationEvaluator {
     private static func timeProgress(resetsAt: Date?, period: TimeInterval, now: Date) -> Double? {
         guard let resetsAt else { return nil }
         let remaining = resetsAt.timeIntervalSince(now)
-        // Window has ended — we're past the reset. Don't fire, the next
+        // Window has ended. We're past the reset. Don't fire, the next
         // fetch will bring a fresh resetsAt that resets dedup.
         guard remaining > 0, period > 0 else { return nil }
         let elapsed = period - remaining

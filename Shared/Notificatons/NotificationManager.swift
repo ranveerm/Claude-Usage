@@ -18,7 +18,7 @@ final class NotificationManager {
 
     // MARK: - Authorisation
 
-    /// Ask the system for permission. Only request `.alert` and `.sound` —
+    /// Ask the system for permission. Only request `.alert` and `.sound`,
     /// deliberately skipping `.badge` and `.criticalAlert` so the app stays
     /// in "banner" territory. iOS only shows the modal once; subsequent
     /// calls return whatever the user's already chosen.
@@ -57,7 +57,7 @@ final class NotificationManager {
             content.title = alert.title
             content.body  = alert.body
             content.sound = .default
-            // `.active` is the default banner priority — visible and audible
+            // `.active` is the default banner priority. Visible and audible
             // when not in Focus, but not timeSensitive (which would require
             // an additional entitlement and break through Focus).
             content.interruptionLevel = .active
@@ -91,7 +91,7 @@ final class NotificationManager {
         }
     }
 
-    /// Wipe dedup state — called on sign-out so the next signed-in user
+    /// Wipe dedup state. Called on sign-out so the next signed-in user
     /// doesn't inherit someone else's "already fired" record.
     func resetState() {
         defaults.removeObject(forKey: stateKey)

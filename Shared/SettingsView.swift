@@ -1,7 +1,7 @@
 import SwiftUI
 import UserNotifications
 
-/// Shared settings UI — presented as a sheet on iOS and hosted by the
+/// Shared settings UI. Presented as a sheet on iOS and hosted by the
 /// SwiftUI `Settings` scene on macOS. The view is identical; platform
 /// chrome (navigation bar, window sizing) is added by the container.
 struct SettingsView: View {
@@ -55,7 +55,7 @@ struct SettingsView: View {
         }
         #if os(macOS)
         // macOS Settings scene doesn't provide a default size for Form-based
-        // panes — without this the window opens ~100pt tall and immediately
+        // panes. Without this the window opens ~100pt tall and immediately
         // feels broken.
         .frame(width: 440, height: 480)
         .formStyle(.grouped)
@@ -86,7 +86,7 @@ struct SettingsView: View {
                         // First time: show the priming alert so the user
                         // isn't surprised by the OS prompt. If they've
                         // already been asked (authorized or denied), skip
-                        // straight to the underlying action — requestAuth()
+                        // straight to the underlying action. requestAuth()
                         // is idempotent and the OS won't re-prompt after
                         // the first response anyway.
                         if systemStatus == .notDetermined {
@@ -101,7 +101,7 @@ struct SettingsView: View {
             ))
 
             if settings.notificationsEnabled && systemStatus == .denied {
-                // User turned us on but the OS-level permission is denied —
+                // User turned us on but the OS-level permission is denied.
                 // probably revoked in Settings after the first prompt. Tell
                 // them where to fix it; we can't re-prompt from inside the
                 // app once the user has actively denied.
@@ -144,7 +144,7 @@ struct SettingsView: View {
         }
     }
 
-    /// Pace rule — per-ring toggles. Copy explains the "usage outpaces
+    /// Pace rule with per-ring toggles. Copy explains the "usage outpaces
     /// time elapsed" concept rather than leaving it implicit.
     @ViewBuilder
     private var paceSection: some View {
@@ -163,7 +163,7 @@ struct SettingsView: View {
     }
 
     #if os(iOS)
-    /// Master switch + Dynamic Island metric picker. Off by default — see
+    /// Master switch + Dynamic Island metric picker. Off by default. See
     /// `LiveActivitySettings`. Both controls fan out to `LiveActivityManager`
     /// automatically (start/end on toggle, refresh in place on metric change).
     @ViewBuilder
@@ -212,7 +212,7 @@ struct SettingsView: View {
 /// Drives the previews through every meaningful state of the settings
 /// screen. `NotificationSettings` is a singleton, so we mutate its
 /// published values in `.task` rather than constructing an isolated
-/// instance — the view reads the same shared source of truth that the
+/// instance. The view reads the same shared source of truth that the
 /// real app does, which keeps the preview faithful.
 private struct SettingsPreviewHarness: View {
     /// Mirrors the real auth states the view branches on. `.authorized`

@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// AppKit ↔ SwiftUI bridge for opening the macOS `Settings` scene from
-/// outside a SwiftUI view — e.g. the status-item right-click menu.
+/// outside a SwiftUI view, e.g. the status-item right-click menu.
 ///
 /// macOS 14 deprecated `NSApp.sendAction(#selector(showSettingsWindow:)...)`
 /// ("Please use SettingsLink for opening the Settings scene.") in favour of
@@ -11,7 +11,7 @@ import SwiftUI
 /// park it in a singleton that AppKit can call synchronously.
 ///
 /// Registration happens via `.captureSettingsOpener()` applied to a view
-/// that's guaranteed to be alive at launch — the popover's root view, which
+/// that's guaranteed to be alive at launch. This is the popover's root view, which
 /// the app auto-shows in `applicationDidFinishLaunching`. After that first
 /// on-appear, `SettingsCoordinator.shared.open()` is callable from anywhere
 /// on the main actor.

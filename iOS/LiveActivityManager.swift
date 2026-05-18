@@ -15,14 +15,14 @@ import Foundation
 ///
 /// - **End**: when `sessionUtilization` drops to 0, the payload carries an
 ///   error or signed-out state, or the percentage hasn't moved for
-///   `idleTimeout` — the user has stopped using Claude and the banner has
+///   `idleTimeout`. The user has stopped using Claude and the banner has
 ///   nothing useful to add.
 @MainActor
 final class LiveActivityManager {
     static let shared = LiveActivityManager()
 
     /// Dismiss the activity if the displayed percentage hasn't changed for
-    /// this long. Set at 10 minutes — a typical Claude reply burst moves
+    /// this long. Set at 10 minutes. A typical Claude reply burst moves
     /// the bar by ≥1 %, so a flat percentage for 10 minutes is a reliable
     /// signal the user has stepped away.
     private static let idleTimeout: TimeInterval = 10 * 60
@@ -31,7 +31,7 @@ final class LiveActivityManager {
 
     /// App-group defaults shared with the iOS app and the widget extension,
     /// used to persist the idle-tracking timestamps. **Persistence is the
-    /// whole point** — iOS routinely kills suspended apps to reclaim
+    /// whole point**. iOS routinely kills suspended apps to reclaim
     /// memory, and `BGAppRefreshTask` wakes a fresh process. If we kept
     /// these as plain stored properties the timer would reset to zero on
     /// every cold launch and the activity would never time out.
@@ -58,7 +58,7 @@ final class LiveActivityManager {
 
     /// Rounded session percentage at which the manager last idle-ended an
     /// activity. While this is set, `update(with:)` refuses to restart an
-    /// activity at the same percentage — otherwise the very next fetch
+    /// activity at the same percentage. Otherwise the very next fetch
     /// (foreground tick or BGAppRefreshTask) would silently re-create
     /// what we just dismissed and the user would perceive the banner as
     /// "never going away". Cleared when the percentage moves to a
@@ -84,7 +84,7 @@ final class LiveActivityManager {
         // If we adopted an activity but the persisted timestamp is missing
         // (first launch under this new build, or the persisted store was
         // cleared) seed it to now. We *don't* overwrite an existing value
-        // — that's the whole point of persistence: the clock has to keep
+        // That's the whole point of persistence: the clock has to keep
         // running even when the process didn't.
         let seededNow = currentActivity != nil && lastPercentChangeAt == nil
         if seededNow {
@@ -146,13 +146,13 @@ final class LiveActivityManager {
             let previous = Int(activity.content.state.sessionUtilization.rounded())
 
             if previous != currentPct {
-                // Percentage moved — user is actively using Claude.
+                // Percentage moved. User is actively using Claude.
                 DebugLog.log("update → percent change \(previous)→\(currentPct); resetting idle clock")
                 lastPercentChangeAt = Date()
             } else if let last = lastPercentChangeAt {
                 let elapsed = Date().timeIntervalSince(last)
                 if elapsed >= Self.idleTimeout {
-                    // No movement for the full idle window — dismiss the
+                    // No movement for the full idle window. Dismiss the
                     // banner and remember the percentage so the next fetch
                     // doesn't immediately recreate it.
                     DebugLog.log("update → IDLE THRESHOLD HIT: \(Int(elapsed))s flat at \(currentPct)%; endAll + suppress")
@@ -179,7 +179,7 @@ final class LiveActivityManager {
         }
     }
 
-    /// Helper for debug logs — formats a Date as a relative-age string.
+    /// Helper for debug logs. Formats a Date as a relative-age string.
     private static func relativeAge(_ date: Date) -> String {
         let elapsed = Int(Date().timeIntervalSince(date))
         return "\(date) (\(elapsed)s ago)"
@@ -188,13 +188,13 @@ final class LiveActivityManager {
     /// Called when `LiveActivitySettings.enabled` toggles. On disable we
     /// end any running activity immediately rather than waiting for the
     /// next fetch. On enable we look at the cached payload and start
-    /// straight away if a session is active — feels more responsive than
+    /// straight away if a session is active. This feels more responsive than
     /// "your activity will appear next time we refresh".
     func applyEnabledChange() {
         let enabled = LiveActivitySettings.shared.enabled
         DebugLog.log("applyEnabledChange: enabled=\(enabled)")
         if enabled {
-            // Clear suppression on explicit re-enable — the user has just
+            // Clear suppression on explicit re-enable. The user has just
             // opted back in, so any in-flight idle-end shouldn't keep them
             // from seeing the activity on the next fetch.
             suppressedAtPercent = nil

@@ -1,45 +1,45 @@
 # Changelog
 
 This file is the source of truth for the in-app **Changelog** screen
-(`Shared/AboutChangelogViews.swift` mirrors it). Update both together —
-the `/ship` skill instructs the agent to append a section here before
+(`Shared/AboutChangelogViews.swift` mirrors it). Update both together.
+The `/ship` skill instructs the agent to append a section here before
 the version-bump commit.
 
 Tag sections are listed newest first. Bullet items describe **user-facing
-changes only** — internal refactors, test-only edits, and bump-only
+changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
 ## 1.1.4
-- Fixed the Claude Design horizontal progress bar so it always renders as a true capsule — both ends are now rounded at every fill level, the usage fill has a rounded trailing cap when it falls short of the time-progress fill, and very low usage values no longer produce a floating shape or a vertical pill
+- Fixed the Claude Design horizontal progress bar so it always renders as a true capsule. Both ends are now rounded at every fill level, the usage fill has a rounded trailing cap when it falls short of the time-progress fill, and very low usage values no longer produce a floating shape or a vertical pill
 
 ## 1.1.3
 - Home-screen and lock-screen widgets now refresh on their own schedule, fetching fresh usage directly from Claude when the system reloads them. Previously they only ever displayed whatever the iOS app had last cached, which meant the rings would appear static until you opened the app
 - Fixed a visual glitch in the horizontal progress bars where low percentages rendered as a floating circle in the middle of the bar instead of as a small sliver hugging the left curve
 
 ## 1.1.2
-- Live Activity idle dismissal now survives across cold launches — when iOS terminates the suspended app to reclaim memory, the 10-minute timer keeps running rather than resetting to zero, so the banner actually goes away after you stop using Claude
+- Live Activity idle dismissal now survives across cold launches. When iOS terminates the suspended app to reclaim memory, the 10-minute timer keeps running rather than resetting to zero, so the banner actually goes away after you stop using Claude
 
 ## 1.1.1
-- Live Activity now actually disappears after 10 minutes of no usage change — previously it would dismiss but immediately restart on the next background refresh, making it look like nothing had happened
+- Live Activity now actually disappears after 10 minutes of no usage change. Previously it would dismiss but immediately restart on the next background refresh, making it look like nothing had happened
 
 ## 1.1.0
 - New **About** screen with an icon legend explaining every SF Symbol used across the app, widgets, and inline widget
 - New **Changelog** screen showing per-version feature additions, accessible from the same menu as Settings and Sign Out
-- Inline widget default metric changed from Session to **All Models Weekly** — more representative of long-term usage at a glance
+- Inline widget default metric changed from Session to **All Models Weekly**. More representative of long-term usage at a glance
 
 ## 1.0.9
-- Configurable inline lock-screen widget — pick which metric to track
+- Configurable inline lock-screen widget. Pick which metric to track
   (Session, Sonnet Weekly, All Models Weekly, All Rings, All Rings + Design)
 - Live Activity bars now translucent so the system Liquid Glass banner
   bleeds through, giving the bars a frosted-tinted-glass look
 
 ## 1.0.8
 - Live Activity dismisses automatically after 10 minutes of no observed
-  percentage change — keeps the lock-screen banner from going stale when
+  percentage change. This keeps the lock-screen banner from going stale when
   the user steps away
 
 ## 1.0.7
-- Live Activity for Claude sessions — four horizontal usage bars on the
+- Live Activity for Claude sessions. Four horizontal usage bars on the
   lock screen, plus a configurable ring in the Dynamic Island
 - Live Activity opt-in setting (defaults off) with a Dynamic Island metric
   picker
@@ -59,7 +59,7 @@ commits don't appear here.
   skipped to 1.0.4)
 
 ## 1.0.3
-- **Demo mode** for App Store reviewers — try the app without signing in
+- **Demo mode** for App Store reviewers. Try the app without signing in
 - Claude Design weekly usage shown as a horizontal bar beneath the rings
 - Renamed throughout to "Vibe Your Rings"
 

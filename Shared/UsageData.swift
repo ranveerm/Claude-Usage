@@ -17,7 +17,7 @@ struct UsageData: Codable {
     /// Code on a weekly cycle. The API field isn't officially documented yet
     /// (the help article notes Design "doesn't support audit logs or usage
     /// tracking yet"); the parser speculatively reads `seven_day_design` and
-    /// sets `designWeeklyApplicable = false` when the block is absent — same
+    /// sets `designWeeklyApplicable = false` when the block is absent. Same
     /// graceful-degrade pattern Sonnet uses on Pro accounts.
     var designWeeklyUtilization: Double = 0
     var designWeeklyResetsAt: Date?

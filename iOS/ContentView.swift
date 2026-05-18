@@ -16,7 +16,7 @@ struct ContentView: View {
 
     private var isConfigured: Bool { UsageService.shared.isConfigured }
     /// True when the app is in its main signed-in state (rings or error shown).
-    /// Used to gate the navigation bar's sign-out toolbar item — we don't want
+    /// Used to gate the navigation bar's sign-out toolbar item. We don't want
     /// to offer "sign out" on a screen that's already asking the user to sign in.
     private var isSignedIn: Bool { isConfigured && !usageData.needsLogin }
 
@@ -63,12 +63,12 @@ struct ContentView: View {
             .toolbar {
                 // Only show the sign-out menu when there's actually something
                 // to sign out of. On the LoginPromptView screen the icon is
-                // confusing — it looks like a sign-in affordance.
+                // confusing. It looks like a sign-in affordance.
                 if isSignedIn {
                     ToolbarItem(placement: .topBarTrailing) {
                         // "More actions" menu replaces the old person.circle
                         // (which read as a sign-in affordance). Settings and
-                        // Sign Out live here together — Settings opens a
+                        // Sign Out live here together. Settings opens a
                         // sheet, Sign Out is destructive and uses the system
                         // confirmation style from the sheet's own binding.
                         Menu {
@@ -161,7 +161,7 @@ struct ContentView: View {
             }
         }
         // Brief centred overlay that confirms a sign-in or sign-out, then
-        // fades itself out. Non-interactive — just acknowledgement. See the
+        // fades itself out. Non-interactive, just acknowledgement. See the
         // SessionTransition enum below for copy variants.
         .overlay(alignment: .center) {
             if let transition {
@@ -178,7 +178,7 @@ struct ContentView: View {
             // ConcentricCirclesView uses SwiftUI Shapes (Circle().trim), whose
             // animatableData SwiftUI interpolates natively. Wrapping the
             // `usageData` assignments below in `withAnimation` is what drives
-            // the fill animation — no separate wrapper view is needed.
+            // the fill animation. No separate wrapper view is needed.
             ConcentricCirclesView(input: circleInput(from: usageData))
                 .frame(width: 250, height: 250)
                 .padding(.top, 8)
@@ -200,7 +200,7 @@ struct ContentView: View {
                              resetsAt: usageData.allModelsWeeklyResetsAt,
                              systemImage: "shippingbox")
                 Divider()
-                // Claude Design (Anthropic Labs) — separate weekly quota, no ring
+                // Claude Design (Anthropic Labs) is a separate weekly quota with no ring
                 // mapping. Shown as a horizontal bar to set it apart visually
                 // from the ring-backed rows above. The bar height matches the
                 // individual ring stroke (rings are 250 pt × 0.13 ≈ 32 pt) so
@@ -230,13 +230,13 @@ struct ContentView: View {
     private func signOut() { signOut(broadcast: true) }
 
     /// Shared sign-out cleanup. Pass `broadcast: false` when reacting to a
-    /// remote sign-out signal — rebroadcasting from every reacting device
+    /// remote sign-out signal. Rebroadcasting from every reacting device
     /// would cascade sign-outs back to the originator.
     private func signOut(broadcast: Bool) {
         if broadcast {
             // Revoke the session on Claude's server *before* we clear the
             // cookies locally, so the POST can carry them. Fire-and-forget
-            // so the UI stays responsive — the caller has committed to
+            // so the UI stays responsive. The caller has committed to
             // signing out regardless of the server's response.
             let sk = UsageService.shared.sessionKey
             let cf = UsageService.shared.cfClearance
@@ -254,7 +254,7 @@ struct ContentView: View {
         publishSignedOutState()
 
         usageData = UsageData()
-        // Don't auto-open the login screen — let the user explicitly tap
+        // Don't auto-open the login screen. Let the user explicitly tap
         // "Sign In" in the LoginPromptView that now shows because
         // !isConfigured.
         showLogin = false
@@ -275,7 +275,7 @@ struct ContentView: View {
     }
 
     /// Stamps the cached payload as "signed out" for every downstream
-    /// consumer (widget, watch, complication). Idempotent — safe to call
+    /// consumer (widget, watch, complication). Idempotent, safe to call
     /// whenever we detect we aren't configured, so no consumer keeps
     /// rendering stale rings.
     private func publishSignedOutState() {
@@ -286,7 +286,7 @@ struct ContentView: View {
     }
 
     /// Read the KVS session signal and apply whatever it tells us to do.
-    /// Never writes to KVS — only mutation happens in the explicit sign-in
+    /// Never writes to KVS. Only mutation happens in the explicit sign-in
     /// (`saveCredentials` → `markSignedIn`) and sign-out paths.
     private func observeSessionSignal() {
         switch SignOutSignal.observe(isConfigured: isConfigured) {
@@ -301,7 +301,7 @@ struct ContentView: View {
             // If iCloud Keychain already synced a sign-out (so we're
             // !isConfigured) before the KVS notification arrived, we'd
             // otherwise miss the chance to tell the widget. Make sure its
-            // cached payload reflects reality — idempotent, so cheap.
+            // cached payload reflects reality. Idempotent, so cheap.
             if !isConfigured, SharedDefaults.load()?.needsLogin != true {
                 publishSignedOutState()
             }
@@ -336,14 +336,14 @@ struct ContentView: View {
         let data = await UsageService.shared.fetchUsage()
         isLoading = false
 
-        // Happy path — accept immediately.
+        // Happy path. Accept immediately.
         if data.error == nil && !data.needsLogin {
             isRefreshing = false
             acceptData(data)
             return
         }
 
-        // Confirmed auth failure with no prior successful session — surface
+        // Confirmed auth failure with no prior successful session. Surface
         // it directly; don't start a retry loop.
         if data.needsLogin && !UsageService.shared.lastKnownSignedIn {
             isRefreshing = false
@@ -381,15 +381,15 @@ struct ContentView: View {
                 }
             }
 
-            // 25 seconds elapsed — draw a conclusion.
+            // 25 seconds elapsed. Draw a conclusion.
             isRefreshing = false
             if lastData.isNetworkError {
-                // Network still down — show offline view, keep session intact.
+                // Network still down. Show offline view, keep session intact.
                 usageData = lastData
             } else {
                 // A Cloudflare challenge after screen-unlock is
                 // indistinguishable from a genuine session expiry over a
-                // 25-second window. Don't clear credentials — only the user
+                // 25-second window. Don't clear credentials. Only the user
                 // can sign out explicitly. Surface a plain error so the user
                 // can Retry (recovers silently if session is still valid) or
                 // Sign Out (their choice, not ours).
@@ -405,7 +405,7 @@ struct ContentView: View {
         // Animate the ring fill: the `Circle().trim` inside
         // ConcentricCirclesView is Shape-animatable, so wrapping the state
         // change in `withAnimation` makes SwiftUI interpolate the trim
-        // values over the duration — producing the "rings fill in from the
+        // values over the duration, producing the "rings fill in from the
         // top" effect on cold boot as well as ease transitions on later refreshes.
         withAnimation(.easeInOut(duration: 0.6)) {
             usageData = data
@@ -679,7 +679,7 @@ private struct LoginStatePreview: View {
 //
 // Lives in this iOS-target file (rather than Shared/ConcentricCirclesView.swift)
 // so Xcode Previews resolves the translation unit unambiguously to the iOS
-// app target — the shared file is compiled by every target, and the preview
+// app target. The shared file is compiled by every target, and the preview
 // subsystem was picking the watchOS target and failing to build.
 //
 // The populated state deliberately uses the overshoot configuration
@@ -728,7 +728,7 @@ private struct RingAnimationPreview: View {
     }
 }
 
-#Preview("Rings animation — tap to toggle") {
+#Preview("Rings animation - tap to toggle") {
     RingAnimationPreview()
 }
 #endif

@@ -1,13 +1,13 @@
 # Vibe Your Rings
 
-A multi-platform companion that visualises your Claude.ai usage as three concentric rings — at a glance, without leaving what you're doing.
+A multi-platform companion that visualises your Claude.ai usage as three concentric rings. See your usage at a glance, without leaving what you're doing.
 
 Runs on:
 
-- **macOS** — menu bar app
-- **iOS / iPadOS** — full-screen app
-- **WidgetKit** — home screen widget (iOS)
-- **watchOS** — paired watch app
+- **macOS** - menu bar app
+- **iOS / iPadOS** - full-screen app
+- **WidgetKit** - home screen widget (iOS)
+- **watchOS** - paired watch app
 
 ## What the rings mean
 
@@ -23,13 +23,13 @@ Each ring fills clockwise. A faded arc shows the *time elapsed* in the current w
 
 On first launch, each platform walks you through an in-app sign-in:
 
-- **macOS** — a welcome window explains what the app does; tapping **Sign In with Claude** opens an embedded Claude.ai login. The window closes automatically once the API accepts your cookies.
-- **iOS** — the main screen shows a "Sign in" button that opens the embedded login flow.
+- **macOS** - a welcome window explains what the app does; tapping **Sign In with Claude** opens an embedded Claude.ai login. The window closes automatically once the API accepts your cookies.
+- **iOS** - the main screen shows a "Sign in" button that opens the embedded login flow.
 
 Your session cookies are stored:
 
-- On macOS — in a device-scoped keychain (not shared, not synced)
-- On iOS / watchOS — in a shared keychain access group, synced via iCloud Keychain so the watch can read what the phone wrote
+- On macOS - in a device-scoped keychain (not shared, not synced)
+- On iOS / watchOS - in a shared keychain access group, synced via iCloud Keychain so the watch can read what the phone wrote
 
 No credentials ever leave your device except to call the same `claude.ai` endpoints your browser already uses.
 
@@ -61,7 +61,7 @@ rm -rf "$HOME/Library/WebKit/com.ranveer.ClaudeYourRings" 2>/dev/null
 
 ### Previews
 
-Every view has `#Preview` macros with representative mock data — SwiftUI previews do not hit the network. The iOS and macOS previews include interactive sliders for tuning ring values.
+Every view has `#Preview` macros with representative mock data. SwiftUI previews do not hit the network. The iOS and macOS previews include interactive sliders for tuning ring values.
 
 ## Privacy
 

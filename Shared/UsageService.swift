@@ -31,7 +31,7 @@ final class UsageService {
     /// `UsageData` fixture from `fetchUsage()`. Exists primarily so App
     /// Store reviewers (and curious users without an Anthropic account)
     /// can evaluate the UI without going through Claude.ai's web sign-in.
-    /// Stored in UserDefaults — it isn't a credential, so the keychain
+    /// Stored in UserDefaults. It isn't a credential, so the keychain
     /// indirection doesn't apply.
     var isDemoMode: Bool {
         get { UserDefaults.standard.bool(forKey: Self.demoModeKey) }
@@ -69,7 +69,7 @@ final class UsageService {
 
     /// Flips the app into demo mode and primes the shared cache so the
     /// watch and any widgets pick up the fixture immediately. No KVS
-    /// broadcast — demo mode is a per-device toggle, not a synced state.
+    /// broadcast. Demo mode is a per-device toggle, not a synced state.
     func enterDemoMode() {
         isDemoMode = true
         SharedDefaults.save(Self.demoFixture())
@@ -84,12 +84,12 @@ final class UsageService {
         // Intentionally does NOT call SignOutSignal.markSignedOut().
         // Broadcasting is the job of the *explicit* sign-out call sites
         // (menu button / confirmation dialog). A reaction to a remote
-        // sign-out must not re-broadcast — that cascades across devices.
+        // sign-out must not re-broadcast. That cascades across devices.
     }
 
     func fetchUsage() async -> UsageData {
         // Demo mode short-circuits the network. The fixture is regenerated
-        // each call so reset timestamps stay relative to "now" — handy when
+        // each call so reset timestamps stay relative to "now". Handy when
         // the reviewer leaves the app open between checks.
         if isDemoMode {
             return Self.demoFixture()
@@ -127,7 +127,7 @@ final class UsageService {
             if http.statusCode == 403 {
                 let body = String(data: data, encoding: .utf8) ?? ""
                 let isCloudflare = body.contains("cf-ray") || body.contains("Just a moment")
-                return UsageData(error: isCloudflare ? "Cloudflare challenge — please sign in again." : "Session expired.",
+                return UsageData(error: isCloudflare ? "Cloudflare challenge. Please sign in again." : "Session expired.",
                                  needsLogin: true)
             }
             if http.statusCode != 200 {
@@ -175,7 +175,7 @@ final class UsageService {
         // keys we don't currently consume. Lets us spot newly-added fields
         // (Claude Design, future labs releases, anything else) without
         // having to MITM the connection. Logs once per fetch on every
-        // DEBUG build — no-op in Release.
+        // DEBUG build. No-op in Release.
         Self.logUnconsumedKeys(json: json, raw: data)
         #endif
 
@@ -198,8 +198,8 @@ final class UsageService {
         // block, not the numeric value, to tell the two apart.
         let sonnetApplicable = (json["seven_day_sonnet"] as? [String: Any]) != nil
         // Claude Design surfaces under its internal code name `omelette` in
-        // the API response (the payload is full of similar codenames —
-        // `iguana_necktie`, `tangelo`, etc. — that map to unannounced or
+        // the API response (the payload is full of similar codenames:
+        // `iguana_necktie`, `tangelo`, etc., that map to unannounced or
         // labs features). We try the codename first and fall back to the
         // public-facing names in case Anthropic eventually renames the key.
         let designBlock = (json["seven_day_omelette"] as? [String: Any])
@@ -232,7 +232,7 @@ final class UsageService {
     private static func logUnconsumedKeys(json: [String: Any], raw: Data) {
         let known: Set<String> = [
             "five_hour", "seven_day", "seven_day_sonnet",
-            // Claude Design — internal codename plus possible future renames.
+            // Claude Design internal codename plus possible future renames.
             "seven_day_omelette", "seven_day_design",
             "seven_day_claude_design", "claude_design",
         ]
@@ -253,7 +253,7 @@ final class UsageService {
         Self.applyHeaders(to: &request, sessionKey: sessionKey, cfClearance: cfClearance)
     }
 
-    /// Stateless header application — used by `verifyCredentials` so we can
+    /// Stateless header application. Used by `verifyCredentials` so we can
     /// test credentials without persisting them to the keychain first.
     static func applyHeaders(to request: inout URLRequest, sessionKey: String, cfClearance: String) {
         var cookieParts = ["sessionKey=\(sessionKey)"]
@@ -283,7 +283,7 @@ final class UsageService {
     /// piles up as an "active session" on the claude.ai dashboard, and a
     /// leaked sessionKey stays valid until natural expiry.
     ///
-    /// Failures are swallowed silently — the caller has already committed
+    /// Failures are swallowed silently. The caller has already committed
     /// to signing out regardless of what the server says.
     static func revokeSession(sessionKey: String, cfClearance: String) async {
         guard !sessionKey.isEmpty,
@@ -320,7 +320,7 @@ final class UsageService {
     }
 
     /// Returns `true` when the error originates in the network transport
-    /// layer — no connectivity, connection reset, DNS failure, timeout —
+    /// layer (no connectivity, connection reset, DNS failure, timeout)
     /// rather than from an auth or server response. The UI uses this to
     /// show an "Offline" recovery screen instead of routing to login when
     /// the session is almost certainly still valid.
@@ -344,7 +344,7 @@ final class UsageService {
     /// Hand-picked demo fixture used when `isDemoMode` is on. Numbers are
     /// chosen to exercise every visual state simultaneously: a partly-used
     /// 5-hour session, a moderately-used weekly all-models budget, a low
-    /// Sonnet-weekly bar (Max tier), and a low Claude Design bar — so the
+    /// Sonnet-weekly bar (Max tier), and a low Claude Design bar. The
     /// reviewer sees the full range of rings and the design progress bar
     /// in a single screen. Reset timestamps are anchored to `Date()` so
     /// the "resets in …" hints stay sensible across launches.

@@ -64,7 +64,7 @@ struct WatchComplicationView: View {
     var body: some View {
         Group {
             if entry.needsLogin {
-                // Signed out — show a small sign-in glyph so the user isn't
+                // Signed out. Show a small sign-in glyph so the user isn't
                 // staring at a stale snapshot of rings from before sign-out.
                 Image(systemName: "person.crop.circle.badge.questionmark")
                     .font(.title3)

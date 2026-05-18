@@ -3,7 +3,7 @@ import Foundation
 
 /// Attributes for the Claude session Live Activity.
 ///
-/// There are no static attributes — the activity is purely data-driven.
+/// There are no static attributes. The activity is purely data-driven.
 ///
 /// ContentState holds the four usage metrics and is refreshed on every
 /// successful fetch (foreground and background). The activity is started
@@ -20,7 +20,7 @@ struct ClaudeSessionAttributes: ActivityAttributes {
         var sonnetApplicable: Bool
         /// `false` when the Design quota block is absent from the API response.
         var designApplicable: Bool
-        /// Reset timestamps — drive both the "Resets in X" text and the
+        /// Reset timestamps. Drive both the "Resets in X" text and the
         /// faded time-progress fill in the underlying UsageProgressBarView.
         var sessionResetsAt: Date?
         var sonnetWeeklyResetsAt: Date?
@@ -76,7 +76,7 @@ extension ClaudeSessionAttributes.ContentState {
 
     /// Whether the user-selected metric is exposed by the API for this tier.
     /// Returns `false` on Pro accounts when the user has picked Sonnet, for
-    /// example — the widget renders the ring greyed out with N/A.
+    /// For example, the widget renders the ring greyed out with N/A.
     var dynamicIslandApplicable: Bool {
         switch dynamicIslandMetric {
         case .session:         true

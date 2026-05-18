@@ -10,11 +10,11 @@ import WidgetKit
 ///
 /// Every variant uses the `timelapse` SF Symbol as its leading icon. This
 /// symbol supports **variable values** (`Image(systemName:variableValue:)`)
-/// — a value between 0 and 1 renders a proportional pie-slice fill,
+/// A value between 0 and 1 renders a proportional pie-slice fill,
 /// giving us a real dynamic progress indicator inside the strict inline-
 /// widget constraints (Label only allows a single SF Symbol).
 ///
-/// `.allRings` reports the *maximum* of the three rings — the most useful
+/// `.allRings` reports the *maximum* of the three rings, the most useful
 /// "watch this" signal: whichever ring is closest to its cap drives the
 /// fill, so the user can spot pressure across any of them.
 enum InlineMetric: String, AppEnum {
@@ -36,7 +36,7 @@ enum InlineMetric: String, AppEnum {
         self == .allRings || self == .allRingsAndDesign
     }
 
-    /// `timelapse` for every variant — clock-face symbol with a pie-slice
+    /// `timelapse` for every variant. A clock-face symbol with a pie-slice
     /// fill driven by `variableValue` on the call site. The differentiator
     /// between metrics is which value drives the fill (see
     /// `UsageInlineView.progress`).
@@ -45,7 +45,7 @@ enum InlineMetric: String, AppEnum {
     /// Metric-specific SF Symbol shown *between* `timelapse` and the
     /// label text in single-metric mode. Same symbols used elsewhere in
     /// the app so the imagery is consistent. `.allRings` has no single
-    /// icon — it renders three pairs instead.
+    /// icon. It renders three pairs instead.
     var metricIcon: String {
         switch self {
         case .session:                          "calendar.day.timeline.left"
@@ -55,9 +55,9 @@ enum InlineMetric: String, AppEnum {
         }
     }
 
-    /// Plain-text description shown after the icon. No percentage — the
+    /// Plain-text description shown after the icon. No percentage. The
     /// inline widget only describes the metric, not its current value.
-    /// `.allRings` deliberately renders no text (the user's spec — the
+    /// `.allRings` deliberately renders no text (the user's spec: the
     /// three icon pairs already convey the meaning).
     var displayLabel: String {
         switch self {
@@ -70,7 +70,7 @@ enum InlineMetric: String, AppEnum {
 }
 
 /// The intent that drives the inline widget's configuration UI. The single
-/// `metric` parameter is enough — there's no other knob worth surfacing
+/// `metric` parameter is enough. There's no other knob worth surfacing
 /// since the inline slot can only render one line of text and one symbol.
 struct InlineMetricIntent: WidgetConfigurationIntent {
     static let title: LocalizedStringResource = "Inline Widget"
@@ -86,7 +86,7 @@ struct InlineMetricIntent: WidgetConfigurationIntent {
 
 struct InlineUsageEntry: TimelineEntry {
     let date: Date
-    /// `nil` when no cached payload exists yet — the view treats that as
+    /// `nil` when no cached payload exists yet. The view treats that as
     /// "signed out" and renders the sign-in prompt.
     let usage: UsageData?
     let metric: InlineMetric
@@ -180,7 +180,7 @@ struct UsageInlineView: View {
     /// stability.
     private var allRingsBody: some View {
         // Built with `Text + Text` concatenation rather than a single
-        // interpolated string — easier to read, and `Text(" ")` lets us
+        // interpolated string. This is easier to read, and `Text(" ")` lets us
         // tune inter-pair spacing without buried whitespace literals.
         let gap = Text("   ")   // three spaces; widens the gaps between
                                 // adjacent pairs so the sets read as
@@ -211,7 +211,7 @@ struct UsageInlineView: View {
         Text("\(Image(systemName: icon))\(Image(systemName: "timelapse", variableValue: progress))")
     }
 
-    /// Design ring's fill value — separate from `ringProgress(_:)` because
+    /// Design ring's fill value. Separate from `ringProgress(_:)` because
     /// design isn't surfaced as a single-metric option in the picker.
     /// Returns 0 when the API didn't expose the design block for this tier.
     private var designProgress: Double {
@@ -229,7 +229,7 @@ struct UsageInlineView: View {
 
     /// 0–1 fill value for the supplied metric, against the entry's
     /// usage payload. Pro tiers' Sonnet returns 0 (its `applicable` flag
-    /// is false). `.allRings` is meaningless here — only the single-metric
+    /// is false). `.allRings` is meaningless here. Only the single-metric
     /// cases are addressed.
     private func ringProgress(_ metric: InlineMetric) -> Double {
         guard let usage = entry.usage else { return 0 }
@@ -246,7 +246,7 @@ struct UsageInlineView: View {
         case .allModelsWeekly:
             return clamp(usage.allModelsWeeklyUtilization)
         case .allRings, .allRingsAndDesign:
-            return 0  // unused — multi-ring variants render pairs directly
+            return 0  // unused: multi-ring variants render pairs directly
         }
     }
 }
@@ -292,49 +292,49 @@ private let inlineNearLimitUsage = UsageData(
     designWeeklyApplicable: true
 )
 
-#Preview("Inline — Session", as: .accessoryInline) {
+#Preview("Inline - Session", as: .accessoryInline) {
     UsageInlineWidget()
 } timeline: {
     InlineUsageEntry(date: .now, usage: inlinePreviewUsage, metric: .session)
 }
 
-#Preview("Inline — Sonnet Weekly", as: .accessoryInline) {
+#Preview("Inline - Sonnet Weekly", as: .accessoryInline) {
     UsageInlineWidget()
 } timeline: {
     InlineUsageEntry(date: .now, usage: inlinePreviewUsage, metric: .sonnetWeekly)
 }
 
-#Preview("Inline — All Models Weekly", as: .accessoryInline) {
+#Preview("Inline - All Models Weekly", as: .accessoryInline) {
     UsageInlineWidget()
 } timeline: {
     InlineUsageEntry(date: .now, usage: inlinePreviewUsage, metric: .allModelsWeekly)
 }
 
-#Preview("Inline — All Rings", as: .accessoryInline) {
+#Preview("Inline - All Rings", as: .accessoryInline) {
     UsageInlineWidget()
 } timeline: {
     InlineUsageEntry(date: .now, usage: inlinePreviewUsage, metric: .allRings)
 }
 
-#Preview("Inline — All Rings + Design", as: .accessoryInline) {
+#Preview("Inline - All Rings + Design", as: .accessoryInline) {
     UsageInlineWidget()
 } timeline: {
     InlineUsageEntry(date: .now, usage: inlinePreviewUsage, metric: .allRingsAndDesign)
 }
 
-#Preview("Inline — Session (near limit)", as: .accessoryInline) {
+#Preview("Inline - Session (near limit)", as: .accessoryInline) {
     UsageInlineWidget()
 } timeline: {
     InlineUsageEntry(date: .now, usage: inlineNearLimitUsage, metric: .session)
 }
 
-#Preview("Inline — All Rings (near limit)", as: .accessoryInline) {
+#Preview("Inline - All Rings (near limit)", as: .accessoryInline) {
     UsageInlineWidget()
 } timeline: {
     InlineUsageEntry(date: .now, usage: inlineNearLimitUsage, metric: .allRings)
 }
 
-#Preview("Inline — Signed out", as: .accessoryInline) {
+#Preview("Inline - Signed out", as: .accessoryInline) {
     UsageInlineWidget()
 } timeline: {
     InlineUsageEntry(date: .now, usage: nil, metric: .session)

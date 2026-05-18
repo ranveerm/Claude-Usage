@@ -23,19 +23,19 @@ struct UsageTimelineProvider: TimelineProvider {
     }
 
     /// Snapshot is shown in the widget gallery / transitional states.
-    /// Reading from cache here is fine — gallery doesn't need live data.
+    /// Reading from cache here is fine. Gallery doesn't need live data.
     func getSnapshot(in context: Context, completion: @escaping (UsageEntry) -> Void) {
         completion(entry(from: SharedDefaults.load()))
     }
 
-    /// Timeline reload — the system calls this when it wants fresh
+    /// Timeline reload. The system calls this when it wants fresh
     /// content (every ~15 minutes by our policy, or sooner when the app
     /// triggers `WidgetCenter.shared.reloadAllTimelines()`).
     ///
     /// **The widget does its own fetch here** rather than relying purely
     /// on the cache. Without this, the only way the rings would ever
     /// move is if the iOS app or its background-refresh handler had run
-    /// since the last reload — which doesn't happen often enough on
+    /// since the last reload, which doesn't happen often enough on
     /// real devices. The cached `SharedDefaults` value still acts as a
     /// fallback when the fetch fails (no network, auth error, etc.).
     func getTimeline(in context: Context, completion: @escaping (Timeline<UsageEntry>) -> Void) {
@@ -44,13 +44,13 @@ struct UsageTimelineProvider: TimelineProvider {
             let usable: UsageData?
 
             if fetched.error == nil && !fetched.needsLogin {
-                // Fresh data — promote it into the shared cache so the
+                // Fresh data. Promote it into the shared cache so the
                 // main app, watch, and Live Activity all see the same
                 // payload the rings just rendered.
                 SharedDefaults.save(fetched)
                 usable = fetched
             } else {
-                // Network/auth failure — fall back to whatever the app
+                // Network/auth failure. Fall back to whatever the app
                 // last cached so the rings don't go blank.
                 usable = SharedDefaults.load()
             }
@@ -88,7 +88,7 @@ struct UsageWidgetView: View {
         }
     }
 
-    // MARK: systemSmall — full-colour rings (unchanged behaviour)
+    // MARK: systemSmall - full-colour rings (unchanged behaviour)
 
     private var systemSmallBody: some View {
         Group {
@@ -110,7 +110,7 @@ struct UsageWidgetView: View {
         }
     }
 
-    // MARK: accessoryCircular — compact rings matching the macOS status bar
+    // MARK: accessoryCircular - compact rings matching the macOS status bar
 
     private var accessoryCircularBody: some View {
         ZStack {
@@ -147,7 +147,7 @@ struct LockScreenRingsView: View {
 
     var body: some View {
         Canvas { ctx, size in
-            // Fill the full canvas — lw is tuned so the inner edge of the
+            // Fill the full canvas. lw is tuned so the inner edge of the
             // inner ring lands at the same absolute position as before.
             let dim = min(size.width, size.height)
             let lw  = dim * 0.107
@@ -164,13 +164,13 @@ struct LockScreenRingsView: View {
                 let r = dim / 2 - lw / 2 - CGFloat(i) * (lw + gap)
                 guard r > lw / 2 else { continue }
 
-                // Track — faint full circle
+                // Track - faint full circle
                 var track = Path()
                 track.addEllipse(in: CGRect(x: cx - r, y: cy - r,
                                             width: r * 2, height: r * 2))
                 ctx.stroke(track, with: .color(.primary.opacity(0.2)), lineWidth: lw)
 
-                // Fill arc — clockwise from 12 o'clock
+                // Fill arc - clockwise from 12 o'clock
                 let p = min(max(ring.progress, 0), 1)
                 if p > 0 && ring.applicable {
                     var arc = Path()
@@ -229,24 +229,24 @@ private let signedOutEntry = UsageEntry(date: .now,
 )
 
 // Home screen
-#Preview("Home — normal", as: .systemSmall) {
+#Preview("Home - normal", as: .systemSmall) {
     UsageWidget()
 } timeline: { previewEntry; nearLimitEntry }
 
-// Lock screen — circular
-#Preview("Lock — circular (normal)", as: .accessoryCircular) {
+// Lock screen - circular
+#Preview("Lock - circular (normal)", as: .accessoryCircular) {
     UsageWidget()
 } timeline: { previewEntry }
 
-#Preview("Lock — circular (near limit)", as: .accessoryCircular) {
+#Preview("Lock - circular (near limit)", as: .accessoryCircular) {
     UsageWidget()
 } timeline: { nearLimitEntry }
 
-#Preview("Lock — circular (Pro, no Sonnet)", as: .accessoryCircular) {
+#Preview("Lock - circular (Pro, no Sonnet)", as: .accessoryCircular) {
     UsageWidget()
 } timeline: { proEntry }
 
-#Preview("Lock — circular (signed out)", as: .accessoryCircular) {
+#Preview("Lock - circular (signed out)", as: .accessoryCircular) {
     UsageWidget()
 } timeline: { signedOutEntry }
 #endif

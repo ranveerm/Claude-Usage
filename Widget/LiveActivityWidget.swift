@@ -12,7 +12,7 @@ struct UsageLiveActivity: Widget {
             // on iOS 26 (and a translucent material on earlier versions).
             // Layering our own `.background(.material)` *inside* the content
             // view would paint on top of that glass and make the banner look
-            // flat — keep the content minimal and let the system handle it.
+            // flat. Keep the content minimal and let the system handle it.
             //
             // NB. Neither this tint nor the system's Liquid Glass banner
             // surround render in the `#Preview(..., as: .content)` canvas:
@@ -29,7 +29,7 @@ struct UsageLiveActivity: Widget {
             let applicable = context.state.dynamicIslandApplicable
 
             return DynamicIsland {
-                // Expanded — shown when the user long-presses the island.
+                // Expanded. Shown when the user long-presses the island.
                 DynamicIslandExpandedRegion(.leading) {
                     DynamicIslandRingView(
                         progress: utilization / 100,
@@ -81,7 +81,7 @@ struct UsageLiveActivity: Widget {
                     .padding(.bottom, 6)
                 }
             } compactLeading: {
-                // Plain ring on the leading side — the metric identity moves
+                // Plain ring on the leading side. The metric identity moves
                 // to the trailing slot where the icon now flanks the percentage.
                 DynamicIslandRingView(
                     progress: utilization / 100,
@@ -108,7 +108,7 @@ struct UsageLiveActivity: Widget {
                 }
                 .padding(.trailing, 4)
             } minimal: {
-                // Minimal slot is a single element — keep the icon at the
+                // Minimal slot is a single element. Keep the icon at the
                 // centre of the ring so the metric stays identifiable.
                 DynamicIslandRingView(
                     progress: utilization / 100,
@@ -124,7 +124,7 @@ struct UsageLiveActivity: Widget {
 // MARK: - Lock Screen / Notification Banner View
 
 /// Four tall horizontal bars with the icon, label, reset hint, and
-/// percentage all embedded *inside* the bar — a denser variant of the
+/// percentage all embedded *inside* the bar. A denser variant of the
 /// iOS `UsageProgressBarView`. The lock screen has the room to fit it.
 ///
 /// The container uses the iOS 26 `.glassEffect()` so the lock-screen
@@ -135,7 +135,7 @@ struct LiveActivityLockScreenView: View {
     let state: ClaudeSessionAttributes.ContentState
 
     var body: some View {
-        // Just the content — no Rectangle, no `.background(.material)`.
+        // Just the content. No Rectangle, no `.background(.material)`.
         // The lock screen Live Activity banner is rendered by the system
         // with its own Liquid Glass surround. Layering a material on top
         // would obscure that glass and make the banner look flat.
@@ -185,7 +185,7 @@ struct LiveActivityLockScreenView: View {
 
 /// Single bar with icon + label + reset hint + percentage all inside.
 /// The row sizes itself to its content (semantic fonts + standard padding)
-/// rather than declaring a fixed height — that way Dynamic Type and the
+/// rather than declaring a fixed height. That way Dynamic Type and the
 /// system's preferred metrics flow through automatically.
 private struct LiveActivityBarRow: View {
     let label: String
@@ -333,14 +333,14 @@ struct DynamicIslandRingView: View {
                     let cy = size.height / 2
                     let r  = min(size.width, size.height) / 2 - lw / 2
 
-                    // Track — faint full circle
+                    // Track - faint full circle
                     var track = Path()
                     track.addEllipse(in: CGRect(x: cx - r, y: cy - r,
                                                 width: r * 2, height: r * 2))
                     ctx.stroke(track, with: .color(.primary.opacity(0.2)),
                                lineWidth: lw)
 
-                    // Fill arc — clockwise from 12 o'clock
+                    // Fill arc - clockwise from 12 o'clock
                     let p = min(max(progress, 0), 1)
                     if applicable && p > 0 {
                         var arc = Path()
@@ -355,7 +355,7 @@ struct DynamicIslandRingView: View {
                 }
 
                 if showsCentreIcon {
-                    // Centred icon — sized to fill ~55 % of the inner
+                    // Centred icon. Sized to fill ~55 % of the inner
                     // diameter so it reads at minimal-slot sizes but
                     // doesn't crowd the ring at the larger expanded size.
                     Image(systemName: systemImage)
@@ -410,30 +410,30 @@ private let proState = ClaudeSessionAttributes.ContentState(
     designWeeklyResetsAt: Date().addingTimeInterval(3 * 86400)
 )
 
-#Preview("Lock Screen — normal", as: .content,
+#Preview("Lock Screen - normal", as: .content,
          using: ClaudeSessionAttributes()) {
     UsageLiveActivity()
 } contentStates: {
     previewState
 }
 
-#Preview("Lock Screen — near limit", as: .content,
+#Preview("Lock Screen - near limit", as: .content,
          using: ClaudeSessionAttributes()) {
     UsageLiveActivity()
 } contentStates: {
     nearLimitState
 }
 
-#Preview("Lock Screen — Pro (no Sonnet)", as: .content,
+#Preview("Lock Screen - Pro (no Sonnet)", as: .content,
          using: ClaudeSessionAttributes()) {
     UsageLiveActivity()
 } contentStates: {
     proState
 }
 
-// Dynamic Island — three presentations.
+// Dynamic Island - three presentations.
 
-#Preview("Dynamic Island — compact", as: .dynamicIsland(.compact),
+#Preview("Dynamic Island - compact", as: .dynamicIsland(.compact),
          using: ClaudeSessionAttributes()) {
     UsageLiveActivity()
 } contentStates: {
@@ -441,7 +441,7 @@ private let proState = ClaudeSessionAttributes.ContentState(
     nearLimitState
 }
 
-#Preview("Dynamic Island — expanded", as: .dynamicIsland(.expanded),
+#Preview("Dynamic Island - expanded", as: .dynamicIsland(.expanded),
          using: ClaudeSessionAttributes()) {
     UsageLiveActivity()
 } contentStates: {
@@ -450,7 +450,7 @@ private let proState = ClaudeSessionAttributes.ContentState(
     proState
 }
 
-#Preview("Dynamic Island — minimal", as: .dynamicIsland(.minimal),
+#Preview("Dynamic Island - minimal", as: .dynamicIsland(.minimal),
          using: ClaudeSessionAttributes()) {
     UsageLiveActivity()
 } contentStates: {

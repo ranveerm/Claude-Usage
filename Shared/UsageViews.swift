@@ -4,7 +4,7 @@ import TipKit
 // MARK: - TipKit tips
 
 /// Surfaces the "Try Demo Mode" button to anyone who lands on the sign-in
-/// screen — including App Store reviewers, who Apple specifically asks us
+/// screen, including App Store reviewers, who Apple specifically asks us
 /// to give a way of evaluating the app without an Anthropic account. The
 /// tip is keyed off `Events.signInScreenShown` so it appears the first
 /// time the LoginPromptView is presented and dismisses itself once the
@@ -153,7 +153,7 @@ struct UsageProgressBarView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
-            // Label · reset hint · percentage — all on one header row so the
+            // Label · reset hint · percentage all on one header row so the
             // reset cadence sits visually distinct from the ring rows below.
             HStack(spacing: 4) {
                 Text(label)
@@ -176,7 +176,7 @@ struct UsageProgressBarView: View {
 
             // Custom capsule bar styled to match the ring palette.
             //
-            // Layout strategy: the Capsule track is the layout-driving view —
+            // Layout strategy: the Capsule track is the layout-driving view.
             // its width comes directly from the parent VStack, guaranteeing a
             // true capsule shape. Fill layers are applied as overlays so that
             // a GeometryReader inside the overlay reads the already-resolved
@@ -193,11 +193,11 @@ struct UsageProgressBarView: View {
             Capsule()
                 .fill(ConcentricCirclesView.anthropicOrange.opacity(0.2))
                 .frame(height: barHeight)
-                // Fill layers — overlaid so the capsule track drives layout.
+                // Fill layers overlaid so the capsule track drives layout.
                 .overlay(alignment: .leading) {
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
-                            // Time-elapsed fill — faded layer behind solid usage.
+                            // Time-elapsed fill. Faded layer behind solid usage.
                             // Same UnevenRoundedRectangle treatment as the usage
                             // fill: zero leading radius (outer capsule clip owns
                             // the left curve) and a clamped trailing radius so the
@@ -215,7 +215,7 @@ struct UsageProgressBarView: View {
                                 .frame(width: timeWidth, height: geo.size.height)
                             }
 
-                            // Usage fill — solid arc; drawn on top of time layer.
+                            // Usage fill. Solid arc drawn on top of time layer.
                             // UnevenRoundedRectangle gives the fill a rounded
                             // trailing cap (visible when usage < time progress)
                             // while keeping the leading corners at zero so the
@@ -241,7 +241,7 @@ struct UsageProgressBarView: View {
                         .clipShape(Capsule())
                     }
                 }
-                // Icon overlay — sits on top of all fill layers
+                // Icon overlay sits on top of all fill layers
                 .overlay(alignment: .leading) {
                     if let systemImage {
                         Image(systemName: systemImage)
@@ -259,7 +259,7 @@ struct UsageProgressBarView: View {
 
 struct LoginPromptView: View {
     let onLogin: () -> Void
-    /// Optional — when supplied, surfaces a "Try Demo" secondary button
+    /// Optional. When supplied, surfaces a "Try Demo" secondary button
     /// that flips the app into mock-data mode. Required by App Review
     /// (Guideline 2.1(a)) so reviewers can evaluate the UI without going
     /// through Claude.ai's web sign-in.
@@ -320,7 +320,7 @@ struct LoginPromptView: View {
 // MARK: - Refreshing View
 
 /// Shown in place of the rings/login screen while the app is in the middle of
-/// its 25-second confirmation window — it has a past successful session but the
+/// its 25-second confirmation window. It has a past successful session but the
 /// current fetch failed. Replaces the old transient-error silencer: instead of
 /// silently swallowing errors and keeping stale rings on screen, we show an
 /// explicit "we're checking" state so the user always knows what's happening.

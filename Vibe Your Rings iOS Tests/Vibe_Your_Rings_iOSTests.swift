@@ -123,7 +123,7 @@ final class RingSnapshotTests: XCTestCase {
     }
 
     func testRings_balanced() {
-        // Usage and time roughly in sync — the faded "time" arc should peek
+        // Usage and time roughly in sync. The faded "time" arc should peek
         // just past the solid "usage" arc on all three rings.
         assertSnapshot(of: ringsView(CircleRendererInput(
             sessionProgress:       0.40,
@@ -136,7 +136,7 @@ final class RingSnapshotTests: XCTestCase {
     }
 
     func testRings_overshoot() {
-        // Usage has outrun time — tests the curved cut where the solid arc
+        // Usage has outrun time. Tests the curved cut where the solid arc
         // wraps around the time arc. Historically fragile.
         assertSnapshot(of: ringsView(CircleRendererInput(
             sessionProgress:       0.85,

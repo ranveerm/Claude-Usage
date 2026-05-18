@@ -6,8 +6,8 @@
 //  - Tier 1 (snapshot): renders UsagePopoverView in representative states
 //    over a range of desktop backgrounds, so visual drift from any future
 //    UI edit is caught against committed baselines.
-//  - Tier 2 (unit): exercises pure business logic — JSON parsing, error
-//    classification, header application — without network or keychain.
+//  - Tier 2 (unit): exercises pure business logic. JSON parsing, error
+//    classification, and header application, without network or keychain.
 //
 //  Conventions:
 //  - All tests use fixed (non-`Date()`) timestamps so snapshots are
@@ -25,7 +25,7 @@ import SnapshotTesting
 
 // MARK: - Fixtures
 
-/// Anchored to a fixed point in time so snapshot output is bit-stable —
+/// Anchored to a fixed point in time so snapshot output is bit-stable.
 /// relative-date text like "Updated just now" would otherwise change every
 /// run and cause spurious diffs.
 private let fixedNow = Date(timeIntervalSince1970: 1_700_000_000)

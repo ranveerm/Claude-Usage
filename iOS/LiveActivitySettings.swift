@@ -4,7 +4,7 @@ import Foundation
 /// User preference for whether Live Activities should run on this device.
 ///
 /// **Default: off.** Live Activities are opt-in because they consume lock-
-/// screen and Dynamic Island real estate every time a session is active —
+/// screen and Dynamic Island real estate every time a session is active.
 /// users who prefer the widget-only experience shouldn't have an activity
 /// banner foisted on them on first launch.
 ///
@@ -22,7 +22,7 @@ final class LiveActivitySettings: ObservableObject {
 
     private let defaults: UserDefaults
 
-    /// `true` when the user has opted in. Default `false` (off) — matches
+    /// `true` when the user has opted in. Default `false` (off). Matches
     /// the rest of the on-demand surfaces (notifications also default off).
     @Published var enabled: Bool {
         didSet {
@@ -35,7 +35,7 @@ final class LiveActivitySettings: ObservableObject {
 
     /// Which metric the Dynamic Island ring tracks. Defaults to `.session`
     /// since that's the only ring that meaningfully changes during a Claude
-    /// session — the weekly rings barely budge over five hours.
+    /// session. The weekly rings barely budge over five hours.
     @Published var dynamicIslandMetric: DynamicIslandMetric {
         didSet {
             defaults.set(dynamicIslandMetric.rawValue, forKey: Keys.dynamicIslandMetric)
@@ -48,7 +48,7 @@ final class LiveActivitySettings: ObservableObject {
     private init() {
         let defaults = UserDefaults(suiteName: "group.com.ranveer.ClaudeYourRings") ?? .standard
         self.defaults = defaults
-        // `bool(forKey:)` returns false for unset keys — exactly the
+        // `bool(forKey:)` returns false for unset keys. Exactly the
         // default we want, no `object(forKey:)` dance needed.
         self.enabled = defaults.bool(forKey: Keys.enabled)
         let storedMetric = defaults.string(forKey: Keys.dynamicIslandMetric) ?? ""

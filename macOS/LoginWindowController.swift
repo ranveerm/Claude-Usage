@@ -21,7 +21,7 @@ final class LoginWindowController: NSWindowController, WKNavigationDelegate, NSW
                 NSApp.activate(ignoringOtherApps: true)
                 return
             } else {
-                // Stale — clean up and recreate.
+                // Stale. Clean up and recreate.
                 existing.pollTimer?.invalidate()
                 current = nil
             }
@@ -95,7 +95,7 @@ final class LoginWindowController: NSWindowController, WKNavigationDelegate, NSW
             self.isVerifying = true
             Task { [sessionKey, cfClearance] in
                 // Only close the window when the API actually accepts the
-                // cookies — avoids false positives from partial login states.
+                // cookies. This avoids false positives from partial login states.
                 let ok = await UsageService.verifyCredentials(
                     sessionKey: sessionKey, cfClearance: cfClearance
                 )

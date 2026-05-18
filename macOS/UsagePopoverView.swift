@@ -28,7 +28,7 @@ struct KeychainDebugView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Debug — App State")
+            Text("Debug - App State")
                 .font(.headline)
                 .padding(.bottom, 10)
 
@@ -185,7 +185,7 @@ private struct UsagePopoverPreview: View {
     @State private var designTime: Double = 0.50
     @State private var tier: PreviewTier = .max
     /// Toggles the Anthropic Labs design block. When `false` the row should
-    /// render greyed-out as N/A — same path Pro takes for the Sonnet row.
+    /// render greyed-out as N/A. Same path Pro takes for the Sonnet row.
     @State private var hasDesignAccess: Bool = true
 
     var body: some View {
@@ -328,12 +328,12 @@ struct UsagePopoverView: View {
     let onRefresh: () -> Void
     let onLogin: () -> Void
     let onSignOut: () -> Void
-    /// Demo-mode entry — flips `UsageService.isDemoMode` on and triggers
+    /// Demo-mode entry. Flips `UsageService.isDemoMode` on and triggers
     /// a refresh so the rings populate from the fixture immediately.
     let onDemoMode: () -> Void
     /// Debug-only reset handler. Only non-nil in DEBUG builds, via AppDelegate.
     let onDebugReset: (() -> Void)?
-    /// When `true` the popover is in a transient "checking" state — it has a
+    /// When `true` the popover is in a transient "checking" state. It has a
     /// previous successful session but the last fetch failed. Shows
     /// `RefreshingView` instead of `LoginPromptView` so the user can see that
     /// the app is actively retrying rather than thinking they've been signed out.
@@ -344,7 +344,7 @@ struct UsagePopoverView: View {
     @State private var showAbout = false
     @State private var showChangelog = false
     /// Captured from the environment so the gear button can open the
-    /// Settings scene directly — `SettingsLink`'s imperative counterpart.
+    /// Settings scene directly. `SettingsLink`'s imperative counterpart.
     /// Same action is re-registered with `SettingsCoordinator` via
     /// `.captureSettingsOpener()` below so AppKit (the right-click menu)
     /// can invoke it too.
@@ -421,7 +421,7 @@ struct UsagePopoverView: View {
 
             Divider()
 
-            // Claude Design (Anthropic Labs) — separate weekly quota that
+            // Claude Design (Anthropic Labs) is a separate weekly quota that
             // doesn't fit the concentric-ring metaphor. Renders as a full-
             // width horizontal bar below the ring/row block so it's visually
             // distinct without competing for the same affordance.
@@ -458,7 +458,7 @@ struct UsagePopoverView: View {
                 .buttonStyle(.borderless)
                 .help("Refresh")
 
-                // Settings sits between Refresh and Sign Out — same visual
+                // Settings sits between Refresh and Sign Out with the same visual
                 // weight as the other footer icons, same help tooltip
                 // convention. Opens the macOS SwiftUI Settings scene via
                 // the `openSettings` environment action (the macOS 14+
@@ -471,7 +471,7 @@ struct UsagePopoverView: View {
                 .buttonStyle(.borderless)
                 .help("Settings")
 
-                // About — opens an icon legend in a sheet.
+                // About opens an icon legend in a sheet.
                 Button { showAbout = true } label: {
                     Image(systemName: "info.circle")
                         .font(.caption)
@@ -483,7 +483,7 @@ struct UsagePopoverView: View {
                     AboutView()
                 }
 
-                // Changelog — list of feature additions per release.
+                // Changelog lists feature additions per release.
                 Button { showChangelog = true } label: {
                     Image(systemName: "clock.arrow.circlepath")
                         .font(.caption)

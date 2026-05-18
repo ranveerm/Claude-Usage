@@ -19,7 +19,7 @@ enum BackgroundRefresh {
     static let taskIdentifier = "com.ranveer.ClaudeYourRings.refresh"
 
     /// Register the launch handler. Must be called before the App finishes
-    /// launching — i.e. from the App struct's `init()` — otherwise iOS
+    /// launching, i.e. from the App struct's `init()`. Otherwise iOS
     /// refuses to dispatch the task ("no handler registered" crash).
     static func register() {
         BGTaskScheduler.shared.register(
@@ -35,7 +35,7 @@ enum BackgroundRefresh {
     }
 
     /// Request iOS schedule another run. Call after every successful fetch
-    /// (foreground *and* background) — the scheduler only keeps the single
+    /// (foreground *and* background). The scheduler only keeps the single
     /// most recent pending request, and our BG handler consumes it, so we
     /// need to re-queue continuously to stay in the rotation.
     static func schedule() {
@@ -61,7 +61,7 @@ enum BackgroundRefresh {
             let data = await UsageService.shared.fetchUsage()
             DebugLog.log("BG handle: fetched, error=\(data.error ?? "nil"), needsLogin=\(data.needsLogin), sessionPct=\(Int(data.sessionUtilization.rounded()))")
 
-            // Only propagate clean results — errored or signed-out payloads
+            // Only propagate clean results. Errored or signed-out payloads
             // would otherwise overwrite a still-valid cache that the widget
             // and watch are already showing.
             if data.error == nil && !data.needsLogin {
@@ -83,7 +83,7 @@ enum BackgroundRefresh {
 
         task.expirationHandler = {
             DebugLog.log("BG handle: expiration handler invoked; cancelling fetch")
-            // iOS is reclaiming us — cancel the in-flight fetch so we
+            // iOS is reclaiming us. Cancel the in-flight fetch so we
             // don't leak work. setTaskCompleted(success:) will have
             // already been called by the Task's completion path.
             fetchTask.cancel()

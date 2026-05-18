@@ -14,14 +14,14 @@ import os.log
 ///
 /// 1. Open **Console.app** on the Mac with the device tethered.
 /// 2. Select the device in the sidebar (left column).
-/// 3. In the search bar, filter by **subsystem** —
+/// 3. In the search bar, filter by **subsystem**.
 ///    `subsystem:com.ranveer.ClaudeYourRings` shows everything; add
 ///    `category:live-activity` to narrow further.
 /// 4. Under **Action → Include Info Messages** make sure info/debug
 ///    messages are visible (default off for some Mac versions).
 ///
 /// `.notice` is the level used here because it survives default Console
-/// filters even in Release / TestFlight builds — `.debug` and `.info`
+/// filters even in Release / TestFlight builds. `.debug` and `.info`
 /// can be elided by the system unless explicitly enabled.
 enum DebugLog {
     private static let logger = Logger(
@@ -32,7 +32,7 @@ enum DebugLog {
     /// Append a log entry visible in Console.app at `.notice` level.
     ///
     /// The interpolation uses `privacy: .public` so messages render
-    /// verbatim instead of being redacted to `<private>` — the dynamic
+    /// verbatim instead of being redacted to `<private>`. The dynamic
     /// parts of these log lines (percentages, elapsed seconds, activity
     /// IDs) carry no PII.
     static func log(_ message: String) {

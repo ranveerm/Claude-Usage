@@ -10,7 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var hostingController: NSHostingController<UsagePopoverView>!
     private var eventMonitor: Any?
     /// Non-nil while the app is in its 25-second retry window after a failed
-    /// fetch — used to show `RefreshingView` and cancel any superseded retry.
+    /// fetch. Used to show `RefreshingView` and cancel any superseded retry.
     private var refreshTask: Task<Void, Never>?
     /// Mirrors the popover's `isRefreshing` state so `makePopoverView()` can
     /// pass it through without the Task capturing `self` in a cycle.
@@ -78,7 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     /// Inspect the KVS session signal and apply whatever it tells us to do.
-    /// Passive — never writes to KVS (only the explicit sign-in/out paths
+    /// Passive. Never writes to KVS (only the explicit sign-in/out paths
     /// mutate it). Removing the `isConfigured` guard the previous version
     /// had is intentional: when keychain sync beats the KVS notification,
     /// `isConfigured` can already be false by the time we arrive here, and
@@ -94,7 +94,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             refreshAfterRemoteSignIn()
         case .inSync:
             // Race: iCloud Keychain may have synced a sign-out before this
-            // KVS notification arrived — so observe() reports inSync (both
+            // KVS notification arrived. So observe() reports inSync (both
             // sides empty), but our in-memory `usageData` still holds the
             // last successful fetch. The popover view is driven off
             // `isConfigured` and will re-render correctly when opened, but
@@ -141,7 +141,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func showStatusMenu() {
-        // Close the main popover first — we're showing a right-click context
+        // Close the main popover first. We're showing a right-click context
         // menu and don't want the popover floating alongside it.
         popover.performClose(nil)
         removeEventMonitor()
@@ -197,7 +197,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// prints "Please use SettingsLink for opening the Settings scene." and
     /// no-ops when sent from AppKit. The replacement (`openSettings`
     /// environment action) is SwiftUI-only, so we go via
-    /// `SettingsCoordinator` — the popover's root view captures the action
+    /// `SettingsCoordinator`. The popover's root view captures the action
     /// from its environment and parks it on the coordinator, letting us
     /// call it synchronously from here.
     func openSettings() {
@@ -296,7 +296,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func signOut(broadcast: Bool) {
         if broadcast {
             // Revoke the session on Claude's server *before* we clear the
-            // cookies locally. Fire-and-forget — we're signing out locally
+            // cookies locally. Fire-and-forget. We're signing out locally
             // regardless of whether the POST succeeds.
             let sk = UsageService.shared.sessionKey
             let cf = UsageService.shared.cfClearance
@@ -320,7 +320,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         usageData = UsageData()
         statusItem.button?.image = renderIcon()
         updatePopoverContent()
-        // Don't auto-open the login window — the popover's LoginPromptView
+        // Don't auto-open the login window. The popover's LoginPromptView
         // (shown because !isConfigured) has a "Sign In" button that the
         // user can tap to explicitly open the login flow.
     }
@@ -337,7 +337,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.refreshData()
                 // Auto-open the popover now that the login window is
                 // closing, so the user's first view of "success" is the
-                // rings themselves — and discovers the menu-bar icon in
+                // rings themselves, and discovers the menu-bar icon in
                 // the process. Refresh is already in flight via
                 // refreshData above, so pass fetchOnOpen: false.
                 self?.openPopover()
@@ -367,7 +367,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Data
 
     private func refreshData() {
-        // Cancel any in-flight retry loop before starting a fresh one —
+        // Cancel any in-flight retry loop before starting a fresh one.
         // e.g. the 5-minute timer fires while a manual refresh is mid-retry.
         refreshTask?.cancel()
 
@@ -386,10 +386,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // If this device was last known to be signed in, enter the
             // "Refreshing Data" spinner and retry for up to 25 seconds.
             // This covers wake-from-sleep races where the network or
-            // Cloudflare CDN isn't ready yet — without this the popover
+            // Cloudflare CDN isn't ready yet. Without this the popover
             // would flash to LoginPromptView unnecessarily.
             guard UsageService.shared.lastKnownSignedIn else {
-                // Never been successfully signed in on this device — surface
+                // Never been successfully signed in on this device. Surface
                 // the result directly (login screen or error).
                 self.isRefreshing = false
                 self.usageData = data
@@ -419,15 +419,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
 
-            // 25 seconds elapsed — draw a conclusion.
+            // 25 seconds elapsed. Draw a conclusion.
             self.isRefreshing = false
             if lastData.isNetworkError {
-                // Network is still down — show the offline view.
+                // Network is still down. Show the offline view.
                 self.usageData = lastData
             } else {
                 // A prolonged Cloudflare challenge after wake-from-sleep is
                 // indistinguishable from a genuine session expiry over a
-                // 25-second window. Never auto-clear credentials — only the
+                // 25-second window. Never auto-clear credentials. Only the
                 // user can sign out explicitly. Surface a plain error so the
                 // user can Retry (recovers silently if session is still valid)
                 // or Sign Out (their choice, not ours).

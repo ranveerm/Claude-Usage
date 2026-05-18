@@ -61,7 +61,7 @@ private struct WebViewRepresentable: UIViewRepresentable {
 
         /// Claude.ai's final login redirect uses SPA pushState routing, which
         /// doesn't reliably fire `didFinish`. A cheap 2-second poll covers
-        /// the gap — matches the macOS `LoginWindowController` implementation.
+        /// the gap. Matches the macOS `LoginWindowController` implementation.
         func startPolling(webView: WKWebView) {
             self.webView = webView
             pollTimer?.invalidate()
@@ -83,7 +83,7 @@ private struct WebViewRepresentable: UIViewRepresentable {
 
                 guard !sessionKey.isEmpty else { return }
 
-                // Only complete when the API actually accepts the cookies —
+                // Only complete when the API actually accepts the cookies.
                 // avoids false positives from a partially-authenticated
                 // intermediate state.
                 self.isVerifying = true

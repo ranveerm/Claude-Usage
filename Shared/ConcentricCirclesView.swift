@@ -5,14 +5,14 @@ import SwiftUI
 ///
 /// Each ring layers three elements:
 ///   1. A faint background **track** (full circle).
-///   2. A **time arc** (`0 → time`) in a lower-opacity "faded" orange — how
+///   2. A **time arc** (`0 → time`) in a lower-opacity "faded" orange. How
 ///      far we are through the reset window.
-///   3. A solid **usage arc** (`0 → usage`) on top — how much of the quota
+///   3. A solid **usage arc** (`0 → usage`) on top. How much of the quota
 ///      has been consumed.
 ///
 /// When `time >= usage` the solid arc is shorter, so the faded arc extends
 /// visibly beyond it (reading as "you have headroom"). When `usage > time`
-/// the solid arc is longer and fully covers the faded arc — matching the
+/// the solid arc is longer and fully covers the faded arc, matching the
 /// "standard" behaviour; the overshoot simply reads as the solid arc having
 /// outrun where the time arc would have ended.
 ///
@@ -105,12 +105,12 @@ struct ConcentricCirclesView: View {
         let usageColor = palette == .grey ? greySolid  : Self.anthropicOrange
 
         ZStack {
-            // 1. Track — faint full circle.
+            // 1. Track - faint full circle.
             Circle()
                 .stroke(trackColor, lineWidth: lw)
                 .frame(width: diameter, height: diameter)
 
-            // 2. Time capsule — drawn first so the (possibly-cut) usage
+            // 2. Time capsule. Drawn first so the (possibly-cut) usage
             //    capsule can layer on top of it, and its round end cap at
             //    `time` is the piece the usage will visually wrap around.
             Circle()
@@ -129,7 +129,7 @@ struct ConcentricCirclesView: View {
             //    through and it *appears* to sit on top of the usage (even
             //    though it's drawn below). Both strokes use round caps, so
             //    the cut edge at `time` is a concave curve mirroring the
-            //    time capsule's round end cap — they fit together with no
+            //    time capsule's round end cap. They fit together with no
             //    straight radial seam.
             //
             //    `.compositingGroup()` routes the inner ZStack into its own
@@ -173,7 +173,7 @@ struct ConcentricCirclesView: View {
     private static let trackOrange = anthropicOrange.opacity(0.2)
     private static let fadedOrange = anthropicOrange.opacity(0.35)
 
-    // Grey palette — adaptive so the disabled ring stays legible on both
+    // Grey palette, adaptive so the disabled ring stays legible on both
     // light and dark backgrounds. In light mode the ring is near-white so it
     // reads as "empty/inactive"; in dark mode it stays a subtle secondary grey.
     private var greySolid: Color {

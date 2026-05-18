@@ -5,7 +5,7 @@ import Combine
 /// UserDefaults so widget/complication processes can read them later
 /// without their own copy of the values.
 ///
-/// Exposed as a singleton `ObservableObject` — SettingsView binds to it
+/// Exposed as a singleton `ObservableObject`. SettingsView binds to it
 /// directly, and mutations fan out through the `didSet` on each published
 /// property. There's no explicit save method; every setter persists.
 final class NotificationSettings: ObservableObject {
@@ -16,7 +16,7 @@ final class NotificationSettings: ObservableObject {
     // MARK: Published preferences
 
     /// Master switch. `false` short-circuits every evaluation and suppresses
-    /// the permission prompt — the system prompt is only requested the first
+    /// the permission prompt. The system prompt is only requested the first
     /// time the user flips this on.
     @Published var notificationsEnabled: Bool {
         didSet { defaults.set(notificationsEnabled, forKey: Keys.notificationsEnabled) }
@@ -53,7 +53,7 @@ final class NotificationSettings: ObservableObject {
         self.defaults = defaults
 
         // Threshold defaults: alerts on, 80%. Using `object(forKey:)` to
-        // distinguish "never set" from "set to false/0" — a plain `bool(...)`
+        // distinguish "never set" from "set to false/0". A plain `bool(...)`
         // would silently default thresholdAlertsEnabled to false.
         self.notificationsEnabled    = defaults.bool(forKey: Keys.notificationsEnabled)
         self.thresholdAlertsEnabled  = (defaults.object(forKey: Keys.thresholdAlertsEnabled) as? Bool) ?? true

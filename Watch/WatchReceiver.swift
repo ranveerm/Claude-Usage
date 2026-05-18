@@ -24,7 +24,7 @@ final class WatchReceiver: NSObject, ObservableObject, WCSessionDelegate {
         SharedDefaults.save(data)
         DispatchQueue.main.async { self.usageData = data }
         // The complication runs in a separate process that reads from
-        // SharedDefaults — without this it happily keeps showing whatever
+        // SharedDefaults. Without this it happily keeps showing whatever
         // was on the face last, even though fresh data has landed. Reload
         // so watchOS asks the complication provider for a new timeline.
         WidgetCenter.shared.reloadAllTimelines()

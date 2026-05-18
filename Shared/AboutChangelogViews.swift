@@ -12,7 +12,7 @@ struct IconLegendItem: Identifiable {
 
 /// One section of the in-app changelog. Versions are listed newest first
 /// in `Changelog.entries`. The plain-data shape is mirrored in
-/// `CHANGELOG.md` at the repo root — keep the two in sync.
+/// `CHANGELOG.md` at the repo root. Keep the two in sync.
 struct ChangelogEntry: Identifiable {
     let id = UUID()
     let version: String
@@ -27,32 +27,32 @@ struct ChangelogEntry: Identifiable {
 enum Changelog {
     static let entries: [ChangelogEntry] = [
         ChangelogEntry(version: "1.1.4", features: [
-            "Fixed the Claude Design horizontal progress bar so it always renders as a true capsule — both ends are now rounded at every fill level, the usage fill has a rounded trailing cap when it falls short of the time-progress fill, and very low usage values no longer produce a floating shape or a vertical pill",
+            "Fixed the Claude Design horizontal progress bar so it always renders as a true capsule. Both ends are now rounded at every fill level, the usage fill has a rounded trailing cap when it falls short of the time-progress fill, and very low usage values no longer produce a floating shape or a vertical pill",
         ]),
         ChangelogEntry(version: "1.1.3", features: [
             "Home-screen and lock-screen widgets now refresh on their own schedule, fetching fresh usage directly from Claude when the system reloads them. Previously they only ever displayed whatever the iOS app had last cached, which meant the rings would appear static until you opened the app",
             "Fixed a visual glitch in the horizontal progress bars where low percentages rendered as a floating circle in the middle of the bar instead of as a small sliver hugging the left curve",
         ]),
         ChangelogEntry(version: "1.1.2", features: [
-            "Live Activity idle dismissal now survives across cold launches — when iOS terminates the suspended app to reclaim memory, the 10-minute timer keeps running rather than resetting to zero, so the banner actually goes away after you stop using Claude",
+            "Live Activity idle dismissal now survives across cold launches. When iOS terminates the suspended app to reclaim memory, the 10-minute timer keeps running rather than resetting to zero, so the banner actually goes away after you stop using Claude",
         ]),
         ChangelogEntry(version: "1.1.1", features: [
-            "Live Activity now actually disappears after 10 minutes of no usage change — previously it would dismiss but immediately restart on the next background refresh, making it look like nothing had happened",
+            "Live Activity now actually disappears after 10 minutes of no usage change. Previously it would dismiss but immediately restart on the next background refresh, making it look like nothing had happened",
         ]),
         ChangelogEntry(version: "1.1.0", features: [
             "New About screen with an icon legend explaining every SF Symbol used across the app, widgets, and inline widget",
             "New Changelog screen showing per-version feature additions, accessible from the same menu as Settings and Sign Out",
-            "Inline widget default metric changed from Session to All Models Weekly — more representative of long-term usage at a glance",
+            "Inline widget default metric changed from Session to All Models Weekly. More representative of long-term usage at a glance",
         ]),
         ChangelogEntry(version: "1.0.9", features: [
-            "Configurable inline lock-screen widget — pick which metric to track (Session, Sonnet Weekly, All Models Weekly, All Rings, All Rings + Design)",
+            "Configurable inline lock-screen widget. Pick which metric to track (Session, Sonnet Weekly, All Models Weekly, All Rings, All Rings + Design)",
             "Live Activity bars now translucent so the system Liquid Glass banner bleeds through, giving the bars a frosted-tinted-glass look",
         ]),
         ChangelogEntry(version: "1.0.8", features: [
-            "Live Activity dismisses automatically after 10 minutes of no observed percentage change — keeps the lock-screen banner from going stale when the user steps away",
+            "Live Activity dismisses automatically after 10 minutes of no observed percentage change. This keeps the lock-screen banner from going stale when the user steps away",
         ]),
         ChangelogEntry(version: "1.0.7", features: [
-            "Live Activity for Claude sessions — four horizontal usage bars on the lock screen, plus a configurable ring in the Dynamic Island",
+            "Live Activity for Claude sessions. Four horizontal usage bars on the lock screen, plus a configurable ring in the Dynamic Island",
             "Live Activity opt-in setting (defaults off) with a Dynamic Island metric picker",
         ]),
         ChangelogEntry(version: "1.0.6", features: [
@@ -66,7 +66,7 @@ enum Changelog {
             "Internal release tag (1.0.3 was already on the remote, so the bump skipped to 1.0.4)",
         ]),
         ChangelogEntry(version: "1.0.3", features: [
-            "Demo mode for App Store reviewers — try the app without signing in",
+            "Demo mode for App Store reviewers. Try the app without signing in",
             "Claude Design weekly usage shown as a horizontal bar beneath the rings",
             "Renamed throughout to \"Vibe Your Rings\"",
         ]),
@@ -164,7 +164,7 @@ struct AboutView: View {
 
 // MARK: - Changelog view
 
-/// Versioned feature list — one `Section` per release, bullet rows beneath.
+/// Versioned feature list. One `Section` per release, bullet rows beneath.
 struct ChangelogView: View {
     var body: some View {
         Form {
@@ -192,21 +192,21 @@ struct ChangelogView: View {
 
 #if DEBUG
 #if os(iOS)
-#Preview("About — iOS") {
+#Preview("About - iOS") {
     NavigationStack { AboutView() }
 }
 
-#Preview("Changelog — iOS") {
+#Preview("Changelog - iOS") {
     NavigationStack { ChangelogView() }
 }
 #endif
 
 #if os(macOS)
-#Preview("About — macOS") {
+#Preview("About - macOS") {
     AboutView()
 }
 
-#Preview("Changelog — macOS") {
+#Preview("Changelog - macOS") {
     ChangelogView()
 }
 #endif

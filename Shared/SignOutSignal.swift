@@ -4,20 +4,20 @@ import Foundation
 ///
 /// ## Design
 ///
-/// The KVS carries a **session id** — a UUID identifying the currently-active
+/// The KVS carries a **session id**, a UUID identifying the currently-active
 /// sign-in across the user's devices, or `""` when signed out.
 ///
 /// Only two events mutate the KVS:
 ///
-/// 1. `markSignedIn()` — generates a fresh UUID on explicit sign-in, stores
+/// 1. `markSignedIn()` generates a fresh UUID on explicit sign-in, stores
 ///    it locally, and broadcasts it via iCloud KVS.
-/// 2. `markSignedOut()` — on explicit user sign-out. Clears both local and
+/// 2. `markSignedOut()` on explicit user sign-out clears both local and
 ///    KVS values.
 ///
 /// Reading (via `observe(isConfigured:)`) is **passive**: the observing
 /// device compares the remote value to its local snapshot and decides what
 /// to do. It may update its local snapshot, but it never writes to the KVS.
-/// This is the key invariant that prevents cascading sign-outs — if a device
+/// This is the key invariant that prevents cascading sign-outs. If a device
 /// reacts to another device's sign-out by writing back to the KVS, every
 /// other device would see *that* write and cascade again.
 ///
@@ -27,7 +27,7 @@ import Foundation
 /// signed in (`local = 0`) would always consider any non-zero remote
 /// `signedOutAt` as "newer" and sign out. That reaction re-broadcast a newer
 /// timestamp, which then signed out every other device. Using an opaque
-/// session id sidesteps the whole ordinal-comparison trap — a device that
+/// session id sidesteps the whole ordinal-comparison trap. A device that
 /// has never seen the current session id simply adopts it (no false
 /// sign-out), and only a deliberate `markSignedOut()` clears the KVS.
 enum SignOutSignal {
@@ -59,11 +59,11 @@ enum SignOutSignal {
 
     /// What the caller should do based on comparing KVS to our local state.
     enum Observation: Equatable {
-        /// Local and remote agree — nothing to do.
+        /// Local and remote agree. Nothing to do.
         case inSync
-        /// The KVS says signed out but this device still has credentials —
-        /// caller should clear local state. Callers MUST NOT re-broadcast
-        /// by calling `markSignedOut()` — that would cascade.
+        /// The KVS says signed out but this device still has credentials.
+        /// Caller should clear local state. Callers MUST NOT re-broadcast
+        /// by calling `markSignedOut()`. That would cascade.
         case shouldSignOut
         /// The KVS has a session id we hadn't observed yet (e.g. because
         /// another device signed in and its credentials just synced into our
@@ -93,7 +93,7 @@ enum SignOutSignal {
             return .inSync
         }
 
-        // A new session id is live. Adopt it — we don't broadcast, because
+        // A new session id is live. Adopt it. We don't broadcast, because
         // the device that wrote this id already broadcast the event.
         UserDefaults.standard.set(remote, forKey: keyLocalSessionId)
         return .adoptedRemote
