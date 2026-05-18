@@ -26,6 +26,9 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.1.5", features: [
+            "Live Activity now reliably dismisses after 10 minutes of no usage change even when iOS never wakes the app for a background refresh. The system itself removes the banner at the idle deadline rather than depending on the app process being alive",
+        ]),
         ChangelogEntry(version: "1.1.4", features: [
             "Fixed the Claude Design horizontal progress bar so it always renders as a true capsule. Both ends are now rounded at every fill level, the usage fill has a rounded trailing cap when it falls short of the time-progress fill, and very low usage values no longer produce a floating shape or a vertical pill",
         ]),

@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.1.5
+- Live Activity now reliably dismisses after 10 minutes of no usage change even when iOS never wakes the app for a background refresh. The system itself removes the banner at the idle deadline rather than depending on the app process being alive
+
 ## 1.1.4
 - Fixed the Claude Design horizontal progress bar so it always renders as a true capsule. Both ends are now rounded at every fill level, the usage fill has a rounded trailing cap when it falls short of the time-progress fill, and very low usage values no longer produce a floating shape or a vertical pill
 

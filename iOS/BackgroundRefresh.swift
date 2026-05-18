@@ -38,28 +38,37 @@ enum BackgroundRefresh {
     /// (foreground *and* background). The scheduler only keeps the single
     /// most recent pending request, and our BG handler consumes it, so we
     /// need to re-queue continuously to stay in the rotation.
+    ///
+    /// When a Live Activity idle timeout is approaching we ask for an
+    /// earlier wake-up so the in-app logic can end the banner precisely.
+    /// The system still treats `earliestBeginDate` as a floor, but a
+    /// targeted hint improves the chance we run before the staleDate fires.
     static func schedule() {
+        let standard = Date().addingTimeInterval(15 * 60)
+        let idleExpiry = LiveActivityManager.nextIdleCheckDate()
+        let earliest: Date
+        if let expiry = idleExpiry, expiry < standard {
+            earliest = expiry
+        } else {
+            earliest = standard
+        }
         let request = BGAppRefreshTaskRequest(identifier: taskIdentifier)
-        request.earliestBeginDate = Date().addingTimeInterval(15 * 60)
+        request.earliestBeginDate = earliest
         do {
             try BGTaskScheduler.shared.submit(request)
-            DebugLog.log("BG schedule: submitted, earliest=\(request.earliestBeginDate?.description ?? "nil")")
         } catch {
-            DebugLog.log("BG schedule: FAILED \(error)")
         }
     }
 
     // MARK: - Private
 
     private static func handle(_ task: BGAppRefreshTask) {
-        DebugLog.log("BG handle: fired")
         // Re-queue *first*: if we crash or time out, at least we have a
         // future slot in the rotation. iOS coalesces duplicate submits.
         schedule()
 
         let fetchTask = Task {
             let data = await UsageService.shared.fetchUsage()
-            DebugLog.log("BG handle: fetched, error=\(data.error ?? "nil"), needsLogin=\(data.needsLogin), sessionPct=\(Int(data.sessionUtilization.rounded()))")
 
             // Only propagate clean results. Errored or signed-out payloads
             // would otherwise overwrite a still-valid cache that the widget
@@ -73,16 +82,13 @@ enum BackgroundRefresh {
                     data: data,
                     settings: NotificationSettings.shared
                 )
-                DebugLog.log("BG handle: completed success")
                 task.setTaskCompleted(success: true)
             } else {
-                DebugLog.log("BG handle: skipping (dirty payload); marking failed")
                 task.setTaskCompleted(success: false)
             }
         }
 
         task.expirationHandler = {
-            DebugLog.log("BG handle: expiration handler invoked; cancelling fetch")
             // iOS is reclaiming us. Cancel the in-flight fetch so we
             // don't leak work. setTaskCompleted(success:) will have
             // already been called by the Task's completion path.

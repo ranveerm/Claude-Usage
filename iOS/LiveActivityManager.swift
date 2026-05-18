@@ -90,12 +90,22 @@ final class LiveActivityManager {
         if seededNow {
             lastPercentChangeAt = Date()
         }
-        DebugLog.log("init: adopted=\(currentActivity != nil), persistedLastChange=\(lastPercentChangeAt.map { String(describing: $0) } ?? "nil"), persistedSuppressed=\(suppressedAtPercent.map(String.init) ?? "nil"), seededTimestamp=\(seededNow)")
     }
 
     private enum Keys {
         static let lastPercentChangeAt = "liveActivity.lastPercentChangeAt"
-        static let suppressedAtPercent = "liveActivity.suppressedAtPercent"
+        static let suppressedAtPercent  = "liveActivity.suppressedAtPercent"
+    }
+
+    /// The wall-clock time at which the running Live Activity should be
+    /// ended due to inactivity, or `nil` if no activity is running.
+    /// Read directly from the app-group defaults so `BackgroundRefresh`
+    /// can call this without crossing to the main actor.
+    static func nextIdleCheckDate() -> Date? {
+        let defaults = UserDefaults(suiteName: "group.com.ranveer.ClaudeYourRings") ?? .standard
+        let raw = defaults.double(forKey: Keys.lastPercentChangeAt)
+        guard raw > 0 else { return nil }
+        return Date(timeIntervalSince1970: raw).addingTimeInterval(idleTimeout)
     }
 
     /// Call after every successful fetch to keep the Live Activity in sync.
@@ -107,13 +117,10 @@ final class LiveActivityManager {
         let systemAllowed = ActivityAuthorizationInfo().areActivitiesEnabled
         let userAllowed = LiveActivitySettings.shared.enabled
 
-        DebugLog.log("update entry: pct=\(currentPct) (raw=\(data.sessionUtilization)), isActive=\(isActive), systemAllowed=\(systemAllowed), userAllowed=\(userAllowed), currentActivity=\(currentActivity != nil), lastChange=\(lastPercentChangeAt.map { Self.relativeAge($0) } ?? "nil"), suppressed=\(suppressedAtPercent.map(String.init) ?? "nil")")
-
         // System-level disable (Settings → Vibe Your Rings → Live Activities)
         // OR in-app opt-out both short-circuit. If something is running when
         // either turns off we tear it down rather than leave a stale banner.
         guard systemAllowed, userAllowed else {
-            DebugLog.log("update → disabled (system=\(systemAllowed), user=\(userAllowed)); endAll")
             endAll()
             return
         }
@@ -122,7 +129,6 @@ final class LiveActivityManager {
         // down anything still running and clear suppression so the next
         // session can start fresh.
         if !isActive {
-            DebugLog.log("update → !isActive; endIfRunning + clear suppression")
             endIfRunning(state: contentState(from: data))
             suppressedAtPercent = nil
             return
@@ -133,10 +139,8 @@ final class LiveActivityManager {
         // Only a real change in usage clears the suppression.
         if let suppressed = suppressedAtPercent {
             if currentPct == suppressed {
-                DebugLog.log("update → suppressed at \(suppressed)%; return")
                 return
             }
-            DebugLog.log("update → percent moved (\(suppressed)→\(currentPct)); clearing suppression")
             suppressedAtPercent = nil
         }
 
@@ -147,7 +151,6 @@ final class LiveActivityManager {
 
             if previous != currentPct {
                 // Percentage moved. User is actively using Claude.
-                DebugLog.log("update → percent change \(previous)→\(currentPct); resetting idle clock")
                 lastPercentChangeAt = Date()
             } else if let last = lastPercentChangeAt {
                 let elapsed = Date().timeIntervalSince(last)
@@ -155,34 +158,31 @@ final class LiveActivityManager {
                     // No movement for the full idle window. Dismiss the
                     // banner and remember the percentage so the next fetch
                     // doesn't immediately recreate it.
-                    DebugLog.log("update → IDLE THRESHOLD HIT: \(Int(elapsed))s flat at \(currentPct)%; endAll + suppress")
                     suppressedAtPercent = currentPct
                     endAll()
                     return
-                } else {
-                    DebugLog.log("update → flat at \(currentPct)%, \(Int(elapsed))s elapsed (idle timeout = \(Int(Self.idleTimeout))s); pushing update")
                 }
-            } else {
-                DebugLog.log("update → flat at \(currentPct)% but lastPercentChangeAt was nil; pushing update")
             }
 
             Task {
+                // staleDate = lastPercentChangeAt + idleTimeout so the
+                // system removes the banner by itself if our process never
+                // runs again before the idle window closes. Previously this
+                // was set to sessionResetsAt (5 h out), which gave iOS no
+                // signal to remove an idle activity for hours.
+                // Falls back to sessionResetsAt only when the timestamp is
+                // somehow missing (should not happen in practice).
+                let staleDate = lastPercentChangeAt
+                    .map { $0.addingTimeInterval(Self.idleTimeout) }
+                    ?? data.sessionResetsAt
                 await activity.update(
-                    ActivityContent(state: state, staleDate: data.sessionResetsAt)
+                    ActivityContent(state: state, staleDate: staleDate)
                 )
-                DebugLog.log("activity.update completed for pct=\(currentPct)")
             }
         } else {
-            DebugLog.log("update → no currentActivity; starting new at \(currentPct)%")
             lastPercentChangeAt = Date()
             start(state: state, resetsAt: data.sessionResetsAt)
         }
-    }
-
-    /// Helper for debug logs. Formats a Date as a relative-age string.
-    private static func relativeAge(_ date: Date) -> String {
-        let elapsed = Int(Date().timeIntervalSince(date))
-        return "\(date) (\(elapsed)s ago)"
     }
 
     /// Called when `LiveActivitySettings.enabled` toggles. On disable we
@@ -192,7 +192,6 @@ final class LiveActivityManager {
     /// "your activity will appear next time we refresh".
     func applyEnabledChange() {
         let enabled = LiveActivitySettings.shared.enabled
-        DebugLog.log("applyEnabledChange: enabled=\(enabled)")
         if enabled {
             // Clear suppression on explicit re-enable. The user has just
             // opted back in, so any in-flight idle-end shouldn't keep them
@@ -215,11 +214,7 @@ final class LiveActivityManager {
 
     /// End any running activity. Safe to call when nothing is active.
     func endAll() {
-        guard let activity = currentActivity else {
-            DebugLog.log("endAll: nothing running")
-            return
-        }
-        DebugLog.log("endAll: ending activity id=\(activity.id)")
+        guard let activity = currentActivity else { return }
         let frozenState = activity.content.state
         currentActivity = nil
         lastPercentChangeAt = nil
@@ -228,7 +223,6 @@ final class LiveActivityManager {
                 ActivityContent(state: frozenState, staleDate: nil),
                 dismissalPolicy: .immediate
             )
-            DebugLog.log("endAll: activity.end completed (id=\(activity.id))")
         }
     }
 
@@ -239,24 +233,21 @@ final class LiveActivityManager {
         resetsAt: Date?
     ) {
         do {
+            // lastPercentChangeAt is set to Date() just before start() is
+            // called, so idleTimeout from now is the correct stale date.
+            let staleDate = Date().addingTimeInterval(Self.idleTimeout)
             let activity = try Activity.request(
                 attributes: ClaudeSessionAttributes(),
-                content: ActivityContent(state: state, staleDate: resetsAt),
+                content: ActivityContent(state: state, staleDate: staleDate),
                 pushType: nil
             )
             currentActivity = activity
-            DebugLog.log("start: success id=\(activity.id) pct=\(Int(state.sessionUtilization.rounded()))")
         } catch {
-            DebugLog.log("start: FAILED \(error)")
         }
     }
 
     private func endIfRunning(state: ClaudeSessionAttributes.ContentState) {
-        guard let activity = currentActivity else {
-            DebugLog.log("endIfRunning: nothing running")
-            return
-        }
-        DebugLog.log("endIfRunning: ending activity id=\(activity.id)")
+        guard let activity = currentActivity else { return }
         lastPercentChangeAt = nil
         Task {
             await activity.end(
@@ -264,7 +255,6 @@ final class LiveActivityManager {
                 dismissalPolicy: .immediate
             )
             currentActivity = nil
-            DebugLog.log("endIfRunning: activity.end completed (id=\(activity.id))")
         }
     }
 

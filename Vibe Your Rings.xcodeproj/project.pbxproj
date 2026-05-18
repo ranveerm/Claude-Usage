@@ -60,7 +60,6 @@
 		FFFF111111111111111F0016 /* UsageInlineWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF111111111111111F0005 /* UsageInlineWidget.swift */; };
 		FFFF111111111111111F0017 /* AboutChangelogViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF111111111111111F0006 /* AboutChangelogViews.swift */; };
 		FFFF111111111111111F0018 /* AboutChangelogViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF111111111111111F0006 /* AboutChangelogViews.swift */; };
-		FFFF111111111111111F0019 /* DebugLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFF111111111111111F0007 /* DebugLog.swift */; };
 		FFFF111111111111111F001A /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A8BE984C8A5C9922570BF34 /* KeychainHelper.swift */; };
 		FFFF111111111111111F001B /* UsageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E7E3A791CA2AB8863C53101 /* UsageService.swift */; };
 		FFFF111111111111111F001C /* SignOutSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEEE111111111111111E0001 /* SignOutSignal.swift */; };
@@ -207,7 +206,6 @@
 		FFFF111111111111111F0004 /* LiveActivitySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivitySettings.swift; sourceTree = "<group>"; };
 		FFFF111111111111111F0005 /* UsageInlineWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageInlineWidget.swift; sourceTree = "<group>"; };
 		FFFF111111111111111F0006 /* AboutChangelogViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutChangelogViews.swift; sourceTree = "<group>"; };
-		FFFF111111111111111F0007 /* DebugLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLog.swift; sourceTree = "<group>"; };
 		F365ECED4F04C6605F294732 /* Claude_Usage_Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Claude_Usage_Widget.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -379,7 +377,6 @@
 				A34B1BE72F99006000FB8DE3 /* BackgroundRefresh.swift */,
 				FFFF111111111111111F0003 /* LiveActivityManager.swift */,
 				FFFF111111111111111F0004 /* LiveActivitySettings.swift */,
-				FFFF111111111111111F0007 /* DebugLog.swift */,
 			);
 			path = iOS;
 			sourceTree = "<group>";
@@ -765,7 +762,6 @@
 				FFFF111111111111111F0014 /* LiveActivityManager.swift in Sources */,
 				FFFF111111111111111F0015 /* LiveActivitySettings.swift in Sources */,
 				FFFF111111111111111F0017 /* AboutChangelogViews.swift in Sources */,
-				FFFF111111111111111F0019 /* DebugLog.swift in Sources */,
 				15CE708F177EBAD43EDD43FB /* ConcentricCirclesView.swift in Sources */,
 				045ED01433B290ED84979F07 /* ContentView.swift in Sources */,
 				010A799CF52B233D3706F902 /* KeychainHelper.swift in Sources */,
@@ -948,7 +944,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 29F59849NR;
@@ -966,7 +962,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1075,7 +1071,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1085,7 +1081,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-iOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1107,13 +1103,13 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-iOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -1135,7 +1131,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1145,7 +1141,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-macOS-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -1166,13 +1162,13 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.1;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.Vibe-Your-Rings-macOS-Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -1195,7 +1191,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Vibe Your Rings Watch Widget/Claude_Usage_WatchWidget.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1211,7 +1207,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.ClaudeYourRings.watchkitapp.Claude-Your-Rings-Watch-Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1238,7 +1234,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "Vibe Your Rings Watch Widget/Claude_Usage_WatchWidget.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEVELOPMENT_TEAM = 29F59849NR;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -1250,7 +1246,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ranveer.ClaudeYourRings.watchkitapp.Claude-Your-Rings-Watch-Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1318,7 +1314,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 29F59849NR;
@@ -1342,7 +1338,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.1.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
