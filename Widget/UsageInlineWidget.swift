@@ -112,16 +112,32 @@ struct InlineTimelineProvider: AppIntentTimelineProvider {
         )
     }
 
+    /// The system asks for a timeline whenever it wants fresh content
+    /// (roughly every 15 minutes by our policy, or immediately when the
+    /// app calls `WidgetCenter.shared.reloadAllTimelines()`).
+    ///
+    /// We do our own fetch here rather than just re-reading the cache,
+    /// for the same reason as the rings widget: the cache is only
+    /// touched by the app or its background refresh, and waiting on
+    /// those leaves the timelapse pie stuck at whatever the user last
+    /// saw when they opened the app. Cache is the fallback when the
+    /// fetch fails.
     func timeline(
         for configuration: InlineMetricIntent,
         in context: Context
     ) async -> Timeline<InlineUsageEntry> {
-        let entry = InlineUsageEntry(
-            date: .now,
-            usage: SharedDefaults.load(),
-            metric: configuration.metric
-        )
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: .now) ?? .now
+        let fetched = await UsageService.shared.fetchUsage()
+        let usable: UsageData?
+
+        if fetched.error == nil && !fetched.needsLogin {
+            SharedDefaults.save(fetched)
+            usable = fetched
+        } else {
+            usable = SharedDefaults.load()
+        }
+
+        let entry = InlineUsageEntry(date: .now, usage: usable, metric: configuration.metric)
+        let nextUpdate = Date().addingTimeInterval(15 * 60)
         return Timeline(entries: [entry], policy: .after(nextUpdate))
     }
 }

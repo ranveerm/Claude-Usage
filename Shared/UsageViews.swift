@@ -181,6 +181,12 @@ struct UsageProgressBarView: View {
                 let usageFraction = min(max(utilization  / 100.0, 0), 1)
                 let timeFraction  = min(max(timeProgress,          0), 1)
 
+                // Fill layers use `Rectangle` (clipped to the outer capsule
+                // below) rather than `Capsule` themselves. A `Capsule`
+                // sized smaller than the bar's height collapses into a
+                // free-floating circle that doesn't hug the parent's left
+                // curvature; `Rectangle` + `.clipShape(Capsule())` gives a
+                // proper capsule-cap-shaped sliver at low fractions.
                 ZStack(alignment: .leading) {
                     // Track — same as ring unfilled arc
                     Capsule()
@@ -188,7 +194,7 @@ struct UsageProgressBarView: View {
 
                     // Time-elapsed fill — same faded layer the rings use
                     if isApplicable && timeFraction > 0 {
-                        Capsule()
+                        Rectangle()
                             .fill(ConcentricCirclesView.anthropicOrange.opacity(0.35))
                             .frame(width: geo.size.width * timeFraction)
                     }
@@ -196,7 +202,7 @@ struct UsageProgressBarView: View {
                     // Usage fill — same as ring solid arc; drawn on top so it
                     // covers the faded time layer when usage has outrun time.
                     if isApplicable {
-                        Capsule()
+                        Rectangle()
                             .fill(ConcentricCirclesView.anthropicOrange)
                             .frame(width: geo.size.width * usageFraction)
                     }
@@ -210,6 +216,7 @@ struct UsageProgressBarView: View {
                     }
                 }
                 .frame(height: barHeight)
+                .clipShape(Capsule())
             }
             .frame(height: barHeight)
         }

@@ -9,6 +9,10 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only** — internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.1.3
+- Home-screen and lock-screen widgets now refresh on their own schedule, fetching fresh usage directly from Claude when the system reloads them. Previously they only ever displayed whatever the iOS app had last cached, which meant the rings would appear static until you opened the app
+- Fixed a visual glitch in the horizontal progress bars where low percentages rendered as a floating circle in the middle of the bar instead of as a small sliver hugging the left curve
+
 ## 1.1.2
 - Live Activity idle dismissal now survives across cold launches — when iOS terminates the suspended app to reclaim memory, the 10-minute timer keeps running rather than resetting to zero, so the banner actually goes away after you stop using Claude
 

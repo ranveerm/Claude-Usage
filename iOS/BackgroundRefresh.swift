@@ -43,25 +43,23 @@ enum BackgroundRefresh {
         request.earliestBeginDate = Date().addingTimeInterval(15 * 60)
         do {
             try BGTaskScheduler.shared.submit(request)
+            DebugLog.log("BG schedule: submitted, earliest=\(request.earliestBeginDate?.description ?? "nil")")
         } catch {
-            // Common reasons: Background App Refresh disabled, or running
-            // in the simulator. Nothing we can do at runtime — surface in
-            // logs for debugging only.
-            #if DEBUG
-            print("[BG] submit failed: \(error)")
-            #endif
+            DebugLog.log("BG schedule: FAILED \(error)")
         }
     }
 
     // MARK: - Private
 
     private static func handle(_ task: BGAppRefreshTask) {
+        DebugLog.log("BG handle: fired")
         // Re-queue *first*: if we crash or time out, at least we have a
         // future slot in the rotation. iOS coalesces duplicate submits.
         schedule()
 
         let fetchTask = Task {
             let data = await UsageService.shared.fetchUsage()
+            DebugLog.log("BG handle: fetched, error=\(data.error ?? "nil"), needsLogin=\(data.needsLogin), sessionPct=\(Int(data.sessionUtilization.rounded()))")
 
             // Only propagate clean results — errored or signed-out payloads
             // would otherwise overwrite a still-valid cache that the widget
@@ -75,13 +73,16 @@ enum BackgroundRefresh {
                     data: data,
                     settings: NotificationSettings.shared
                 )
+                DebugLog.log("BG handle: completed success")
                 task.setTaskCompleted(success: true)
             } else {
+                DebugLog.log("BG handle: skipping (dirty payload); marking failed")
                 task.setTaskCompleted(success: false)
             }
         }
 
         task.expirationHandler = {
+            DebugLog.log("BG handle: expiration handler invoked; cancelling fetch")
             // iOS is reclaiming us — cancel the in-flight fetch so we
             // don't leak work. setTaskCompleted(success:) will have
             // already been called by the Task's completion path.

@@ -242,18 +242,25 @@ private struct LiveActivityBarRow: View {
                 // (track < time < fill) while none of them block the glass
                 // entirely. The white text on top keeps its soft drop
                 // shadow so it stays legible across all three shades.
+                //
+                // **Why `Rectangle` and not `Capsule` for the fills:** at
+                // small fractions a `Capsule` shape collapses into a free-
+                // floating circle of diameter == width, instead of hugging
+                // the parent's left curvature. `Rectangle` + the outer
+                // `.clipShape(Capsule())` lets the fill follow the
+                // surrounding curve at any width.
                 ZStack(alignment: .leading) {
                     Capsule()
                         .fill(ConcentricCirclesView.anthropicOrange.opacity(0.18))
 
                     if applicable && timeFraction > 0 {
-                        Capsule()
+                        Rectangle()
                             .fill(ConcentricCirclesView.anthropicOrange.opacity(0.32))
                             .frame(width: geo.size.width * timeFraction)
                     }
 
                     if applicable {
-                        Capsule()
+                        Rectangle()
                             .fill(ConcentricCirclesView.anthropicOrange.opacity(0.55))
                             .frame(width: geo.size.width * usageFraction)
                     }

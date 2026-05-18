@@ -11,20 +11,54 @@ struct UsageEntry: TimelineEntry {
 }
 
 struct UsageTimelineProvider: TimelineProvider {
+    /// Tells the system to reload the widget at most this often. The
+    /// system may defer past this, but won't reload sooner unless the
+    /// app explicitly calls `WidgetCenter.shared.reloadAllTimelines()`.
+    private static let reloadInterval: TimeInterval = 15 * 60
+
     func placeholder(in context: Context) -> UsageEntry {
         UsageEntry(date: .now, input: CircleRendererInput(
             sessionProgress: 0.5, sonnetProgress: 0.3, allModelsProgress: 0.4
         ))
     }
 
+    /// Snapshot is shown in the widget gallery / transitional states.
+    /// Reading from cache here is fine — gallery doesn't need live data.
     func getSnapshot(in context: Context, completion: @escaping (UsageEntry) -> Void) {
         completion(entry(from: SharedDefaults.load()))
     }
 
+    /// Timeline reload — the system calls this when it wants fresh
+    /// content (every ~15 minutes by our policy, or sooner when the app
+    /// triggers `WidgetCenter.shared.reloadAllTimelines()`).
+    ///
+    /// **The widget does its own fetch here** rather than relying purely
+    /// on the cache. Without this, the only way the rings would ever
+    /// move is if the iOS app or its background-refresh handler had run
+    /// since the last reload — which doesn't happen often enough on
+    /// real devices. The cached `SharedDefaults` value still acts as a
+    /// fallback when the fetch fails (no network, auth error, etc.).
     func getTimeline(in context: Context, completion: @escaping (Timeline<UsageEntry>) -> Void) {
-        let currentEntry = entry(from: SharedDefaults.load())
-        let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: .now) ?? .now
-        completion(Timeline(entries: [currentEntry], policy: .after(nextUpdate)))
+        Task {
+            let fetched = await UsageService.shared.fetchUsage()
+            let usable: UsageData?
+
+            if fetched.error == nil && !fetched.needsLogin {
+                // Fresh data — promote it into the shared cache so the
+                // main app, watch, and Live Activity all see the same
+                // payload the rings just rendered.
+                SharedDefaults.save(fetched)
+                usable = fetched
+            } else {
+                // Network/auth failure — fall back to whatever the app
+                // last cached so the rings don't go blank.
+                usable = SharedDefaults.load()
+            }
+
+            let next = Date().addingTimeInterval(Self.reloadInterval)
+            completion(Timeline(entries: [entry(from: usable)],
+                                policy: .after(next)))
+        }
     }
 
     private func entry(from data: UsageData?) -> UsageEntry {
