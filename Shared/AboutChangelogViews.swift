@@ -26,6 +26,11 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.1.6", features: [
+            "Lock-screen Live Activity bars now render as true capsules at all fill levels, matching the fix applied to the Claude Design bar in 1.1.4",
+            "Watch app rings page now shows the \"Updated X ago\" timestamp directly below the rings instead of at the bottom of the detail list",
+            "Pull down on the watch rings page to fetch fresh usage from the paired iPhone immediately, without waiting for the next scheduled sync",
+        ]),
         ChangelogEntry(version: "1.1.5", features: [
             "Live Activity now reliably dismisses after 10 minutes of no usage change even when iOS never wakes the app for a background refresh. The system itself removes the banner at the idle deadline rather than depending on the app process being alive",
         ]),

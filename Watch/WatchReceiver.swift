@@ -33,4 +33,29 @@ final class WatchReceiver: NSObject, ObservableObject, WCSessionDelegate {
     func session(_ session: WCSession,
                  activationDidCompleteWith activationState: WCSessionActivationState,
                  error: Error?) {}
+
+    // MARK: - Watch-initiated refresh
+
+    /// Asks the paired iPhone to fetch fresh usage and send it back.
+    /// Called from the pull-to-refresh gesture on the circles page.
+    /// Returns immediately (no-op) if the iPhone is not reachable.
+    func requestRefresh() async {
+        guard WCSession.default.isReachable else { return }
+
+        await withCheckedContinuation { continuation in
+            WCSession.default.sendMessage(["requestRefresh": true]) { [weak self] reply in
+                defer { continuation.resume() }
+                guard let self,
+                      let encoded = reply["usage"] as? Data,
+                      let data = try? JSONDecoder().decode(UsageData.self, from: encoded) else { return }
+                SharedDefaults.save(data)
+                DispatchQueue.main.async {
+                    self.usageData = data
+                    WidgetCenter.shared.reloadAllTimelines()
+                }
+            } errorHandler: { _ in
+                continuation.resume()
+            }
+        }
+    }
 }

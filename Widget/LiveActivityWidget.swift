@@ -253,16 +253,34 @@ private struct LiveActivityBarRow: View {
                     Capsule()
                         .fill(ConcentricCirclesView.anthropicOrange.opacity(0.18))
 
+                    // UnevenRoundedRectangle: zero leading radius (the outer
+                    // clipShape(Capsule()) owns the left curve) and a clamped
+                    // trailing radius so the right cap is rounded without
+                    // becoming a vertical pill at very small fractions.
                     if applicable && timeFraction > 0 {
-                        Rectangle()
-                            .fill(ConcentricCirclesView.anthropicOrange.opacity(0.32))
-                            .frame(width: geo.size.width * timeFraction)
+                        let timeWidth = geo.size.width * timeFraction
+                        let timeR = min(geo.size.height / 2, timeWidth / 2)
+                        UnevenRoundedRectangle(
+                            topLeadingRadius: 0,
+                            bottomLeadingRadius: 0,
+                            bottomTrailingRadius: timeR,
+                            topTrailingRadius: timeR
+                        )
+                        .fill(ConcentricCirclesView.anthropicOrange.opacity(0.32))
+                        .frame(width: timeWidth)
                     }
 
                     if applicable {
-                        Rectangle()
-                            .fill(ConcentricCirclesView.anthropicOrange.opacity(0.55))
-                            .frame(width: geo.size.width * usageFraction)
+                        let fillWidth = geo.size.width * usageFraction
+                        let fillR = min(geo.size.height / 2, fillWidth / 2)
+                        UnevenRoundedRectangle(
+                            topLeadingRadius: 0,
+                            bottomLeadingRadius: 0,
+                            bottomTrailingRadius: fillR,
+                            topTrailingRadius: fillR
+                        )
+                        .fill(ConcentricCirclesView.anthropicOrange.opacity(0.55))
+                        .frame(width: fillWidth)
                     }
                 }
             }

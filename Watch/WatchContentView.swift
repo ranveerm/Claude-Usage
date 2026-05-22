@@ -4,7 +4,7 @@ struct WatchContentView: View {
     @EnvironmentObject private var receiver: WatchReceiver
 
     var body: some View {
-        WatchBody(usageData: receiver.usageData)
+        WatchBody(usageData: receiver.usageData, onRefresh: receiver.requestRefresh)
     }
 }
 
@@ -12,6 +12,7 @@ struct WatchContentView: View {
 
 private struct WatchBody: View {
     let usageData: UsageData?
+    var onRefresh: () async -> Void = {}
 
     var body: some View {
         // `needsLogin` means the iPhone explicitly broadcast a signed-out
@@ -20,7 +21,7 @@ private struct WatchBody: View {
         // back at the iPhone app rather than showing 0% rings.
         if let data = usageData, !data.needsLogin {
             TabView {
-                CirclesPage(data: data)
+                CirclesPage(data: data, onRefresh: onRefresh)
                 DetailPage(data: data)
             }
             .tabViewStyle(.verticalPage)
@@ -42,10 +43,25 @@ private struct WatchBody: View {
 
 private struct CirclesPage: View {
     let data: UsageData
+    var onRefresh: () async -> Void = {}
 
     var body: some View {
-        ConcentricCirclesView(input: circleInput(from: data))
-            .padding(4)
+        ScrollView {
+            VStack(spacing: 4) {
+                ConcentricCirclesView(input: circleInput(from: data))
+                    .padding(4)
+
+                if let refreshed = data.lastRefreshed {
+                    Text("Updated \(refreshed.formatted(.relative(presentation: .named)))")
+                        .font(rowResetFont)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
+            }
+        }
+        .refreshable {
+            await onRefresh()
+        }
     }
 }
 
@@ -78,14 +94,6 @@ private struct DetailPage: View {
                     resetsAt: data.allModelsWeeklyResetsAt,
                     systemImage: "shippingbox"
                 )
-
-                if let refreshed = data.lastRefreshed {
-                    Text("Updated \(refreshed.formatted(.relative(presentation: .named)))")
-                        .font(rowResetFont)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 4)
-                }
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 10)
