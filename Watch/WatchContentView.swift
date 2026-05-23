@@ -46,21 +46,29 @@ private struct CirclesPage: View {
     var onRefresh: () async -> Void = {}
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 4) {
-                ConcentricCirclesView(input: circleInput(from: data))
-                    .padding(4)
+        // GeometryReader pins the VStack to the available screen size so the
+        // ScrollView doesn't grant ConcentricCirclesView unbounded vertical
+        // space. Without this, the rings expand past the screen and push the
+        // "Updated" timestamp out of view, requiring the user to scroll.
+        // The ScrollView is still required for `.refreshable` to work.
+        GeometryReader { proxy in
+            ScrollView {
+                VStack(spacing: 15) {
+                    ConcentricCirclesView(input: circleInput(from: data))
+                        .padding(4)
 
-                if let refreshed = data.lastRefreshed {
-                    Text("Updated \(refreshed.formatted(.relative(presentation: .named)))")
-                        .font(rowResetFont)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                    if let refreshed = data.lastRefreshed {
+                        Text("Updated \(refreshed.formatted(.relative(presentation: .named)))")
+                            .font(rowResetFont)
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
                 }
+                .frame(width: proxy.size.width, height: proxy.size.height)
             }
-        }
-        .refreshable {
-            await onRefresh()
+            .refreshable {
+                await onRefresh()
+            }
         }
     }
 }
@@ -114,11 +122,48 @@ private let mockWatchData = UsageData(
     lastRefreshed: Date()
 )
 
+private let mockWatchDataStale = UsageData(
+    sessionUtilization: 22,
+    sessionResetsAt: Date().addingTimeInterval(4.2 * 3600),
+    sonnetWeeklyUtilization: 88,
+    sonnetWeeklyResetsAt: Date().addingTimeInterval(1.1 * 86400),
+    allModelsWeeklyUtilization: 71,
+    allModelsWeeklyResetsAt: Date().addingTimeInterval(2.0 * 86400),
+    lastRefreshed: Date().addingTimeInterval(-3 * 3600)
+)
+
+private let mockWatchDataNoTimestamp = UsageData(
+    sessionUtilization: 45,
+    sessionResetsAt: Date().addingTimeInterval(2.5 * 3600),
+    sonnetWeeklyUtilization: 60,
+    sonnetWeeklyResetsAt: Date().addingTimeInterval(3.0 * 86400),
+    allModelsWeeklyUtilization: 55,
+    allModelsWeeklyResetsAt: Date().addingTimeInterval(3.5 * 86400),
+    lastRefreshed: nil
+)
+
 #Preview("With Data") {
     WatchBody(usageData: mockWatchData)
 }
 
 #Preview("No Data") {
     WatchBody(usageData: nil)
+}
+
+#Preview("Circles - just refreshed") {
+    CirclesPage(data: mockWatchData)
+}
+
+#Preview("Circles - 3h old") {
+    CirclesPage(data: mockWatchDataStale)
+}
+
+#Preview("Circles - no timestamp") {
+    CirclesPage(data: mockWatchDataNoTimestamp)
+}
+
+#Preview("Circles - large dynamic type") {
+    CirclesPage(data: mockWatchData)
+        .environment(\.dynamicTypeSize, .accessibility2)
 }
 #endif

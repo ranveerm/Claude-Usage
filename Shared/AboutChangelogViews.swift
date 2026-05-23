@@ -26,6 +26,9 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.1.7", features: [
+            "Increased spacing between the rings and the \"Updated X ago\" timestamp on the watch rings page",
+        ]),
         ChangelogEntry(version: "1.1.6", features: [
             "Lock-screen Live Activity bars now render as true capsules at all fill levels, matching the fix applied to the Claude Design bar in 1.1.4",
             "Watch app rings page now shows the \"Updated X ago\" timestamp directly below the rings instead of at the bottom of the detail list",

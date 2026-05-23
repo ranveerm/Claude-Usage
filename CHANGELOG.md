@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.1.7
+- Increased spacing between the rings and the "Updated X ago" timestamp on the watch rings page
+
 ## 1.1.6
 - Lock-screen Live Activity bars now render as true capsules at all fill levels, matching the fix applied to the Claude Design bar in 1.1.4
 - Watch app rings page now shows the "Updated X ago" timestamp directly below the rings instead of at the bottom of the detail list
