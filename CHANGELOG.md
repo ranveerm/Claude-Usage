@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.1.9
+- Widened the macOS menu-bar popover slightly so the "All Models Weekly" row label no longer truncates to "All Models Wee..."
+
 ## 1.1.8
 - Replaced pull-to-refresh on the watch rings page with a tap gesture on the rings. Tapping dims the rings and shows a spinner while fresh usage is fetched from the paired iPhone
 

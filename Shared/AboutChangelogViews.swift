@@ -26,6 +26,9 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.1.9", features: [
+            "Widened the macOS menu-bar popover slightly so the \"All Models Weekly\" row label no longer truncates to \"All Models Wee...\"",
+        ]),
         ChangelogEntry(version: "1.1.8", features: [
             "Replaced pull-to-refresh on the watch rings page with a tap gesture on the rings. Tapping dims the rings and shows a spinner while fresh usage is fetched from the paired iPhone",
         ]),

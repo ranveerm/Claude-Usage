@@ -299,24 +299,45 @@ private struct PopoverOnBackground: View {
     }
 }
 
-#Preview("Interactive") {
-    UsagePopoverPreview()
+/// Side-by-side comparison of the popover sitting on the three vibrant
+/// desktop backgrounds the `.thickMaterial` blur most needs to cope with.
+/// Light desktop is kept as a separate preview (the everyday case) so a
+/// glance at the file's preview list still gives you a clean "neutral
+/// background" rendering without scanning a grid.
+private struct PopoverBackgroundComparison: View {
+    private let cases: [(label: String, color: Color)] = [
+        ("Dark desktop", Color(white: 0.12)),
+        ("Yellow/vibrant", Color(red: 0.95, green: 0.82, blue: 0.35)),
+        ("Deep blue", Color(red: 0.1, green: 0.2, blue: 0.5)),
+    ]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ForEach(cases, id: \.label) { item in
+                ZStack(alignment: .topLeading) {
+                    PopoverOnBackground(background: item.color, label: item.label)
+                    Text(item.label)
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(.regularMaterial, in: Capsule())
+                        .padding(8)
+                }
+            }
+        }
+    }
 }
 
-#Preview("Dark desktop") {
-    PopoverOnBackground(background: Color(white: 0.12), label: "Dark desktop")
+#Preview("Interactive") {
+    UsagePopoverPreview()
 }
 
 #Preview("Light desktop") {
     PopoverOnBackground(background: Color(white: 0.85), label: "Light desktop")
 }
 
-#Preview("Yellow/vibrant") {
-    PopoverOnBackground(background: Color(red: 0.95, green: 0.82, blue: 0.35), label: "Yellow/vibrant")
-}
-
-#Preview("Deep blue") {
-    PopoverOnBackground(background: Color(red: 0.1, green: 0.2, blue: 0.5), label: "Deep blue")
+#Preview("Background comparison (dark / yellow / deep blue)") {
+    PopoverBackgroundComparison()
 }
 #endif
 
@@ -385,7 +406,7 @@ struct UsagePopoverView: View {
             }
         }
         .padding(10)
-        .frame(width: 300)
+        .frame(width: 320)
         .background(.thickMaterial)
         // Park the SwiftUI `openSettings` action on the shared coordinator
         // so the AppKit right-click menu can reach it. Fires on every
