@@ -45,29 +45,40 @@ private struct CirclesPage: View {
     let data: UsageData
     var onRefresh: () async -> Void = {}
 
-    var body: some View {
-        // GeometryReader pins the VStack to the available screen size so the
-        // ScrollView doesn't grant ConcentricCirclesView unbounded vertical
-        // space. Without this, the rings expand past the screen and push the
-        // "Updated" timestamp out of view, requiring the user to scroll.
-        // The ScrollView is still required for `.refreshable` to work.
-        GeometryReader { proxy in
-            ScrollView {
-                VStack(spacing: 15) {
-                    ConcentricCirclesView(input: circleInput(from: data))
-                        .padding(4)
+    @State private var isRefreshing = false
 
-                    if let refreshed = data.lastRefreshed {
-                        Text("Updated \(refreshed.formatted(.relative(presentation: .named)))")
-                            .font(rowResetFont)
-                            .foregroundColor(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    }
+    var body: some View {
+        VStack(spacing: 15) {
+            // Tap anywhere on the rings to ask the iPhone for fresh usage.
+            // ZStack lets the spinner sit centred over the rings while
+            // they're dimmed during the round-trip. `.contentShape` makes
+            // the whole rectangle tappable, not just the stroke pixels of
+            // the rings themselves.
+            ZStack {
+                ConcentricCirclesView(input: circleInput(from: data))
+                    .padding(4)
+                    .opacity(isRefreshing ? 0.35 : 1)
+
+                if isRefreshing {
+                    ProgressView()
+                        .progressViewStyle(.circular)
                 }
-                .frame(width: proxy.size.width, height: proxy.size.height)
             }
-            .refreshable {
-                await onRefresh()
+            .contentShape(Rectangle())
+            .onTapGesture {
+                guard !isRefreshing else { return }
+                Task {
+                    isRefreshing = true
+                    await onRefresh()
+                    isRefreshing = false
+                }
+            }
+
+            if let refreshed = data.lastRefreshed {
+                Text("Updated \(refreshed.formatted(.relative(presentation: .named)))")
+                    .font(rowResetFont)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
             }
         }
     }
@@ -122,6 +133,16 @@ private let mockWatchData = UsageData(
     lastRefreshed: Date()
 )
 
+private let mockWatchDataElevenMinAgo = UsageData(
+    sessionUtilization: 69,
+    sessionResetsAt: Date().addingTimeInterval(2.9 * 3600),
+    sonnetWeeklyUtilization: 33,
+    sonnetWeeklyResetsAt: Date().addingTimeInterval(2.8 * 86400),
+    allModelsWeeklyUtilization: 42,
+    allModelsWeeklyResetsAt: Date().addingTimeInterval(3.2 * 86400),
+    lastRefreshed: Date().addingTimeInterval(-11 * 60)
+)
+
 private let mockWatchDataStale = UsageData(
     sessionUtilization: 22,
     sessionResetsAt: Date().addingTimeInterval(4.2 * 3600),
@@ -142,6 +163,27 @@ private let mockWatchDataNoTimestamp = UsageData(
     lastRefreshed: nil
 )
 
+/// Interactive preview wrapper. Holds the displayed data in `@State` so
+/// the tap-to-refresh gesture mutates `lastRefreshed` and the timestamp
+/// re-renders. Simulates the WatchConnectivity round-trip with a short
+/// sleep so the in-place spinner is visible for a moment before the new
+/// data lands. Confirms the gesture is wired up end-to-end without
+/// needing a paired phone.
+private struct CirclesPagePreviewWrapper: View {
+    @State private var data: UsageData
+
+    init(initial: UsageData) {
+        _data = State(initialValue: initial)
+    }
+
+    var body: some View {
+        CirclesPage(data: data) {
+            try? await Task.sleep(nanoseconds: 600_000_000)
+            data.lastRefreshed = Date()
+        }
+    }
+}
+
 #Preview("With Data") {
     WatchBody(usageData: mockWatchData)
 }
@@ -150,8 +192,8 @@ private let mockWatchDataNoTimestamp = UsageData(
     WatchBody(usageData: nil)
 }
 
-#Preview("Circles - just refreshed") {
-    CirclesPage(data: mockWatchData)
+#Preview("Circles - tap to refresh (11m ago → now)") {
+    CirclesPagePreviewWrapper(initial: mockWatchDataElevenMinAgo)
 }
 
 #Preview("Circles - 3h old") {

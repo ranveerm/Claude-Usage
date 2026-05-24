@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.1.8
+- Replaced pull-to-refresh on the watch rings page with a tap gesture on the rings. Tapping dims the rings and shows a spinner while fresh usage is fetched from the paired iPhone
+
 ## 1.1.7
 - Increased spacing between the rings and the "Updated X ago" timestamp on the watch rings page
 

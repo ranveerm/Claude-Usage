@@ -37,7 +37,7 @@ final class WatchReceiver: NSObject, ObservableObject, WCSessionDelegate {
     // MARK: - Watch-initiated refresh
 
     /// Asks the paired iPhone to fetch fresh usage and send it back.
-    /// Called from the pull-to-refresh gesture on the circles page.
+    /// Called from the tap gesture on the circles page.
     /// Returns immediately (no-op) if the iPhone is not reachable.
     func requestRefresh() async {
         guard WCSession.default.isReachable else { return }
