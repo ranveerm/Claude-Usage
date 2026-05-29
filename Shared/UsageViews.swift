@@ -83,6 +83,10 @@ struct UsageRowView: View {
     /// Defaults to `true` so existing call sites are unaffected.
     var isApplicable: Bool = true
 
+    /// Toggles between the approximate relative label ("in 2 days") and a
+    /// precise breakdown ("in 2 days and 12 hours") when the row is tapped.
+    @State private var showPrecise = false
+
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
             if let systemImage {
@@ -106,17 +110,49 @@ struct UsageRowView: View {
                 // if one snuck through we'd rather suppress it than imply
                 // this metric is ticking down.
                 if isApplicable, let resets = resetsAt {
-                    Text("Resets \(resets.formatted(.relative(presentation: .named)))")
-                        .font(rowResetFont)
-                        .foregroundColor(.secondary)
+                    // ZStack keeps both labels in the same slot so the row
+                    // height is stable. The cross-fade is driven purely by
+                    // opacity so there's no layout jump mid-animation.
+                    ZStack(alignment: .leading) {
+                        Text("Resets \(resets.formatted(.relative(presentation: .named)))")
+                            .opacity(showPrecise ? 0 : 1)
+                        Text(preciseResetLabel(for: resets))
+                            .opacity(showPrecise ? 1 : 0)
+                    }
+                    .font(rowResetFont)
+                    .foregroundColor(.secondary)
+                    .animation(.easeInOut(duration: 0.25), value: showPrecise)
                 }
             }
         }
         .opacity(isApplicable ? 1.0 : 0.65)
+        // Tap anywhere on the row to reveal / hide the precise breakdown.
+        // Guard means N/A rows (no reset date) are inert.
+        .contentShape(Rectangle())
+        .onTapGesture {
+            guard isApplicable, resetsAt != nil else { return }
+            withAnimation(.easeInOut(duration: 0.25)) { showPrecise.toggle() }
+        }
     }
 
     private var iconTint: Color {
         isApplicable ? ConcentricCirclesView.anthropicOrange.opacity(0.8) : .secondary
+    }
+
+    /// Returns a precise days-and-hours breakdown, e.g. "Resets in 2 days and 12 hours".
+    /// Falls back to shorter strings as the window shrinks.
+    private func preciseResetLabel(for date: Date) -> String {
+        let interval = max(0, date.timeIntervalSinceNow)
+        let days  = Int(interval / 86400)
+        let hours = Int(interval.truncatingRemainder(dividingBy: 86400) / 3600)
+        let dayWord  = days  == 1 ? "day"  : "days"
+        let hourWord = hours == 1 ? "hour" : "hours"
+        switch (days, hours) {
+        case (0, 0): return "Resets soon"
+        case (0, _): return "Resets in \(hours) \(hourWord)"
+        case (_, 0): return "Resets in \(days) \(dayWord)"
+        default:     return "Resets in \(days) \(dayWord) and \(hours) \(hourWord)"
+        }
     }
 }
 
@@ -397,3 +433,63 @@ struct ErrorDisplayView: View {
         .padding(.vertical, 8)
     }
 }
+
+// MARK: - Previews
+
+#if DEBUG
+/// Interactive wrapper that lets the preview confirm the tap-to-precise
+/// animation fires on both the approximate and detailed labels.
+private struct UsageRowPreviewWrapper: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Session row — tap shows hours only (short window)
+            UsageRowView(
+                label: "Session (5h)",
+                utilization: 57,
+                resetsAt: Date().addingTimeInterval(1.8 * 3600),
+                systemImage: "calendar.day.timeline.left"
+            )
+            Divider()
+            // Weekly row — tap shows "X days and Y hours"
+            UsageRowView(
+                label: "Sonnet Weekly",
+                utilization: 33,
+                resetsAt: Date().addingTimeInterval(2.5 * 86400),
+                systemImage: "calendar"
+            )
+            Divider()
+            // Weekly row — whole number of days remaining (the motivating case)
+            UsageRowView(
+                label: "All Models Weekly",
+                utilization: 42,
+                resetsAt: Date().addingTimeInterval(3 * 86400),
+                systemImage: "shippingbox"
+            )
+            Divider()
+            // N/A row — tap should be inert
+            UsageRowView(
+                label: "Sonnet Weekly",
+                utilization: 0,
+                resetsAt: nil,
+                systemImage: "calendar",
+                isApplicable: false
+            )
+        }
+        .padding()
+    }
+}
+
+#Preview("Row — tap to toggle precision") {
+    UsageRowPreviewWrapper()
+}
+
+#Preview("Row — dark mode") {
+    UsageRowPreviewWrapper()
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Row — large dynamic type") {
+    UsageRowPreviewWrapper()
+        .environment(\.dynamicTypeSize, .accessibility2)
+}
+#endif

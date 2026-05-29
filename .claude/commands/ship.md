@@ -1,3 +1,5 @@
+> **Deprecated:** Use `/ship-Xcode` instead. This project-local command is superseded by the global `/ship-Xcode` command in `~/.claude/commands/`.
+
 Build and test all platforms, bump the version, update the changelog,
 commit, tag, then push to origin. Stop immediately on any failure — do
 not proceed past the failing step.
