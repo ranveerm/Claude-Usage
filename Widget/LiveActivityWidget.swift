@@ -19,7 +19,8 @@ struct UsageLiveActivity: Widget {
             // Xcode draws only the inner content view, without the lock-
             // screen banner chrome around it. To verify the runtime look,
             // run on a simulator/device with an active session.
-            LiveActivityLockScreenView(state: context.state)
+            LiveActivityLockScreenView(state: context.state,
+                                       isStale: context.isStale)
                 .activityBackgroundTint(nil)
         } dynamicIsland: { context in
             // The user-chosen metric (Settings → Live Activities → Dynamic
@@ -55,27 +56,32 @@ struct UsageLiveActivity: Widget {
                     .padding(.trailing, 4)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    HStack(spacing: 10) {
-                        ExpandedMiniBar(
-                            label: "Session",
-                            utilization: context.state.sessionUtilization,
-                            applicable: true
-                        )
-                        ExpandedMiniBar(
-                            label: "Sonnet",
-                            utilization: context.state.sonnetWeeklyUtilization,
-                            applicable: context.state.sonnetApplicable
-                        )
-                        ExpandedMiniBar(
-                            label: "All Models",
-                            utilization: context.state.allModelsWeeklyUtilization,
-                            applicable: true
-                        )
-                        ExpandedMiniBar(
-                            label: "Design",
-                            utilization: context.state.designWeeklyUtilization,
-                            applicable: context.state.designApplicable
-                        )
+                    VStack(spacing: 4) {
+                        HStack(spacing: 10) {
+                            ExpandedMiniBar(
+                                label: "Session",
+                                utilization: context.state.sessionUtilization,
+                                applicable: true
+                            )
+                            ExpandedMiniBar(
+                                label: "Sonnet",
+                                utilization: context.state.sonnetWeeklyUtilization,
+                                applicable: context.state.sonnetApplicable
+                            )
+                            ExpandedMiniBar(
+                                label: "All Models",
+                                utilization: context.state.allModelsWeeklyUtilization,
+                                applicable: true
+                            )
+                            ExpandedMiniBar(
+                                label: "Design",
+                                utilization: context.state.designWeeklyUtilization,
+                                applicable: context.state.designApplicable
+                            )
+                        }
+                        if context.isStale {
+                            StaleHint()
+                        }
                     }
                     .padding(.horizontal, 10)
                     .padding(.bottom, 6)
@@ -133,6 +139,10 @@ struct UsageLiveActivity: Widget {
 /// affordances).
 struct LiveActivityLockScreenView: View {
     let state: ClaudeSessionAttributes.ContentState
+    /// `true` once the data is older than the freshness window. We can't
+    /// refresh the banner while the app is backgrounded, so rather than show
+    /// numbers that look current but aren't, we annotate them honestly.
+    var isStale: Bool = false
 
     var body: some View {
         // Just the content. No Rectangle, no `.background(.material)`.
@@ -176,9 +186,34 @@ struct LiveActivityLockScreenView: View {
                 timeProgress: timeElapsed(resetsAt: state.designWeeklyResetsAt,
                                           period: 7 * 86400)
             )
+            if isStale {
+                StaleHint()
+                    .padding(.horizontal, 10)
+                    .padding(.top, 1)
+            }
         }
         .padding(.horizontal)
         .padding(.vertical, 15)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+/// Small, honest "the numbers may be outdated" caption shown when a Live
+/// Activity's `staleDate` has passed. We surface this instead of silently
+/// displaying old data because the banner can only refresh while the app's
+/// process runs (foreground or a background-refresh slot), which may not
+/// have happened for a while.
+struct StaleHint: View {
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "clock.badge.exclamationmark")
+            Text("Not updated recently. Open the app to refresh.")
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .font(.caption2)
+        .foregroundStyle(.white.opacity(0.75))
+        .shadow(color: .black.opacity(0.28), radius: 1, x: 0, y: 0.5)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
@@ -447,6 +482,14 @@ private let proState = ClaudeSessionAttributes.ContentState(
     UsageLiveActivity()
 } contentStates: {
     proState
+}
+
+// Stale rendering. The ActivityKit `.content` preview can't force
+// `context.isStale`, so exercise the stale hint by rendering the lock
+// screen view directly over a dark surround that mimics the banner glass.
+#Preview("Lock Screen - stale") {
+    LiveActivityLockScreenView(state: previewState, isStale: true)
+        .background(.black)
 }
 
 // Dynamic Island - three presentations.

@@ -27,6 +27,22 @@ final class LiveActivityManager {
     /// signal the user has stepped away.
     private static let idleTimeout: TimeInterval = 10 * 60
 
+    /// How long after the last successful fetch the displayed numbers are
+    /// considered potentially outdated. Drives `ActivityContent.staleDate`,
+    /// which flips `context.isStale` so the banner can honestly mark itself
+    /// "not updated recently".
+    ///
+    /// **`staleDate` does NOT remove a Live Activity.** It only changes how
+    /// the banner *renders*. Removal happens solely through `endAll()` /
+    /// `endIfRunning()`, which require our process to be running (foreground
+    /// tick or `BGAppRefreshTask`). An earlier build set `staleDate` to the
+    /// idle deadline believing the system would auto-remove the banner. It
+    /// never did, which is why idle banners lingered for hours. 30 minutes
+    /// is two missed 15-minute refresh cycles: long enough not to nag a
+    /// still-active session the moment a single background refresh slips,
+    /// short enough to flag genuinely stale numbers.
+    private static let freshnessWindow: TimeInterval = 30 * 60
+
     private var currentActivity: Activity<ClaudeSessionAttributes>?
 
     /// App-group defaults shared with the iOS app and the widget extension,
@@ -165,16 +181,15 @@ final class LiveActivityManager {
             }
 
             Task {
-                // staleDate = lastPercentChangeAt + idleTimeout so the
-                // system removes the banner by itself if our process never
-                // runs again before the idle window closes. Previously this
-                // was set to sessionResetsAt (5 h out), which gave iOS no
-                // signal to remove an idle activity for hours.
-                // Falls back to sessionResetsAt only when the timestamp is
-                // somehow missing (should not happen in practice).
-                let staleDate = lastPercentChangeAt
-                    .map { $0.addingTimeInterval(Self.idleTimeout) }
-                    ?? data.sessionResetsAt
+                // staleDate marks *when the data goes stale*, not when the
+                // banner should be removed (the system never removes a
+                // banner just because its staleDate passed). Anchor it to
+                // the last successful fetch so `context.isStale` flips once
+                // the numbers are genuinely old, letting the view show a
+                // "not updated recently" hint. Actual removal stays the job
+                // of the idle/reset checks above via endAll()/endIfRunning().
+                let staleDate = (data.lastRefreshed ?? Date())
+                    .addingTimeInterval(Self.freshnessWindow)
                 await activity.update(
                     ActivityContent(state: state, staleDate: staleDate)
                 )
@@ -233,9 +248,10 @@ final class LiveActivityManager {
         resetsAt: Date?
     ) {
         do {
-            // lastPercentChangeAt is set to Date() just before start() is
-            // called, so idleTimeout from now is the correct stale date.
-            let staleDate = Date().addingTimeInterval(Self.idleTimeout)
+            // The session was just fetched, so the numbers are fresh now and
+            // go stale one freshness window out. See `freshnessWindow` for
+            // why staleDate is about rendering, not removal.
+            let staleDate = Date().addingTimeInterval(Self.freshnessWindow)
             let activity = try Activity.request(
                 attributes: ClaudeSessionAttributes(),
                 content: ActivityContent(state: state, staleDate: staleDate),

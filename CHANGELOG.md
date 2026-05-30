@@ -9,6 +9,10 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.1.12
+- The Live Activity now shows a "Not updated recently" hint on the Lock Screen and Dynamic Island when its usage figures have gone stale, so you can tell at a glance whether to open the app for fresh numbers instead of trusting outdated ones
+- Fixed the Live Activity fading to a stale, greyed-out look after only 10 minutes during an active session; staleness is now based on when the data was last fetched, so a still-running session stays clear as long as it keeps refreshing
+
 ## 1.1.11
 - Refined the tap-to-expand reset time: the word "Resets" is replaced by a clock symbol when expanded, the "in" prefix is removed, and days are floored rather than rounded so "3 days (and 12 hours)" always adds up correctly
 
