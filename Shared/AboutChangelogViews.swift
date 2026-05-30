@@ -26,6 +26,9 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.1.11", features: [
+            "Refined the tap-to-expand reset time: the word \"Resets\" is replaced by a clock symbol when expanded, the \"in\" prefix is removed, and days are floored rather than rounded so \"3 days (and 12 hours)\" always adds up correctly",
+        ]),
         ChangelogEntry(version: "1.1.10", features: [
             "Tap any usage row to reveal a precise time remaining (e.g. \"2 days and 12 hours\") instead of the rounded relative label. Tap again to return to the summary",
         ]),

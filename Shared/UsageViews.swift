@@ -83,8 +83,8 @@ struct UsageRowView: View {
     /// Defaults to `true` so existing call sites are unaffected.
     var isApplicable: Bool = true
 
-    /// Toggles between the approximate relative label ("in 2 days") and a
-    /// precise breakdown ("in 2 days and 12 hours") when the row is tapped.
+    /// When `true` the row shows the next-precision unit in parentheses
+    /// next to the relative label. Toggled by tapping the row.
     @State private var showPrecise = false
 
     var body: some View {
@@ -110,28 +110,38 @@ struct UsageRowView: View {
                 // if one snuck through we'd rather suppress it than imply
                 // this metric is ticking down.
                 if isApplicable, let resets = resetsAt {
-                    // ZStack keeps both labels in the same slot so the row
-                    // height is stable. The cross-fade is driven purely by
-                    // opacity so there's no layout jump mid-animation.
-                    ZStack(alignment: .leading) {
-                        Text("Resets \(resets.formatted(.relative(presentation: .named)))")
-                            .opacity(showPrecise ? 0 : 1)
-                        Text(preciseResetLabel(for: resets))
-                            .opacity(showPrecise ? 1 : 0)
+                    // Collapsed: "Resets in 2 days" (system formatter, rounds).
+                    // Expanded: "🔄 3 days (and 12 hours)" — custom floor-based
+                    // label so the parts add up and "in" is absent. The whole
+                    // collapsed/expanded blocks carry .transition(.opacity) so
+                    // SwiftUI cross-fades them; the parenthetical fades in
+                    // independently at the trailing end of the HStack.
+                    HStack(spacing: 4) {
+                        if showPrecise {
+                            Image(systemName: "arrow.trianglehead.clockwise")
+                                .imageScale(.small)
+                            Text(expandedMainLabel(for: resets))
+                        } else {
+                            Text("Resets \(resets.formatted(.relative(presentation: .named)))")
+                        }
+                        if showPrecise, let detail = preciseParenthetical(for: resets) {
+                            Text("(\(detail))")
+                                .transition(.opacity)
+                        }
                     }
                     .font(rowResetFont)
                     .foregroundColor(.secondary)
-                    .animation(.easeInOut(duration: 0.25), value: showPrecise)
+                    .animation(.easeInOut(duration: 0.3), value: showPrecise)
                 }
             }
         }
         .opacity(isApplicable ? 1.0 : 0.65)
-        // Tap anywhere on the row to reveal / hide the precise breakdown.
-        // Guard means N/A rows (no reset date) are inert.
+        // Tap anywhere on the row to reveal / hide the sub-unit breakdown.
+        // Guard means N/A rows and rows with no reset date are inert.
         .contentShape(Rectangle())
         .onTapGesture {
             guard isApplicable, resetsAt != nil else { return }
-            withAnimation(.easeInOut(duration: 0.25)) { showPrecise.toggle() }
+            withAnimation(.easeInOut(duration: 0.3)) { showPrecise.toggle() }
         }
     }
 
@@ -139,20 +149,33 @@ struct UsageRowView: View {
         isApplicable ? ConcentricCirclesView.anthropicOrange.opacity(0.8) : .secondary
     }
 
-    /// Returns a precise days-and-hours breakdown, e.g. "Resets in 2 days and 12 hours".
-    /// Falls back to shorter strings as the window shrinks.
-    private func preciseResetLabel(for date: Date) -> String {
+    /// Floored main label for the expanded state — "3 days", "5 hours",
+    /// "45 minutes". Uses integer division rather than the system formatter's
+    /// rounding, so 3.5 days yields "3 days" and the parenthetical "and 12 hours"
+    /// adds up correctly.
+    private func expandedMainLabel(for date: Date) -> String {
         let interval = max(0, date.timeIntervalSinceNow)
-        let days  = Int(interval / 86400)
-        let hours = Int(interval.truncatingRemainder(dividingBy: 86400) / 3600)
-        let dayWord  = days  == 1 ? "day"  : "days"
-        let hourWord = hours == 1 ? "hour" : "hours"
-        switch (days, hours) {
-        case (0, 0): return "Resets soon"
-        case (0, _): return "Resets in \(hours) \(hourWord)"
-        case (_, 0): return "Resets in \(days) \(dayWord)"
-        default:     return "Resets in \(days) \(dayWord) and \(hours) \(hourWord)"
-        }
+        let days = Int(interval / 86400)
+        if days > 0 { return "\(days) \(days == 1 ? "day" : "days")" }
+        let hours = Int(interval / 3600)
+        if hours > 0 { return "\(hours) \(hours == 1 ? "hour" : "hours")" }
+        let mins = Int(interval / 60)
+        return mins > 0 ? "\(mins) \(mins == 1 ? "minute" : "minutes")" : "soon"
+    }
+
+    /// Sub-unit detail shown in parentheses, e.g. "and 12 hours" when the main
+    /// label conveys days, or "and 45 minutes" when it conveys hours. Returns
+    /// `nil` when the interval is already exact at the displayed unit so the
+    /// parenthetical is suppressed (e.g. precisely 2 days with 0 hours left).
+    private func preciseParenthetical(for date: Date) -> String? {
+        let interval   = max(0, date.timeIntervalSinceNow)
+        let totalDays  = Int(interval / 86400)
+        let remHours   = Int(interval.truncatingRemainder(dividingBy: 86400) / 3600)
+        let totalHours = Int(interval / 3600)
+        let remMins    = Int(interval.truncatingRemainder(dividingBy: 3600) / 60)
+        if totalDays  > 0 { return remHours > 0 ? "and \(remHours) \(remHours == 1 ? "hour" : "hours")"     : nil }
+        if totalHours > 0 { return remMins  > 0 ? "and \(remMins) \(remMins  == 1 ? "minute" : "minutes")"  : nil }
+        return nil
     }
 }
 
@@ -437,12 +460,14 @@ struct ErrorDisplayView: View {
 // MARK: - Previews
 
 #if DEBUG
-/// Interactive wrapper that lets the preview confirm the tap-to-precise
-/// animation fires on both the approximate and detailed labels.
+/// Interactive wrapper that lets the preview confirm:
+/// - The clock icon replaces "Resets in"
+/// - Tapping reveals the parenthetical detail with an opacity + layout animation
+/// - N/A rows are inert
 private struct UsageRowPreviewWrapper: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Session row — tap shows hours only (short window)
+            // Session row — tap reveals "(and N minutes)" sub-unit
             UsageRowView(
                 label: "Session (5h)",
                 utilization: 57,
@@ -450,7 +475,7 @@ private struct UsageRowPreviewWrapper: View {
                 systemImage: "calendar.day.timeline.left"
             )
             Divider()
-            // Weekly row — tap shows "X days and Y hours"
+            // Weekly row — tap reveals "(and N hours)" — the motivating case
             UsageRowView(
                 label: "Sonnet Weekly",
                 utilization: 33,
@@ -458,7 +483,7 @@ private struct UsageRowPreviewWrapper: View {
                 systemImage: "calendar"
             )
             Divider()
-            // Weekly row — whole number of days remaining (the motivating case)
+            // Exactly whole days — parenthetical suppressed (nothing to add)
             UsageRowView(
                 label: "All Models Weekly",
                 utilization: 42,
@@ -479,7 +504,7 @@ private struct UsageRowPreviewWrapper: View {
     }
 }
 
-#Preview("Row — tap to toggle precision") {
+#Preview("Row — tap to reveal parenthetical") {
     UsageRowPreviewWrapper()
 }
 

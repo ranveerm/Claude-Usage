@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.1.11
+- Refined the tap-to-expand reset time: the word "Resets" is replaced by a clock symbol when expanded, the "in" prefix is removed, and days are floored rather than rounded so "3 days (and 12 hours)" always adds up correctly
+
 ## 1.1.10
 - Tap any usage row to reveal a precise time remaining (e.g. "2 days and 12 hours") instead of the rounded relative label. Tap again to return to the summary
 
