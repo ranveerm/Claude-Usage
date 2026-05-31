@@ -33,6 +33,10 @@ struct ClaudeUsageiOSApp: App {
             // launch; request a slot each time the user sends us to the
             // background so we're always on the rotation.
             if phase == .background {
+                // Schedule a background refresh targeted at the Live Activity's
+                // TTL expiry. The banner stays live (so the refresh can update
+                // it); if no refresh arrives in time it's dismissed on the next
+                // wake. See LiveActivityManager for the rolling-TTL model.
                 BackgroundRefresh.schedule()
             }
         }

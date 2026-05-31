@@ -1,132 +1,118 @@
 import ActivityKit
 import Foundation
+import UIKit
 
 /// Manages the Claude session Live Activity lifecycle.
 ///
 /// ## Lifecycle
 ///
-/// - **Start**: `update(with:)` is called on every successful fetch. When
-///   `sessionUtilization > 0` and no activity is running, a new one is
-///   started. Any pre-existing activity from a previous app launch is
-///   adopted on `init()` so updates resume seamlessly.
+/// - **Start**: `update(with:)` starts a banner when `sessionUtilization > 0`
+///   and none is running. Starting is foreground-only (ActivityKit forbids it
+///   from the background). A banner from a previous launch is adopted in
+///   `init()` so background refreshes keep updating it.
 ///
-/// - **Update**: called from both `ContentView.acceptData()` and the
-///   `BGAppRefreshTask` background handler so the lock screen stays fresh.
+/// - **Update**: called from `ContentView.acceptData()` (foreground) and the
+///   `BGAppRefreshTask` handler (background). Each call pushes fresh numbers
+///   and resets the rolling TTL (`ttl`). Updating an existing banner is
+///   permitted from the background, so a background refresh keeps it current.
 ///
-/// - **End**: when `sessionUtilization` drops to 0, the payload carries an
-///   error or signed-out state, or the percentage hasn't moved for
-///   `idleTimeout`. The user has stopped using Claude and the banner has
-///   nothing useful to add.
+/// - **End**: when the session ends (`sessionUtilization` drops to 0, or an
+///   error / signed-out payload arrives), when Live Activities are disabled,
+///   or when the TTL lapses with no further refresh. The TTL end is
+///   **best-effort**: it can only fire when iOS runs our code (a background
+///   wake or the app being reopened), so a fully dormant device may keep the
+///   banner until reopen or the system's own ~8-12h cap.
 @MainActor
 final class LiveActivityManager {
     static let shared = LiveActivityManager()
 
-    /// Dismiss the activity if the displayed percentage hasn't changed for
-    /// this long. Set at 10 minutes. A typical Claude reply burst moves
-    /// the bar by ≥1 %, so a flat percentage for 10 minutes is a reliable
-    /// signal the user has stepped away.
-    private static let idleTimeout: TimeInterval = 10 * 60
-
-    /// How long after the last successful fetch the displayed numbers are
-    /// considered potentially outdated. Drives `ActivityContent.staleDate`,
-    /// which flips `context.isStale` so the banner can honestly mark itself
-    /// "not updated recently".
+    /// Rolling time-to-live for the Live Activity. Every refresh (foreground
+    /// tick or background poll) pushes the removal deadline out to `now + ttl`.
+    /// If no refresh lands within the window the banner is dismissed on the
+    /// next wake that notices (see `dismissIfExpired`). Also drives
+    /// `ActivityContent.staleDate`, so the banner becomes `isStale` at the same
+    /// moment it becomes eligible for dismissal.
     ///
-    /// **`staleDate` does NOT remove a Live Activity.** It only changes how
-    /// the banner *renders*. Removal happens solely through `endAll()` /
-    /// `endIfRunning()`, which require our process to be running (foreground
-    /// tick or `BGAppRefreshTask`). An earlier build set `staleDate` to the
-    /// idle deadline believing the system would auto-remove the banner. It
-    /// never did, which is why idle banners lingered for hours. 30 minutes
-    /// is two missed 15-minute refresh cycles: long enough not to nag a
-    /// still-active session the moment a single background refresh slips,
-    /// short enough to flag genuinely stale numbers.
-    private static let freshnessWindow: TimeInterval = 30 * 60
+    /// **`staleDate` only restyles the banner, it never removes it.** Removal
+    /// is always our job via `endAll()` / `endIfRunning()`. That is why the TTL
+    /// is best-effort: it fires only when iOS runs our code. A dormant device
+    /// that gets no background wake keeps the banner until the app is reopened.
+    private static let ttl: TimeInterval = 15 * 60
 
     private var currentActivity: Activity<ClaudeSessionAttributes>?
 
     /// App-group defaults shared with the iOS app and the widget extension,
-    /// used to persist the idle-tracking timestamps. **Persistence is the
-    /// whole point**. iOS routinely kills suspended apps to reclaim
-    /// memory, and `BGAppRefreshTask` wakes a fresh process. If we kept
-    /// these as plain stored properties the timer would reset to zero on
-    /// every cold launch and the activity would never time out.
+    /// used to persist the TTL deadline. **Persistence is the whole point**:
+    /// iOS kills suspended apps to reclaim memory and `BGAppRefreshTask` wakes
+    /// a fresh process, so an in-memory deadline would reset to zero on every
+    /// cold launch and the banner would never time out.
     private let defaults: UserDefaults
 
-    /// The wall-clock time at which we last saw the rounded session
-    /// percentage change. Reset on start, on every observed change, and
-    /// cleared on end. `nil` while no activity is running. **Persisted**
-    /// to the app group so the clock keeps ticking across process
-    /// terminations.
-    private var lastPercentChangeAt: Date? {
+    /// Wall-clock time of the most recent push to the Live Activity (start or
+    /// update). The TTL deadline is `lastUpdateAt + ttl`. Reset on every
+    /// refresh, cleared on end, `nil` while nothing is running. **Persisted**
+    /// to the app group so the deadline survives the process being killed
+    /// between a background refresh and the wake that enforces the TTL.
+    private var lastUpdateAt: Date? {
         get {
-            let raw = defaults.double(forKey: Keys.lastPercentChangeAt)
+            let raw = defaults.double(forKey: Keys.lastUpdateAt)
             return raw > 0 ? Date(timeIntervalSince1970: raw) : nil
         }
         set {
             if let value = newValue {
-                defaults.set(value.timeIntervalSince1970, forKey: Keys.lastPercentChangeAt)
+                defaults.set(value.timeIntervalSince1970, forKey: Keys.lastUpdateAt)
             } else {
-                defaults.removeObject(forKey: Keys.lastPercentChangeAt)
-            }
-        }
-    }
-
-    /// Rounded session percentage at which the manager last idle-ended an
-    /// activity. While this is set, `update(with:)` refuses to restart an
-    /// activity at the same percentage. Otherwise the very next fetch
-    /// (foreground tick or BGAppRefreshTask) would silently re-create
-    /// what we just dismissed and the user would perceive the banner as
-    /// "never going away". Cleared when the percentage moves to a
-    /// different integer value (signalling real Claude usage has
-    /// resumed) or when the session resets / settings toggle off.
-    /// **Persisted** so suppression survives across cold launches.
-    private var suppressedAtPercent: Int? {
-        get { defaults.object(forKey: Keys.suppressedAtPercent) as? Int }
-        set {
-            if let value = newValue {
-                defaults.set(value, forKey: Keys.suppressedAtPercent)
-            } else {
-                defaults.removeObject(forKey: Keys.suppressedAtPercent)
+                defaults.removeObject(forKey: Keys.lastUpdateAt)
             }
         }
     }
 
     private init() {
         defaults = UserDefaults(suiteName: "group.com.ranveer.ClaudeYourRings") ?? .standard
-        // Adopt any activity that survived an app relaunch.
-        currentActivity = Activity<ClaudeSessionAttributes>.activities.first
+        // Adopt a banner that survived an app relaunch (warm, or a cold launch
+        // from a BGAppRefreshTask) so background refreshes can keep updating it.
+        // Never adopt an `.ended` one: pushing into a corpse is a no-op and
+        // would block starting a fresh banner.
+        currentActivity = Activity<ClaudeSessionAttributes>.activities.first {
+            $0.activityState == .active || $0.activityState == .stale
+        }
 
-        // If we adopted an activity but the persisted timestamp is missing
-        // (first launch under this new build, or the persisted store was
-        // cleared) seed it to now. We *don't* overwrite an existing value
-        // That's the whole point of persistence: the clock has to keep
-        // running even when the process didn't.
-        let seededNow = currentActivity != nil && lastPercentChangeAt == nil
-        if seededNow {
-            lastPercentChangeAt = Date()
+        // Seed the TTL clock if we adopted a banner but lost the timestamp
+        // (first launch on this build, or the store was cleared). Don't
+        // overwrite a live value: persistence exists so the deadline keeps
+        // running even when our process didn't.
+        if currentActivity != nil, lastUpdateAt == nil {
+            lastUpdateAt = Date()
         }
     }
 
     private enum Keys {
-        static let lastPercentChangeAt = "liveActivity.lastPercentChangeAt"
-        static let suppressedAtPercent  = "liveActivity.suppressedAtPercent"
+        static let lastUpdateAt = "liveActivity.lastUpdateAt"
     }
 
-    /// The wall-clock time at which the running Live Activity should be
-    /// ended due to inactivity, or `nil` if no activity is running.
-    /// Read directly from the app-group defaults so `BackgroundRefresh`
-    /// can call this without crossing to the main actor.
-    static func nextIdleCheckDate() -> Date? {
+    /// When the running banner's TTL lapses, or `nil` if nothing is running.
+    /// `BackgroundRefresh` targets its next wake here so iOS has the best
+    /// chance of either delivering a refresh (which resets the TTL) or letting
+    /// us dismiss the lapsed banner. Read straight from app-group defaults so
+    /// `BackgroundRefresh` can call it without hopping to the main actor.
+    static func nextTTLExpiry() -> Date? {
         let defaults = UserDefaults(suiteName: "group.com.ranveer.ClaudeYourRings") ?? .standard
-        let raw = defaults.double(forKey: Keys.lastPercentChangeAt)
+        let raw = defaults.double(forKey: Keys.lastUpdateAt)
         guard raw > 0 else { return nil }
-        return Date(timeIntervalSince1970: raw).addingTimeInterval(idleTimeout)
+        return Date(timeIntervalSince1970: raw).addingTimeInterval(ttl)
+    }
+
+    /// A Live Activity can only be *started* while the app is in the
+    /// foreground. We gate `start()` on this so a background caller (a
+    /// `BGAppRefreshTask` running `update()`) never attempts a request that
+    /// would fail.
+    private var isForeground: Bool {
+        UIApplication.shared.applicationState == .active
     }
 
     /// Call after every successful fetch to keep the Live Activity in sync.
+    /// Each call pushes fresh numbers and resets the rolling TTL.
     func update(with data: UsageData) {
-        let currentPct = Int(data.sessionUtilization.rounded())
         let isActive = data.sessionUtilization > 0
                     && data.error == nil
                     && !data.needsLogin
@@ -134,94 +120,70 @@ final class LiveActivityManager {
         let userAllowed = LiveActivitySettings.shared.enabled
 
         // System-level disable (Settings → Vibe Your Rings → Live Activities)
-        // OR in-app opt-out both short-circuit. If something is running when
-        // either turns off we tear it down rather than leave a stale banner.
+        // or in-app opt-out both short-circuit. Tear down anything running.
         guard systemAllowed, userAllowed else {
             endAll()
             return
         }
 
-        // Session naturally ended (rollover, error, or signed out): tear
-        // down anything still running and clear suppression so the next
-        // session can start fresh.
+        // Session ended (rollover, error, or signed out): tear down.
         if !isActive {
             endIfRunning(state: contentState(from: data))
-            suppressedAtPercent = nil
             return
-        }
-
-        // Idle-suppression gate. If we recently dismissed an activity due
-        // to inactivity, refuse to restart it at the same percentage.
-        // Only a real change in usage clears the suppression.
-        if let suppressed = suppressedAtPercent {
-            if currentPct == suppressed {
-                return
-            }
-            suppressedAtPercent = nil
         }
 
         let state = contentState(from: data)
 
         if let activity = currentActivity {
-            let previous = Int(activity.content.state.sessionUtilization.rounded())
-
-            if previous != currentPct {
-                // Percentage moved. User is actively using Claude.
-                lastPercentChangeAt = Date()
-            } else if let last = lastPercentChangeAt {
-                let elapsed = Date().timeIntervalSince(last)
-                if elapsed >= Self.idleTimeout {
-                    // No movement for the full idle window. Dismiss the
-                    // banner and remember the percentage so the next fetch
-                    // doesn't immediately recreate it.
-                    suppressedAtPercent = currentPct
-                    endAll()
-                    return
-                }
-            }
-
+            // A refresh arrived (foreground tick or background poll). Push the
+            // fresh numbers and reset the TTL. Updating an existing banner is
+            // allowed from the background, which is what lets a BGAppRefreshTask
+            // keep the lock screen current.
+            lastUpdateAt = Date()
+            let staleDate = Date().addingTimeInterval(Self.ttl)
             Task {
-                // staleDate marks *when the data goes stale*, not when the
-                // banner should be removed (the system never removes a
-                // banner just because its staleDate passed). Anchor it to
-                // the last successful fetch so `context.isStale` flips once
-                // the numbers are genuinely old, letting the view show a
-                // "not updated recently" hint. Actual removal stays the job
-                // of the idle/reset checks above via endAll()/endIfRunning().
-                let staleDate = (data.lastRefreshed ?? Date())
-                    .addingTimeInterval(Self.freshnessWindow)
                 await activity.update(
                     ActivityContent(state: state, staleDate: staleDate)
                 )
             }
         } else {
-            lastPercentChangeAt = Date()
+            // No running banner. Start one, foreground-only: ActivityKit forbids
+            // starting from the background. A background fetch that reaches here
+            // (e.g. after a TTL-dismiss) just waits for the next foreground
+            // fetch to start a fresh banner.
+            guard isForeground else { return }
+            lastUpdateAt = Date()
             start(state: state, resetsAt: data.sessionResetsAt)
         }
     }
 
-    /// Called when `LiveActivitySettings.enabled` toggles. On disable we
-    /// end any running activity immediately rather than waiting for the
-    /// next fetch. On enable we look at the cached payload and start
-    /// straight away if a session is active. This feels more responsive than
-    /// "your activity will appear next time we refresh".
-    func applyEnabledChange() {
-        let enabled = LiveActivitySettings.shared.enabled
-        if enabled {
-            // Clear suppression on explicit re-enable. The user has just
-            // opted back in, so any in-flight idle-end shouldn't keep them
-            // from seeing the activity on the next fetch.
-            suppressedAtPercent = nil
-            refreshFromCache()
-        } else {
+    /// Best-effort enforcement of the "dismiss when no refresh arrives within
+    /// `ttl`" rule. Called from a background wake that did **not** receive a
+    /// fresh refresh (e.g. the fetch failed). If the running banner's TTL has
+    /// lapsed, remove it. It can only fire when iOS actually wakes us: a fully
+    /// dormant device that gets no wake leaves the banner up until the app is
+    /// reopened or the system's own cap removes it.
+    func dismissIfExpired() {
+        guard currentActivity != nil, let last = lastUpdateAt else { return }
+        if Date().timeIntervalSince(last) >= Self.ttl {
             endAll()
-            suppressedAtPercent = nil
         }
     }
 
-    /// Re-encode the current state from `SharedDefaults` and push it. Used
-    /// when a settings change (e.g. the Dynamic Island metric picker) needs
-    /// to flow into a running activity without waiting for the next fetch.
+    /// Called when `LiveActivitySettings.enabled` toggles. On disable we end
+    /// any running activity immediately. On enable we look at the cached
+    /// payload and start straight away if a session is active.
+    func applyEnabledChange() {
+        if LiveActivitySettings.shared.enabled {
+            refreshFromCache()
+        } else {
+            endAll()
+        }
+    }
+
+    /// Re-encode the current state from `SharedDefaults` and push it. Used when
+    /// a settings change (e.g. the Dynamic Island metric picker) needs to flow
+    /// into a running activity without waiting for the next fetch.
     func refreshFromCache() {
         guard let cached = SharedDefaults.load() else { return }
         update(with: cached)
@@ -232,7 +194,7 @@ final class LiveActivityManager {
         guard let activity = currentActivity else { return }
         let frozenState = activity.content.state
         currentActivity = nil
-        lastPercentChangeAt = nil
+        lastUpdateAt = nil
         Task {
             await activity.end(
                 ActivityContent(state: frozenState, staleDate: nil),
@@ -247,11 +209,14 @@ final class LiveActivityManager {
         state: ClaudeSessionAttributes.ContentState,
         resetsAt: Date?
     ) {
+        // Clear any banner the system is still showing (e.g. a leftover from a
+        // previous run) so requesting a new activity never stacks two banners.
+        for stray in Activity<ClaudeSessionAttributes>.activities {
+            Task { await stray.end(nil, dismissalPolicy: .immediate) }
+        }
         do {
-            // The session was just fetched, so the numbers are fresh now and
-            // go stale one freshness window out. See `freshnessWindow` for
-            // why staleDate is about rendering, not removal.
-            let staleDate = Date().addingTimeInterval(Self.freshnessWindow)
+            // Fresh now, so the TTL / staleDate is one window out.
+            let staleDate = Date().addingTimeInterval(Self.ttl)
             let activity = try Activity.request(
                 attributes: ClaudeSessionAttributes(),
                 content: ActivityContent(state: state, staleDate: staleDate),
@@ -264,7 +229,7 @@ final class LiveActivityManager {
 
     private func endIfRunning(state: ClaudeSessionAttributes.ContentState) {
         guard let activity = currentActivity else { return }
-        lastPercentChangeAt = nil
+        lastUpdateAt = nil
         Task {
             await activity.end(
                 ActivityContent(state: state, staleDate: nil),

@@ -8,6 +8,11 @@ struct UsageEntry: TimelineEntry {
     /// renders a sign-in prompt instead of rings so the user isn't staring
     /// at stale percentages from the last fetch before sign-out.
     var needsLogin: Bool = false
+    /// True for a future-dated entry that the system reaches only when it has
+    /// stopped reloading the widget. The view swaps the rings for a
+    /// tap-to-refresh prompt so the user knows the numbers are old and a tap
+    /// (which opens the app) will refresh them. See `getTimeline`.
+    var needsRefresh: Bool = false
 }
 
 struct UsageTimelineProvider: TimelineProvider {
@@ -15,6 +20,13 @@ struct UsageTimelineProvider: TimelineProvider {
     /// system may defer past this, but won't reload sooner unless the
     /// app explicitly calls `WidgetCenter.shared.reloadAllTimelines()`.
     private static let reloadInterval: TimeInterval = 15 * 60
+
+    /// How old the displayed data may get before the widget flips to the
+    /// tap-to-refresh prompt. Set above `reloadInterval` so ordinary
+    /// system throttling (a late reload or two) doesn't trip the prompt;
+    /// it only fires once the widget has genuinely gone unrefreshed, which
+    /// is the dormant-app case the user hits.
+    private static let staleThreshold: TimeInterval = 45 * 60
 
     func placeholder(in context: Context) -> UsageEntry {
         UsageEntry(date: .now, input: CircleRendererInput(
@@ -40,6 +52,7 @@ struct UsageTimelineProvider: TimelineProvider {
     /// fallback when the fetch fails (no network, auth error, etc.).
     func getTimeline(in context: Context, completion: @escaping (Timeline<UsageEntry>) -> Void) {
         Task {
+            let now = Date()
             let fetched = await UsageService.shared.fetchUsage()
             let usable: UsageData?
 
@@ -55,11 +68,40 @@ struct UsageTimelineProvider: TimelineProvider {
                 usable = SharedDefaults.load()
             }
 
-            let next = Date().addingTimeInterval(Self.reloadInterval)
-            completion(Timeline(entries: [entry(from: usable)],
-                                policy: .after(next)))
+            // Signed out (or nothing cached yet): a single sign-in entry.
+            guard let data = usable, !data.needsLogin else {
+                let entry = UsageEntry(date: now, input: Self.zeroInput, needsLogin: true)
+                completion(Timeline(entries: [entry],
+                                    policy: .after(now.addingTimeInterval(Self.reloadInterval))))
+                return
+            }
+
+            // Self-staling timeline. We can't force iOS to reload a dormant
+            // widget, but we *can* hand it a future-dated entry that flips to
+            // the refresh prompt on its own. While iOS keeps reloading us the
+            // fresh "now" entry is always replaced before the stale one is
+            // reached; once it stops, the widget shows the prompt at `staleAt`
+            // with no code running. This is the widget analogue of the Live
+            // Activity's background TTL.
+            let staleAt = (data.lastRefreshed ?? now).addingTimeInterval(Self.staleThreshold)
+            let input = circleInput(from: data)
+
+            var entries: [UsageEntry] = [
+                UsageEntry(date: now, input: input, needsRefresh: now >= staleAt)
+            ]
+            if staleAt > now {
+                entries.append(UsageEntry(date: staleAt, input: input, needsRefresh: true))
+            }
+
+            // Nudge iOS to try a real refresh around the staleness boundary.
+            let reloadAt = max(staleAt, now.addingTimeInterval(Self.reloadInterval))
+            completion(Timeline(entries: entries, policy: .after(reloadAt)))
         }
     }
+
+    private static let zeroInput = CircleRendererInput(
+        sessionProgress: 0, sonnetProgress: 0, allModelsProgress: 0
+    )
 
     private func entry(from data: UsageData?) -> UsageEntry {
         guard let data else {
@@ -104,9 +146,27 @@ struct UsageWidgetView: View {
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                 }
+            } else if entry.needsRefresh {
+                refreshPromptBody
             } else {
                 ConcentricCirclesView(input: entry.input)
             }
+        }
+    }
+
+    // MARK: needsRefresh - tap-to-refresh prompt (data went stale)
+
+    private var refreshPromptBody: some View {
+        VStack(spacing: 8) {
+            RefreshGlyph()
+                .frame(width: 54, height: 54)
+                .foregroundStyle(ConcentricCirclesView.anthropicOrange)
+            Text("Tap to refresh")
+                .font(.caption.weight(.semibold))
+            Text("Open app for fresh usage")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
         }
     }
 
@@ -119,6 +179,10 @@ struct UsageWidgetView: View {
                 Image(systemName: "person.crop.circle.badge.questionmark")
                     .font(.title3)
                     .widgetAccentable()
+            } else if entry.needsRefresh {
+                RefreshGlyph()
+                    .padding(9)
+                    .widgetAccentable()
             } else {
                 LockScreenRingsView(input: entry.input)
                     .padding(5)
@@ -126,6 +190,28 @@ struct UsageWidgetView: View {
         }
     }
 
+}
+
+// MARK: - Refresh glyph
+
+/// Composite "tap to refresh" glyph: a circular refresh arrow with a tap
+/// gesture symbol nested at its centre. Shown when the widget's data has gone
+/// stale because iOS stopped reloading it. Tapping anywhere on a widget opens
+/// the app, which fetches fresh usage. Scales to its frame so it reads at both
+/// the systemSmall and accessoryCircular sizes.
+struct RefreshGlyph: View {
+    var body: some View {
+        GeometryReader { geo in
+            let d = min(geo.size.width, geo.size.height)
+            ZStack {
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: d * 0.9, weight: .semibold))
+                Image(systemName: "hand.tap.fill")
+                    .font(.system(size: d * 0.38, weight: .semibold))
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+        }
+    }
 }
 
 // MARK: - Lock Screen Rings View
@@ -228,10 +314,22 @@ private let signedOutEntry = UsageEntry(date: .now,
     needsLogin: true
 )
 
+private let needsRefreshEntry = UsageEntry(date: .now, input: CircleRendererInput(
+    sessionProgress: 0.69, sonnetProgress: 0.33, allModelsProgress: 0.42
+), needsRefresh: true)
+
 // Home screen
 #Preview("Home - normal", as: .systemSmall) {
     UsageWidget()
 } timeline: { previewEntry; nearLimitEntry }
+
+#Preview("Home - needs refresh", as: .systemSmall) {
+    UsageWidget()
+} timeline: { needsRefreshEntry }
+
+#Preview("Lock - circular (needs refresh)", as: .accessoryCircular) {
+    UsageWidget()
+} timeline: { needsRefreshEntry }
 
 // Lock screen - circular
 #Preview("Lock - circular (normal)", as: .accessoryCircular) {

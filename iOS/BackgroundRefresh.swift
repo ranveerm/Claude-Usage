@@ -39,15 +39,15 @@ enum BackgroundRefresh {
     /// most recent pending request, and our BG handler consumes it, so we
     /// need to re-queue continuously to stay in the rotation.
     ///
-    /// When a Live Activity idle timeout is approaching we ask for an
-    /// earlier wake-up so the in-app logic can end the banner precisely.
-    /// The system still treats `earliestBeginDate` as a floor, but a
-    /// targeted hint improves the chance we run before the staleDate fires.
+    /// When a Live Activity's TTL is approaching we ask for an earlier wake-up
+    /// so we can either refresh the banner (resetting the TTL) or dismiss it if
+    /// no fresh data arrives. The system still treats `earliestBeginDate` as a
+    /// floor, but a targeted hint improves the chance we run near the deadline.
     static func schedule() {
         let standard = Date().addingTimeInterval(15 * 60)
-        let idleExpiry = LiveActivityManager.nextIdleCheckDate()
+        let ttlExpiry = LiveActivityManager.nextTTLExpiry()
         let earliest: Date
-        if let expiry = idleExpiry, expiry < standard {
+        if let expiry = ttlExpiry, expiry < standard {
             earliest = expiry
         } else {
             earliest = standard
@@ -84,6 +84,10 @@ enum BackgroundRefresh {
                 )
                 task.setTaskCompleted(success: true)
             } else {
+                // No fresh data this wake. The Live Activity didn't get a
+                // refresh, so dismiss it if its TTL has lapsed (best-effort
+                // enforcement of the 15-minute no-refresh timeout).
+                await MainActor.run { LiveActivityManager.shared.dismissIfExpired() }
                 task.setTaskCompleted(success: false)
             }
         }

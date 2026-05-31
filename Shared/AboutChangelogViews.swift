@@ -26,6 +26,10 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.1.13", features: [
+            "The Live Activity now refreshes whenever the app gets a background update, and is set to dismiss itself about 15 minutes after the last update once updates stop arriving, so it no longer lingers on the Lock Screen showing old numbers",
+            "The home-screen and Lock Screen rings widgets now show a tap-to-refresh prompt when their data has gone stale (because iOS stopped refreshing them in the background) instead of silently displaying outdated rings. Tapping opens the app to refresh",
+        ]),
         ChangelogEntry(version: "1.1.12", features: [
             "The Live Activity now shows a \"Not updated recently\" hint on the Lock Screen and Dynamic Island when its usage figures have gone stale, so you can tell at a glance whether to open the app for fresh numbers instead of trusting outdated ones",
             "Fixed the Live Activity fading to a stale, greyed-out look after only 10 minutes during an active session; staleness is now based on when the data was last fetched, so a still-running session stays clear as long as it keeps refreshing",
