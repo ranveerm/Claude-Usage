@@ -14,20 +14,19 @@ struct UsageData: Codable {
     var allModelsWeeklyUtilization: Double = 0
     var allModelsWeeklyResetsAt: Date?
     /// Claude Design (Anthropic Labs) is metered separately from chat/Claude
-    /// Code on a weekly cycle. The API field isn't officially documented yet
-    /// (the help article notes Design "doesn't support audit logs or usage
-    /// tracking yet"); the parser speculatively reads `seven_day_design` and
-    /// sets `designWeeklyApplicable = false` when the block is absent. Same
-    /// graceful-degrade pattern Sonnet uses on Pro accounts.
+    /// Code on a weekly cycle, surfaced under the internal codename
+    /// `seven_day_omelette`. The parser reads it (with fallbacks) and derives
+    /// `designWeeklyApplicable` from whether the block is present.
     var designWeeklyUtilization: Double = 0
     var designWeeklyResetsAt: Date?
-    /// Optimistically defaults to `true` so the bar renders even when the
-    /// API response omits the design block. Anthropic's help article notes
-    /// Design "doesn't support audit logs or usage tracking yet", so we'd
-    /// rather show 0% honestly than hide the row behind an N/A. The parser
-    /// keeps it at `true` regardless of field presence; only an explicit
-    /// signal from elsewhere (future work) would set it `false`.
-    var designWeeklyApplicable: Bool = true
+    /// `true` only when the `/usage` response actually contains the Design
+    /// block. Anthropic appears to have removed the separate Design meter, so
+    /// the parser derives this from block presence (the same graceful-degrade
+    /// pattern Sonnet uses on Pro accounts) and every surface hides the Design
+    /// bar entirely when it's `false`, rather than showing a misleading 0%.
+    /// Defaults to `false` so an empty/placeholder payload doesn't flash a
+    /// stray Design bar before the first real fetch.
+    var designWeeklyApplicable: Bool = false
     var lastRefreshed: Date?
     var error: String?
     var needsLogin: Bool = false

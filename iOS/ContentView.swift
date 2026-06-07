@@ -199,20 +199,23 @@ struct ContentView: View {
                              utilization: usageData.allModelsWeeklyUtilization,
                              resetsAt: usageData.allModelsWeeklyResetsAt,
                              systemImage: "shippingbox")
-                Divider()
                 // Claude Design (Anthropic Labs) is a separate weekly quota with no ring
                 // mapping. Shown as a horizontal bar to set it apart visually
                 // from the ring-backed rows above. The bar height matches the
                 // individual ring stroke (rings are 250 pt × 0.13 ≈ 32 pt) so
-                // it reads as a fourth ring laid out flat.
-                UsageProgressBarView(label: "Claude Design",
-                                     utilization: usageData.designWeeklyUtilization,
-                                     resetsAt: usageData.designWeeklyResetsAt,
-                                     systemImage: "paintbrush.pointed.fill",
-                                     isApplicable: usageData.designWeeklyApplicable,
-                                     timeProgress: timeElapsed(resetsAt: usageData.designWeeklyResetsAt,
-                                                               period: 7 * 86400),
-                                     barHeight: 32)
+                // it reads as a fourth ring laid out flat. Hidden entirely
+                // (along with its divider) when the API omits the Design block.
+                if usageData.designWeeklyApplicable {
+                    Divider()
+                    UsageProgressBarView(label: "Claude Design",
+                                         utilization: usageData.designWeeklyUtilization,
+                                         resetsAt: usageData.designWeeklyResetsAt,
+                                         systemImage: "paintbrush.pointed.fill",
+                                         isApplicable: usageData.designWeeklyApplicable,
+                                         timeProgress: timeElapsed(resetsAt: usageData.designWeeklyResetsAt,
+                                                                   period: 7 * 86400),
+                                         barHeight: 32)
+                }
             }
             .padding(.horizontal)
 

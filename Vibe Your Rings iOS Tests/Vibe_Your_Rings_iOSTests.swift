@@ -60,6 +60,37 @@ final class UsageLogicTests_iOS: XCTestCase {
         XCTAssertNil(result.error)
     }
 
+    func testParseUsageResponse_designBlockPresent_isApplicable() throws {
+        let json = """
+        {
+          "five_hour":          { "utilization": 10.0 },
+          "seven_day_omelette": { "utilization": 42.0, "resets_at": "2026-04-22T12:00:00.000Z" }
+        }
+        """.data(using: .utf8)!
+
+        let result = UsageService.shared.parseUsageResponse(json)
+
+        XCTAssertTrue(result.designWeeklyApplicable)
+        XCTAssertEqual(result.designWeeklyUtilization, 42.0, accuracy: 0.001)
+        XCTAssertNotNil(result.designWeeklyResetsAt)
+    }
+
+    func testParseUsageResponse_designBlockAbsent_notApplicable() throws {
+        // Mirrors Anthropic dropping the Design meter: no design block present.
+        let json = """
+        {
+          "five_hour": { "utilization": 10.0 },
+          "seven_day": { "utilization": 20.0 }
+        }
+        """.data(using: .utf8)!
+
+        let result = UsageService.shared.parseUsageResponse(json)
+
+        XCTAssertFalse(result.designWeeklyApplicable)
+        XCTAssertEqual(result.designWeeklyUtilization, 0)
+        XCTAssertNil(result.designWeeklyResetsAt)
+    }
+
     func testIsCloudflareError_matches() {
         XCTAssertTrue(UsageService.isCloudflareError("Just a moment"))
         XCTAssertTrue(UsageService.isCloudflareError("x-cf-ray: foo"))

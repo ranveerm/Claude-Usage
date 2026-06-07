@@ -195,7 +195,11 @@ struct UsageInlineView: View {
                    + pair(icon: InlineMetric.allModelsWeekly.metricIcon,
                           progress: ringProgress(.allModelsWeekly))
 
-        if entry.metric == .allRingsAndDesign {
+        // Only append the Design pair when the API actually exposes the block.
+        // When absent, `.allRingsAndDesign` collapses to the same three pairs
+        // as `.allRings` rather than showing a stray empty Design indicator.
+        if entry.metric == .allRingsAndDesign,
+           entry.usage?.designWeeklyApplicable == true {
             result = result
                 + gap
                 + pair(icon: "paintbrush.pointed.fill",

@@ -44,6 +44,10 @@ private func makeUsageData(
         sonnetWeeklyResetsAt: fixedNow.addingTimeInterval(3 * 86400),
         allModelsWeeklyUtilization: allModels * 100,
         allModelsWeeklyResetsAt: fixedNow.addingTimeInterval(4 * 86400),
+        // Exercise the Design-bar-present layout. `designWeeklyApplicable` now
+        // defaults to `false` (the bar is hidden when the API omits the block),
+        // so a fixture that wants the bar must opt in explicitly.
+        designWeeklyApplicable: true,
         lastRefreshed: fixedNow,
         error: error,
         needsLogin: needsLogin

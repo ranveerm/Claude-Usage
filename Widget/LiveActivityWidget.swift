@@ -71,11 +71,14 @@ struct UsageLiveActivity: Widget {
                             utilization: context.state.allModelsWeeklyUtilization,
                             applicable: true
                         )
-                        ExpandedMiniBar(
-                            label: "Design",
-                            utilization: context.state.designWeeklyUtilization,
-                            applicable: context.state.designApplicable
-                        )
+                        // Hidden entirely when the API omits the Design block.
+                        if context.state.designApplicable {
+                            ExpandedMiniBar(
+                                label: "Design",
+                                utilization: context.state.designWeeklyUtilization,
+                                applicable: context.state.designApplicable
+                            )
+                        }
                     }
                     .padding(.horizontal, 10)
                     .padding(.bottom, 6)
@@ -167,15 +170,18 @@ struct LiveActivityLockScreenView: View {
                 timeProgress: timeElapsed(resetsAt: state.allModelsWeeklyResetsAt,
                                           period: 7 * 86400)
             )
-            LiveActivityBarRow(
-                label: "Claude Design",
-                utilization: state.designWeeklyUtilization,
-                resetsAt: state.designWeeklyResetsAt,
-                systemImage: "paintbrush.pointed.fill",
-                applicable: state.designApplicable,
-                timeProgress: timeElapsed(resetsAt: state.designWeeklyResetsAt,
-                                          period: 7 * 86400)
-            )
+            // Hidden entirely when the API omits the Design block.
+            if state.designApplicable {
+                LiveActivityBarRow(
+                    label: "Claude Design",
+                    utilization: state.designWeeklyUtilization,
+                    resetsAt: state.designWeeklyResetsAt,
+                    systemImage: "paintbrush.pointed.fill",
+                    applicable: state.designApplicable,
+                    timeProgress: timeElapsed(resetsAt: state.designWeeklyResetsAt,
+                                              period: 7 * 86400)
+                )
+            }
         }
         .padding(.horizontal)
         .padding(.vertical, 15)

@@ -219,7 +219,12 @@ final class UsageService {
             allModelsWeeklyResetsAt: weekly.resetsAt,
             designWeeklyUtilization: designUtil,
             designWeeklyResetsAt: designReset,
-            designWeeklyApplicable: true,
+            // Applicable only when the response actually carries a Design
+            // block. Anthropic appears to have removed the separate Design
+            // meter from `/usage`; deriving this from presence (rather than
+            // hardcoding `true`) lets the UI hide the bar instead of showing a
+            // misleading 0%. Same graceful-degrade pattern as Sonnet above.
+            designWeeklyApplicable: designBlock != nil,
             lastRefreshed: Date()
         )
     }

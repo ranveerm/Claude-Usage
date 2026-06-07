@@ -440,19 +440,22 @@ struct UsagePopoverView: View {
                 }
             }
 
-            Divider()
-
             // Claude Design (Anthropic Labs) is a separate weekly quota that
             // doesn't fit the concentric-ring metaphor. Renders as a full-
             // width horizontal bar below the ring/row block so it's visually
-            // distinct without competing for the same affordance.
-            UsageProgressBarView(label: "Claude Design",
-                                 utilization: usageData.designWeeklyUtilization,
-                                 resetsAt: usageData.designWeeklyResetsAt,
-                                 systemImage: "paintbrush.pointed.fill",
-                                 isApplicable: usageData.designWeeklyApplicable,
-                                 timeProgress: timeElapsed(resetsAt: usageData.designWeeklyResetsAt,
-                                                           period: 7 * 86400))
+            // distinct without competing for the same affordance. Hidden
+            // entirely (with its leading divider) when the API omits the block.
+            if usageData.designWeeklyApplicable {
+                Divider()
+
+                UsageProgressBarView(label: "Claude Design",
+                                     utilization: usageData.designWeeklyUtilization,
+                                     resetsAt: usageData.designWeeklyResetsAt,
+                                     systemImage: "paintbrush.pointed.fill",
+                                     isApplicable: usageData.designWeeklyApplicable,
+                                     timeProgress: timeElapsed(resetsAt: usageData.designWeeklyResetsAt,
+                                                               period: 7 * 86400))
+            }
 
             Divider()
 
