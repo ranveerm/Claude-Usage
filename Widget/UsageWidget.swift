@@ -159,7 +159,7 @@ struct UsageWidgetView: View {
     private var refreshPromptBody: some View {
         VStack(spacing: 8) {
             RefreshGlyph()
-                .frame(width: 54, height: 54)
+                .frame(width: 64, height: 64)
                 .foregroundStyle(ConcentricCirclesView.anthropicOrange)
             Text("Tap to refresh")
                 .font(.caption.weight(.semibold))
@@ -181,7 +181,7 @@ struct UsageWidgetView: View {
                     .widgetAccentable()
             } else if entry.needsRefresh {
                 RefreshGlyph()
-                    .padding(9)
+                    .padding(6)
                     .widgetAccentable()
             } else {
                 LockScreenRingsView(input: entry.input)
@@ -204,10 +204,19 @@ struct RefreshGlyph: View {
         GeometryReader { geo in
             let d = min(geo.size.width, geo.size.height)
             ZStack {
+                // Circular arrow: thin, frame-filling, and subdued so the
+                // finger reads as the focal element. Opacity (rather than a
+                // fixed colour) keeps it subdued on both the orange home-screen
+                // tint and the lock screen's vibrancy.
                 Image(systemName: "arrow.clockwise")
-                    .font(.system(size: d * 0.9, weight: .semibold))
+                    .font(.system(size: d, weight: .light))
+                    .opacity(0.45)
+                // Finger seated in the clear opening below the arrowhead, and
+                // nudged down-and-right so it sits in the opening without
+                // overlapping the inward-jutting arrowhead.
                 Image(systemName: "hand.tap.fill")
-                    .font(.system(size: d * 0.38, weight: .semibold))
+                    .font(.system(size: d * 0.29, weight: .semibold))
+                    .offset(x: d * 0.05, y: d * 0.19)
             }
             .frame(width: geo.size.width, height: geo.size.height)
         }
