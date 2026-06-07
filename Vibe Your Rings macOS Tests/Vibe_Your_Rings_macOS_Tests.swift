@@ -23,6 +23,17 @@ import AppKit
 import SnapshotTesting
 @testable import Vibe_Your_Rings
 
+// Image snapshots use a small tolerance so imperceptible host-rendering jitter
+// (antialiasing, font hinting, GPU state) doesn't cause spurious failures,
+// while real visual changes still fail. macOS `NSView` image snapshots are not
+// bit-stable across machines/render states; exact matching made the suite
+// flaky (a blank diff still failed on sub-pixel deltas).
+private extension Snapshotting where Value == NSView, Format == NSImage {
+    static var tolerantImage: Snapshotting {
+        .image(precision: 0.99, perceptualPrecision: 0.98)
+    }
+}
+
 // MARK: - Fixtures
 
 /// Anchored to a fixed point in time so snapshot output is bit-stable.
@@ -207,19 +218,19 @@ final class PopoverSnapshotTests: XCTestCase {
     func testPopover_normalState() {
         assertSnapshot(of: hosted(makePopover(state: .normal),
                                   size: CGSize(width: 320, height: 160)),
-                       as: .image)
+                       as: .tolerantImage)
     }
 
     func testPopover_nearLimit() {
         assertSnapshot(of: hosted(makePopover(state: .nearLimit),
                                   size: CGSize(width: 320, height: 160)),
-                       as: .image)
+                       as: .tolerantImage)
     }
 
     func testPopover_empty() {
         assertSnapshot(of: hosted(makePopover(state: .empty),
                                   size: CGSize(width: 320, height: 160)),
-                       as: .image)
+                       as: .tolerantImage)
     }
 
     // Pro tier: Sonnet weekly metric isn't available. The middle ring
@@ -237,7 +248,7 @@ final class PopoverSnapshotTests: XCTestCase {
             onLogin: {}
         )
         assertSnapshot(of: hosted(view, size: CGSize(width: 320, height: 160)),
-                       as: .image)
+                       as: .tolerantImage)
     }
 
     // MARK: Edge states
@@ -251,7 +262,7 @@ final class PopoverSnapshotTests: XCTestCase {
             onLogin: {}
         )
         assertSnapshot(of: hosted(view, size: CGSize(width: 320, height: 220)),
-                       as: .image)
+                       as: .tolerantImage)
     }
 
     func testPopover_error() {
@@ -263,7 +274,7 @@ final class PopoverSnapshotTests: XCTestCase {
             onLogin: {}
         )
         assertSnapshot(of: hosted(view, size: CGSize(width: 320, height: 220)),
-                       as: .image)
+                       as: .tolerantImage)
     }
 
     // MARK: Backgrounds (re the .regularMaterial fix)
@@ -271,13 +282,13 @@ final class PopoverSnapshotTests: XCTestCase {
     func testPopover_onYellowDesktop() {
         assertSnapshot(of: hosted(popoverOver(.yellow),
                                   size: CGSize(width: 360, height: 200)),
-                       as: .image)
+                       as: .tolerantImage)
     }
 
     func testPopover_onDarkDesktop() {
         assertSnapshot(of: hosted(popoverOver(Color(white: 0.12)),
                                   size: CGSize(width: 360, height: 200)),
-                       as: .image)
+                       as: .tolerantImage)
     }
 
     // MARK: Helpers
