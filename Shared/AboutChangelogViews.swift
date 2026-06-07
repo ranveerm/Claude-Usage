@@ -26,6 +26,10 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.2.0", features: [
+            "The Claude Design usage bar now disappears when Anthropic stops reporting it in the usage API, instead of showing a misleading 0%. (Anthropic recently removed the separate Claude Design meter, so the bar would otherwise sit empty.)",
+            "Refined the widget's tap-to-refresh prompt with a cleaner, more subtle refresh icon",
+        ]),
         ChangelogEntry(version: "1.1.13", features: [
             "The Live Activity now refreshes whenever the app gets a background update, and is set to dismiss itself about 15 minutes after the last update once updates stop arriving, so it no longer lingers on the Lock Screen showing old numbers",
             "The home-screen and Lock Screen rings widgets now show a tap-to-refresh prompt when their data has gone stale (because iOS stopped refreshing them in the background) instead of silently displaying outdated rings. Tapping opens the app to refresh",

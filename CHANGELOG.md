@@ -9,6 +9,10 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.2.0
+- The Claude Design usage bar now disappears when Anthropic stops reporting it in the usage API, instead of showing a misleading 0%. (Anthropic recently removed the separate Claude Design meter, so the bar would otherwise sit empty.)
+- Refined the widget's tap-to-refresh prompt with a cleaner, more subtle refresh icon
+
 ## 1.1.13
 - The Live Activity now refreshes whenever the app gets a background update, and is set to dismiss itself about 15 minutes after the last update once updates stop arriving, so it no longer lingers on the Lock Screen showing old numbers
 - The home-screen and Lock Screen rings widgets now show a tap-to-refresh prompt when their data has gone stale (because iOS stopped refreshing them in the background) instead of silently displaying outdated rings. Tapping opens the app to refresh
