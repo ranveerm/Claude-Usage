@@ -60,6 +60,37 @@ final class UsageLogicTests_iOS: XCTestCase {
         XCTAssertNil(result.error)
     }
 
+    func testParseUsageResponse_fableKey_readIntoMiddleRing() throws {
+        // The middle-ring weekly cap ("Fable only") is read from the new
+        // `seven_day_fable` key and preferred over the legacy sonnet key.
+        // It still populates the internal sonnetWeekly* fields.
+        let json = """
+        {
+          "five_hour":        { "utilization": 10.0 },
+          "seven_day_fable":  { "utilization": 61.0, "resets_at": "2026-04-28T00:00:00.000Z" },
+          "seven_day_sonnet": { "utilization": 5.0 }
+        }
+        """.data(using: .utf8)!
+
+        let result = UsageService.shared.parseUsageResponse(json)
+
+        XCTAssertTrue(result.sonnetWeeklyApplicable)
+        XCTAssertEqual(result.sonnetWeeklyUtilization, 61.0, accuracy: 0.001)
+        XCTAssertNotNil(result.sonnetWeeklyResetsAt)
+    }
+
+    func testParseUsageResponse_legacySonnetKey_stillRead() throws {
+        // Until the key migrates, the middle ring falls back to seven_day_sonnet.
+        let json = """
+        { "five_hour": { "utilization": 10.0 }, "seven_day_sonnet": { "utilization": 44.0 } }
+        """.data(using: .utf8)!
+
+        let result = UsageService.shared.parseUsageResponse(json)
+
+        XCTAssertTrue(result.sonnetWeeklyApplicable)
+        XCTAssertEqual(result.sonnetWeeklyUtilization, 44.0, accuracy: 0.001)
+    }
+
     func testParseUsageResponse_designBlockPresent_isApplicable() throws {
         let json = """
         {

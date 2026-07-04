@@ -100,10 +100,10 @@ private struct DetailPage: View {
                 )
                 Divider()
                 UsageRowView(
-                    label: "Sonnet Weekly",
+                    label: "Fable Only",
                     utilization: data.sonnetWeeklyUtilization,
                     resetsAt: data.sonnetWeeklyResetsAt,
-                    systemImage: "calendar",
+                    systemImage: "book",
                     isApplicable: data.sonnetWeeklyApplicable
                 )
                 Divider()

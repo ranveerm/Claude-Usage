@@ -189,10 +189,10 @@ struct ContentView: View {
                              resetsAt: usageData.sessionResetsAt,
                              systemImage: "calendar.day.timeline.left")
                 Divider()
-                UsageRowView(label: "Sonnet Weekly",
+                UsageRowView(label: "Fable Only",
                              utilization: usageData.sonnetWeeklyUtilization,
                              resetsAt: usageData.sonnetWeeklyResetsAt,
-                             systemImage: "calendar",
+                             systemImage: "book",
                              isApplicable: usageData.sonnetWeeklyApplicable)
                 Divider()
                 UsageRowView(label: "All Models Weekly",
@@ -550,10 +550,10 @@ private struct ContentViewPreview: View {
                                      resetsAt: mockData.sessionResetsAt,
                                      systemImage: "calendar.day.timeline.left")
                         Divider()
-                        UsageRowView(label: "Sonnet Weekly",
+                        UsageRowView(label: "Fable Only",
                                      utilization: mockData.sonnetWeeklyUtilization,
                                      resetsAt: mockData.sonnetWeeklyResetsAt,
-                                     systemImage: "calendar",
+                                     systemImage: "book",
                                      isApplicable: mockData.sonnetWeeklyApplicable)
                         Divider()
                         UsageRowView(label: "All Models Weekly",
@@ -591,9 +591,9 @@ private struct ContentViewPreview: View {
                         sliderRow("Session Usage",    value: $sessionUsage)
                         sliderRow("Session Time",     value: $sessionTime)
                         Divider()
-                        sliderRow("Sonnet Usage",     value: $sonnetUsage)
+                        sliderRow("Fable Usage",     value: $sonnetUsage)
                             .disabled(tier == .pro)
-                        sliderRow("Sonnet Time",      value: $sonnetTime)
+                        sliderRow("Fable Time",      value: $sonnetTime)
                             .disabled(tier == .pro)
                         Divider()
                         sliderRow("All Models Usage", value: $allModelsUsage)

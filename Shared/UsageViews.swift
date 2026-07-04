@@ -477,10 +477,10 @@ private struct UsageRowPreviewWrapper: View {
             Divider()
             // Weekly row — tap reveals "(and N hours)" — the motivating case
             UsageRowView(
-                label: "Sonnet Weekly",
+                label: "Fable Only",
                 utilization: 33,
                 resetsAt: Date().addingTimeInterval(2.5 * 86400),
-                systemImage: "calendar"
+                systemImage: "book"
             )
             Divider()
             // Exactly whole days — parenthetical suppressed (nothing to add)
@@ -493,10 +493,10 @@ private struct UsageRowPreviewWrapper: View {
             Divider()
             // N/A row — tap should be inert
             UsageRowView(
-                label: "Sonnet Weekly",
+                label: "Fable Only",
                 utilization: 0,
                 resetsAt: nil,
-                systemImage: "calendar",
+                systemImage: "book",
                 isApplicable: false
             )
         }

@@ -46,7 +46,7 @@ enum DynamicIslandMetric: String, CaseIterable, Codable, Identifiable, Hashable 
     var label: String {
         switch self {
         case .session:         "Session (5h)"
-        case .sonnetWeekly:    "Sonnet Weekly"
+        case .sonnetWeekly:    "Fable Only"
         case .allModelsWeekly: "All Models Weekly"
         case .design:          "Claude Design"
         }
@@ -56,7 +56,7 @@ enum DynamicIslandMetric: String, CaseIterable, Codable, Identifiable, Hashable 
     var systemImage: String {
         switch self {
         case .session:         "calendar.day.timeline.left"
-        case .sonnetWeekly:    "calendar"
+        case .sonnetWeekly:    "book"
         case .allModelsWeekly: "shippingbox"
         case .design:          "paintbrush.pointed.fill"
         }

@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.3.0
+- The middle usage ring is now labelled "Fable Only" with a book icon (it was "Sonnet Weekly"), reflecting Anthropic's change to this weekly limit, and the app now reads the Fable weekly figure from the usage API
+
 ## 1.2.0
 - The Claude Design usage bar now disappears when Anthropic stops reporting it in the usage API, instead of showing a misleading 0%. (Anthropic recently removed the separate Claude Design meter, so the bar would otherwise sit empty.)
 - Refined the widget's tap-to-refresh prompt with a cleaner, more subtle refresh icon

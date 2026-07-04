@@ -153,7 +153,7 @@ struct SettingsView: View {
             // The Sonnet-weekly ring is Max-only; leave the toggle visible
             // on Pro accounts but it'll simply never fire (evaluator skips
             // rings where `sonnetWeeklyApplicable == false`).
-            Toggle("Sonnet weekly",       isOn: $settings.paceAlertSonnet)
+            Toggle("Fable Only",       isOn: $settings.paceAlertSonnet)
             Toggle("All models weekly",   isOn: $settings.paceAlertAllModels)
         } header: {
             Text("Pace alerts")

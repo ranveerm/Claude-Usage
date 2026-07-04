@@ -12,7 +12,7 @@ enum UsageRing: String, CaseIterable {
     var label: String {
         switch self {
         case .session:   return "Current Session"
-        case .sonnet:    return "Sonnet weekly"
+        case .sonnet:    return "Fable Only"
         case .allModels: return "All-models weekly"
         }
     }

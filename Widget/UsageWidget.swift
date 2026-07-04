@@ -349,7 +349,7 @@ private let needsRefreshEntry = UsageEntry(date: .now, input: CircleRendererInpu
     UsageWidget()
 } timeline: { nearLimitEntry }
 
-#Preview("Lock - circular (Pro, no Sonnet)", as: .accessoryCircular) {
+#Preview("Lock - circular (Pro, no Fable)", as: .accessoryCircular) {
     UsageWidget()
 } timeline: { proEntry }
 

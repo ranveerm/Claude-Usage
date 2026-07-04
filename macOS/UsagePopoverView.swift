@@ -213,9 +213,9 @@ private struct UsagePopoverPreview: View {
                 sliderRow("Session Usage",     value: $sessionUsage)
                 sliderRow("Session Time",      value: $sessionTime)
                 Divider()
-                sliderRow("Sonnet Usage",      value: $sonnetUsage)
+                sliderRow("Fable Usage",      value: $sonnetUsage)
                     .disabled(tier == .pro)
-                sliderRow("Sonnet Time",       value: $sonnetTime)
+                sliderRow("Fable Time",       value: $sonnetTime)
                     .disabled(tier == .pro)
                 Divider()
                 sliderRow("All Models Usage",  value: $allModelsUsage)
@@ -428,10 +428,10 @@ struct UsagePopoverView: View {
                                  utilization: usageData.sessionUtilization,
                                  resetsAt: usageData.sessionResetsAt,
                                  systemImage: "calendar.day.timeline.left")
-                    UsageRowView(label: "Sonnet Weekly",
+                    UsageRowView(label: "Fable Only",
                                  utilization: usageData.sonnetWeeklyUtilization,
                                  resetsAt: usageData.sonnetWeeklyResetsAt,
-                                 systemImage: "calendar",
+                                 systemImage: "book",
                                  isApplicable: usageData.sonnetWeeklyApplicable)
                     UsageRowView(label: "All Models Weekly",
                                  utilization: usageData.allModelsWeeklyUtilization,

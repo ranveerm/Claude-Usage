@@ -24,7 +24,7 @@ enum InlineMetric: String, AppEnum {
 
     static let caseDisplayRepresentations: [InlineMetric: DisplayRepresentation] = [
         .session:           "Session (5h)",
-        .sonnetWeekly:      "Sonnet Weekly",
+        .sonnetWeekly:      "Fable Only",
         .allModelsWeekly:   "All Models Weekly",
         .allRings:          "All Rings",
         .allRingsAndDesign: "All Rings + Design",
@@ -49,7 +49,7 @@ enum InlineMetric: String, AppEnum {
     var metricIcon: String {
         switch self {
         case .session:                          "calendar.day.timeline.left"
-        case .sonnetWeekly:                     "calendar"
+        case .sonnetWeekly:                     "book"
         case .allModelsWeekly:                  "shippingbox"
         case .allRings, .allRingsAndDesign:     ""
         }
@@ -62,7 +62,7 @@ enum InlineMetric: String, AppEnum {
     var displayLabel: String {
         switch self {
         case .session:                          "Session"
-        case .sonnetWeekly:                     "Sonnet Weekly"
+        case .sonnetWeekly:                     "Fable Only"
         case .allModelsWeekly:                  "All Models Weekly"
         case .allRings, .allRingsAndDesign:     ""
         }
@@ -302,7 +302,7 @@ private let inlineNearLimitUsage = UsageData(
     InlineUsageEntry(date: .now, usage: inlinePreviewUsage, metric: .session)
 }
 
-#Preview("Inline - Sonnet Weekly", as: .accessoryInline) {
+#Preview("Inline - Fable Only", as: .accessoryInline) {
     UsageInlineWidget()
 } timeline: {
     InlineUsageEntry(date: .now, usage: inlinePreviewUsage, metric: .sonnetWeekly)

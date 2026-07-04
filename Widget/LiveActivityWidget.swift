@@ -62,7 +62,7 @@ struct UsageLiveActivity: Widget {
                             applicable: true
                         )
                         ExpandedMiniBar(
-                            label: "Sonnet",
+                            label: "Fable",
                             utilization: context.state.sonnetWeeklyUtilization,
                             applicable: context.state.sonnetApplicable
                         )
@@ -153,10 +153,10 @@ struct LiveActivityLockScreenView: View {
                                           period: 5 * 3600)
             )
             LiveActivityBarRow(
-                label: "Sonnet Weekly",
+                label: "Fable Only",
                 utilization: state.sonnetWeeklyUtilization,
                 resetsAt: state.sonnetWeeklyResetsAt,
-                systemImage: "calendar",
+                systemImage: "book",
                 applicable: state.sonnetApplicable,
                 timeProgress: timeElapsed(resetsAt: state.sonnetWeeklyResetsAt,
                                           period: 7 * 86400)
@@ -448,7 +448,7 @@ private let proState = ClaudeSessionAttributes.ContentState(
     nearLimitState
 }
 
-#Preview("Lock Screen - Pro (no Sonnet)", as: .content,
+#Preview("Lock Screen - Pro (no Fable)", as: .content,
          using: ClaudeSessionAttributes()) {
     UsageLiveActivity()
 } contentStates: {

@@ -26,6 +26,9 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.3.0", features: [
+            "The middle usage ring is now labelled \"Fable Only\" with a book icon (it was \"Sonnet Weekly\"), reflecting Anthropic's change to this weekly limit, and the app now reads the Fable weekly figure from the usage API",
+        ]),
         ChangelogEntry(version: "1.2.0", features: [
             "The Claude Design usage bar now disappears when Anthropic stops reporting it in the usage API, instead of showing a misleading 0%. (Anthropic recently removed the separate Claude Design meter, so the bar would otherwise sit empty.)",
             "Refined the widget's tap-to-refresh prompt with a cleaner, more subtle refresh icon",
@@ -117,9 +120,9 @@ private let usageMetricIcons: [IconLegendItem] = [
         description: "Your rolling 5-hour usage window."
     ),
     IconLegendItem(
-        systemImage: "calendar",
-        name: "Sonnet Weekly",
-        description: "Sonnet-specific weekly cap (Max tier only). Shown as N/A on Pro accounts."
+        systemImage: "book",
+        name: "Fable Only",
+        description: "Fable-only weekly cap (Max tier only). Shown as N/A on Pro accounts."
     ),
     IconLegendItem(
         systemImage: "shippingbox",

@@ -234,7 +234,7 @@ final class PopoverSnapshotTests: XCTestCase {
     }
 
     // Pro tier: Sonnet weekly metric isn't available. The middle ring
-    // should render grey and the "Sonnet Weekly" list row should read "N/A"
+    // should render grey and the "Fable Only" list row should read "N/A"
     // in a dimmed style rather than "0%".
     func testPopover_proTier() {
         var data = makeUsageData()

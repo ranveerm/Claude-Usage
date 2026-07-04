@@ -29,7 +29,7 @@ struct ConcentricCirclesView: View {
     /// SF symbol names overlaid at the 12 o'clock position of each ring.
     /// Pass `nil` to hide for that ring.
     var outerIcon:  String? = "calendar.day.timeline.left"
-    var middleIcon: String? = "calendar"
+    var middleIcon: String? = "book"
     var innerIcon:  String? = "shippingbox"
 
     var body: some View {

@@ -191,12 +191,18 @@ final class UsageService {
 
         let session = parseLimit("five_hour")
         let weekly = parseLimit("seven_day")
-        let sonnet = parseLimit("seven_day_sonnet")
-
-        // Pro tier responses omit `seven_day_sonnet` entirely; Max tier
-        // includes it (even at 0% utilisation). We key off presence of the
-        // block, not the numeric value, to tell the two apart.
-        let sonnetApplicable = (json["seven_day_sonnet"] as? [String: Any]) != nil
+        // The middle-ring weekly cap. Anthropic relabelled this metric from
+        // "Sonnet weekly" to "Fable only". The block may move to a new API key,
+        // so prefer a Fable key and fall back to the historical `seven_day_sonnet`
+        // (which still carries the value today). It's kept in the `sonnet*`
+        // fields internally so persisted payloads and settings keys stay
+        // compatible. Presence of either block signals the Max tier; Pro tier
+        // responses omit it entirely, which is how we tell the two apart.
+        let fableBlock = (json["seven_day_fable"] as? [String: Any])
+                      ?? (json["seven_day_sonnet"] as? [String: Any])
+        let fableUtil = (fableBlock?["utilization"] as? Double) ?? 0
+        let fableReset = (fableBlock?["resets_at"] as? String).flatMap { formatter.date(from: $0) }
+        let sonnetApplicable = fableBlock != nil
         // Claude Design surfaces under its internal code name `omelette` in
         // the API response (the payload is full of similar codenames:
         // `iguana_necktie`, `tangelo`, etc., that map to unannounced or
@@ -212,8 +218,8 @@ final class UsageService {
         return UsageData(
             sessionUtilization: session.utilization,
             sessionResetsAt: session.resetsAt,
-            sonnetWeeklyUtilization: sonnet.utilization,
-            sonnetWeeklyResetsAt: sonnet.resetsAt,
+            sonnetWeeklyUtilization: fableUtil,
+            sonnetWeeklyResetsAt: fableReset,
             sonnetWeeklyApplicable: sonnetApplicable,
             allModelsWeeklyUtilization: weekly.utilization,
             allModelsWeeklyResetsAt: weekly.resetsAt,
@@ -236,7 +242,7 @@ final class UsageService {
     /// future Anthropic Labs metrics) without having to MITM TLS traffic.
     private static func logUnconsumedKeys(json: [String: Any], raw: Data) {
         let known: Set<String> = [
-            "five_hour", "seven_day", "seven_day_sonnet",
+            "five_hour", "seven_day", "seven_day_fable", "seven_day_sonnet",
             // Claude Design internal codename plus possible future renames.
             "seven_day_omelette", "seven_day_design",
             "seven_day_claude_design", "claude_design",
