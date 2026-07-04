@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.3.1
+- Fixed all usage rings going blank after Anthropic restructured its usage API. The app now reads the new response format, so Session, All Models Weekly, and Fable show correct figures and reset times again
+
 ## 1.3.0
 - The middle usage ring is now labelled "Fable Only" with a book icon (it was "Sonnet Weekly"), reflecting Anthropic's change to this weekly limit, and the app now reads the Fable weekly figure from the usage API
 

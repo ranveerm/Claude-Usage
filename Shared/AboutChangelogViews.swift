@@ -26,6 +26,9 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.3.1", features: [
+            "Fixed all usage rings going blank after Anthropic restructured its usage API. The app now reads the new response format, so Session, All Models Weekly, and Fable show correct figures and reset times again",
+        ]),
         ChangelogEntry(version: "1.3.0", features: [
             "The middle usage ring is now labelled \"Fable Only\" with a book icon (it was \"Sonnet Weekly\"), reflecting Anthropic's change to this weekly limit, and the app now reads the Fable weekly figure from the usage API",
         ]),

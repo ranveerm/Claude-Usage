@@ -179,41 +179,67 @@ final class UsageService {
         Self.logUnconsumedKeys(json: json, raw: data)
         #endif
 
+        // Reset timestamps are ISO-8601. The current API uses 6-digit
+        // fractional seconds and a "+00:00" offset (e.g.
+        // "2026-07-04T10:19:59.673345+00:00"), which the strict formatter with
+        // `.withFractionalSeconds` can reject, so `parseDate` retries without
+        // the fractional part before giving up.
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let plainFormatter = ISO8601DateFormatter()
+        plainFormatter.formatOptions = [.withInternetDateTime]
+        func parseDate(_ raw: String?) -> Date? {
+            guard let raw else { return nil }
+            if let d = formatter.date(from: raw) { return d }
+            let stripped = raw.replacingOccurrences(
+                of: #"\.\d+"#, with: "", options: .regularExpression)
+            return plainFormatter.date(from: stripped)
+        }
 
+        // Anthropic restructured `/usage` into a `limits` array. Each entry has
+        // a `kind` ("session", "weekly_all", "weekly_scoped"), a `percent`
+        // (0-100) and `resets_at`. The model-scoped weekly cap (currently
+        // "Fable", per `scope.model.display_name`) lives here as
+        // "weekly_scoped" and no longer as a top-level `seven_day_*` key (those
+        // are now null). Read from `limits` where present, and fall back to the
+        // legacy top-level blocks for older responses.
+        let limits = (json["limits"] as? [[String: Any]]) ?? []
+        func limitFor(_ kind: String) -> (utilization: Double, resetsAt: Date?)? {
+            guard let entry = limits.first(where: { ($0["kind"] as? String) == kind })
+            else { return nil }
+            let pct = (entry["percent"] as? Double) ?? 0
+            return (pct, parseDate(entry["resets_at"] as? String))
+        }
         func parseLimit(_ key: String) -> (utilization: Double, resetsAt: Date?) {
             guard let block = json[key] as? [String: Any] else { return (0, nil) }
             let utilization = (block["utilization"] as? Double) ?? 0
-            let resetsAt = (block["resets_at"] as? String).flatMap { formatter.date(from: $0) }
-            return (utilization, resetsAt)
+            return (utilization, parseDate(block["resets_at"] as? String))
         }
 
-        let session = parseLimit("five_hour")
-        let weekly = parseLimit("seven_day")
-        // The middle-ring weekly cap. Anthropic relabelled this metric from
-        // "Sonnet weekly" to "Fable only". The block may move to a new API key,
-        // so prefer a Fable key and fall back to the historical `seven_day_sonnet`
-        // (which still carries the value today). It's kept in the `sonnet*`
+        let session = limitFor("session")   ?? parseLimit("five_hour")
+        let weekly  = limitFor("weekly_all") ?? parseLimit("seven_day")
+
+        // Middle ring ("Fable only"): the model-scoped weekly cap. Prefer the
+        // structured `limits` entry; fall back to the legacy seven_day_fable /
+        // seven_day_sonnet keys for older responses. Kept in the `sonnet*`
         // fields internally so persisted payloads and settings keys stay
-        // compatible. Presence of either block signals the Max tier; Pro tier
-        // responses omit it entirely, which is how we tell the two apart.
-        let fableBlock = (json["seven_day_fable"] as? [String: Any])
-                      ?? (json["seven_day_sonnet"] as? [String: Any])
-        let fableUtil = (fableBlock?["utilization"] as? Double) ?? 0
-        let fableReset = (fableBlock?["resets_at"] as? String).flatMap { formatter.date(from: $0) }
-        let sonnetApplicable = fableBlock != nil
-        // Claude Design surfaces under its internal code name `omelette` in
-        // the API response (the payload is full of similar codenames:
-        // `iguana_necktie`, `tangelo`, etc., that map to unannounced or
-        // labs features). We try the codename first and fall back to the
-        // public-facing names in case Anthropic eventually renames the key.
+        // compatible. Presence signals a Max plan; Pro plans have no scoped cap.
+        let scopedWeekly = limitFor("weekly_scoped")
+        let fableLegacy = (json["seven_day_fable"] as? [String: Any])
+                       ?? (json["seven_day_sonnet"] as? [String: Any])
+        let fableUtil  = scopedWeekly?.utilization ?? (fableLegacy?["utilization"] as? Double) ?? 0
+        let fableReset = scopedWeekly?.resetsAt ?? parseDate(fableLegacy?["resets_at"] as? String)
+        let sonnetApplicable = scopedWeekly != nil || fableLegacy != nil
+
+        // Claude Design (`seven_day_omelette`) is now null in the response, so
+        // designBlock stays nil and the bar hides (the graceful-degrade added
+        // in 1.2.0). Left in place in case the block returns.
         let designBlock = (json["seven_day_omelette"] as? [String: Any])
                        ?? (json["seven_day_design"] as? [String: Any])
                        ?? (json["seven_day_claude_design"] as? [String: Any])
                        ?? (json["claude_design"] as? [String: Any])
         let designUtil = (designBlock?["utilization"] as? Double) ?? 0
-        let designReset = (designBlock?["resets_at"] as? String).flatMap { formatter.date(from: $0) }
+        let designReset = parseDate(designBlock?["resets_at"] as? String)
 
         return UsageData(
             sessionUtilization: session.utilization,
@@ -242,7 +268,8 @@ final class UsageService {
     /// future Anthropic Labs metrics) without having to MITM TLS traffic.
     private static func logUnconsumedKeys(json: [String: Any], raw: Data) {
         let known: Set<String> = [
-            "five_hour", "seven_day", "seven_day_fable", "seven_day_sonnet",
+            "five_hour", "seven_day", "limits",
+            "seven_day_fable", "seven_day_sonnet",
             // Claude Design internal codename plus possible future renames.
             "seven_day_omelette", "seven_day_design",
             "seven_day_claude_design", "claude_design",

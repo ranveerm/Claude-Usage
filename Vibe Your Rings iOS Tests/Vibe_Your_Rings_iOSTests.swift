@@ -79,6 +79,56 @@ final class UsageLogicTests_iOS: XCTestCase {
         XCTAssertNotNil(result.sonnetWeeklyResetsAt)
     }
 
+    func testParseUsageResponse_limitsArray_currentAPIShape() throws {
+        // The real /usage payload: data moved into a `limits` array and the
+        // old top-level seven_day_sonnet is now null. Session/all-models/Fable
+        // must all read from `limits`, with the 6-digit-fractional +00:00
+        // timestamps parsing to real dates.
+        let json = """
+        {
+          "five_hour":        { "utilization": 17 },
+          "seven_day":        { "utilization": 30 },
+          "seven_day_sonnet": null,
+          "seven_day_omelette": null,
+          "limits": [
+            { "kind": "session",        "percent": 17, "resets_at": "2026-07-04T10:19:59.673345+00:00" },
+            { "kind": "weekly_all",     "percent": 30, "resets_at": "2026-07-05T17:59:59.673369+00:00" },
+            { "kind": "weekly_scoped",  "percent": 52, "resets_at": "2026-07-05T17:59:59.673749+00:00",
+              "scope": { "model": { "display_name": "Fable" } } }
+          ]
+        }
+        """.data(using: .utf8)!
+
+        let result = UsageService.shared.parseUsageResponse(json)
+
+        XCTAssertEqual(result.sessionUtilization, 17, accuracy: 0.001)
+        XCTAssertEqual(result.allModelsWeeklyUtilization, 30, accuracy: 0.001)
+        XCTAssertTrue(result.sonnetWeeklyApplicable, "weekly_scoped present → Fable applies")
+        XCTAssertEqual(result.sonnetWeeklyUtilization, 52, accuracy: 0.001)
+        XCTAssertNotNil(result.sonnetWeeklyResetsAt, "6-digit fractional +00:00 date must parse")
+        XCTAssertNotNil(result.sessionResetsAt)
+        // Design meter is gone (null) → hidden.
+        XCTAssertFalse(result.designWeeklyApplicable)
+    }
+
+    func testParseUsageResponse_noScopedLimit_notApplicable() throws {
+        // Pro-style: limits array without a weekly_scoped entry → middle ring N/A.
+        let json = """
+        {
+          "limits": [
+            { "kind": "session",    "percent": 5,  "resets_at": "2026-07-04T10:00:00.000000+00:00" },
+            { "kind": "weekly_all", "percent": 12, "resets_at": "2026-07-05T10:00:00.000000+00:00" }
+          ]
+        }
+        """.data(using: .utf8)!
+
+        let result = UsageService.shared.parseUsageResponse(json)
+
+        XCTAssertFalse(result.sonnetWeeklyApplicable)
+        XCTAssertEqual(result.sonnetWeeklyUtilization, 0)
+        XCTAssertEqual(result.allModelsWeeklyUtilization, 12, accuracy: 0.001)
+    }
+
     func testParseUsageResponse_legacySonnetKey_stillRead() throws {
         // Until the key migrates, the middle ring falls back to seven_day_sonnet.
         let json = """
