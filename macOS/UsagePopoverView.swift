@@ -395,6 +395,15 @@ struct UsagePopoverView: View {
         VStack(spacing: 12) {
             if isRefreshing {
                 RefreshingView()
+                // Keep the control bar available while a refresh is in flight
+                // (or stalled) so Sign Out is always reachable. Without this the
+                // popover showed only the spinner, trapping the user with no way
+                // to recover from an expired session.
+                Divider()
+                HStack {
+                    Spacer()
+                    controlButtons
+                }
             } else if usageData.needsLogin || !isConfigured {
                 LoginPromptView(onLogin: onLogin, onDemoMode: onDemoMode)
             } else if usageData.isNetworkError {
@@ -474,73 +483,83 @@ struct UsagePopoverView: View {
                 }
                 Spacer()
 
-                Button(action: onRefresh) {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.caption)
-                        .foregroundColor(.white)
-                }
-                .buttonStyle(.borderless)
-                .help("Refresh")
-
-                // Settings sits between Refresh and Sign Out with the same visual
-                // weight as the other footer icons, same help tooltip
-                // convention. Opens the macOS SwiftUI Settings scene via
-                // the `openSettings` environment action (the macOS 14+
-                // replacement for `showSettingsWindow:`).
-                Button { openSettings() } label: {
-                    Image(systemName: "gearshape")
-                        .font(.caption)
-                        .foregroundColor(.white)
-                }
-                .buttonStyle(.borderless)
-                .help("Settings")
-
-                // About opens an icon legend in a sheet.
-                Button { showAbout = true } label: {
-                    Image(systemName: "info.circle")
-                        .font(.caption)
-                        .foregroundColor(.white)
-                }
-                .buttonStyle(.borderless)
-                .help("About")
-                .popover(isPresented: $showAbout) {
-                    AboutView()
-                }
-
-                // Changelog lists feature additions per release.
-                Button { showChangelog = true } label: {
-                    Image(systemName: "clock.arrow.circlepath")
-                        .font(.caption)
-                        .foregroundColor(.white)
-                }
-                .buttonStyle(.borderless)
-                .help("Changelog")
-                .popover(isPresented: $showChangelog) {
-                    ChangelogView()
-                }
-
-                Button(action: { showSignOutConfirmation = true }) {
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                        .font(.caption)
-                        .foregroundColor(.white)
-                }
-                .buttonStyle(.borderless)
-                .help("Sign Out")
-                .confirmationDialog("Sign out of Claude?",
-                                    isPresented: $showSignOutConfirmation,
-                                    titleVisibility: .visible) {
-                    Button("Sign Out", role: .destructive) {
-                        onSignOut()
-                    }
-                    Button("Cancel", role: .cancel) { }
-                } message: {
-                    Text("You will need to sign in again to view your usage data.")
-                }
-
-                if let onDebugReset {
-                    debugInfoButton(onDebugReset: onDebugReset)
-                }
+                controlButtons
             }
+        }
+    }
+
+    // MARK: - Footer control buttons
+
+    /// Refresh / Settings / About / Changelog / Sign Out (+ debug reset).
+    /// Factored out of the loaded footer so the same bar can also be shown
+    /// under the "Refreshing Data" spinner. That guarantees the user always
+    /// has a way out (Sign Out) even before a fetch succeeds, so a stalled
+    /// refresh can never trap them with no controls.
+    @ViewBuilder
+    private var controlButtons: some View {
+        Button(action: onRefresh) {
+            Image(systemName: "arrow.clockwise")
+                .font(.caption)
+                .foregroundColor(.white)
+        }
+        .buttonStyle(.borderless)
+        .help("Refresh")
+
+        // Settings sits between Refresh and Sign Out with the same visual
+        // weight as the other footer icons. Opens the macOS SwiftUI Settings
+        // scene via the `openSettings` environment action.
+        Button { openSettings() } label: {
+            Image(systemName: "gearshape")
+                .font(.caption)
+                .foregroundColor(.white)
+        }
+        .buttonStyle(.borderless)
+        .help("Settings")
+
+        // About opens an icon legend in a sheet.
+        Button { showAbout = true } label: {
+            Image(systemName: "info.circle")
+                .font(.caption)
+                .foregroundColor(.white)
+        }
+        .buttonStyle(.borderless)
+        .help("About")
+        .popover(isPresented: $showAbout) {
+            AboutView()
+        }
+
+        // Changelog lists feature additions per release.
+        Button { showChangelog = true } label: {
+            Image(systemName: "clock.arrow.circlepath")
+                .font(.caption)
+                .foregroundColor(.white)
+        }
+        .buttonStyle(.borderless)
+        .help("Changelog")
+        .popover(isPresented: $showChangelog) {
+            ChangelogView()
+        }
+
+        Button(action: { showSignOutConfirmation = true }) {
+            Image(systemName: "rectangle.portrait.and.arrow.right")
+                .font(.caption)
+                .foregroundColor(.white)
+        }
+        .buttonStyle(.borderless)
+        .help("Sign Out")
+        .confirmationDialog("Sign out of Claude?",
+                            isPresented: $showSignOutConfirmation,
+                            titleVisibility: .visible) {
+            Button("Sign Out", role: .destructive) {
+                onSignOut()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("You will need to sign in again to view your usage data.")
+        }
+
+        if let onDebugReset {
+            debugInfoButton(onDebugReset: onDebugReset)
         }
     }
 

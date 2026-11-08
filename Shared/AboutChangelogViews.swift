@@ -26,6 +26,9 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.3.2", features: [
+            "The macOS menu-bar popover now keeps its controls (including Sign Out) visible while it shows \"Refreshing Data\", so you can always sign out and reconnect instead of being stuck with no options when a session expires",
+        ]),
         ChangelogEntry(version: "1.3.1", features: [
             "Fixed all usage rings going blank after Anthropic restructured its usage API. The app now reads the new response format, so Session, All Models Weekly, and Fable show correct figures and reset times again",
         ]),
