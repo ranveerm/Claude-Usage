@@ -9,6 +9,9 @@ Tag sections are listed newest first. Bullet items describe **user-facing
 changes only**. Internal refactors, test-only edits, and bump-only
 commits don't appear here.
 
+## 1.3.3
+- Fixed the app getting stuck on "Refreshing Data" indefinitely. The retry now always settles on your usage or an error screen within its retry window, instead of restarting every time you reopen the popover or the app checks again
+
 ## 1.3.2
 - The macOS menu-bar popover now keeps its controls (including Sign Out) visible while it shows "Refreshing Data", so you can always sign out and reconnect instead of being stuck with no options when a session expires
 

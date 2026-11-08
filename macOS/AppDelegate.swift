@@ -367,8 +367,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Data
 
     private func refreshData() {
-        // Cancel any in-flight retry loop before starting a fresh one.
-        // e.g. the 5-minute timer fires while a manual refresh is mid-retry.
+        // While a retry window is already running, ignore incidental
+        // re-triggers (reopening the popover via fetchOnOpen, the 5-minute
+        // timer, wake-from-sleep). They would otherwise cancel and restart the
+        // 25-second retry, so a persistently-failing fetch (e.g. an expired
+        // session) could keep the popover stuck on "Refreshing Data" forever.
+        // The in-flight retry always runs to its own conclusion (fresh data,
+        // the offline view, or the error view with Sign Out) within the window.
+        guard !isRefreshing else { return }
+
+        // Cancel any stray task before starting a fresh one.
         refreshTask?.cancel()
 
         refreshTask = Task { @MainActor [weak self] in

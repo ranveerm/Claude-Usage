@@ -331,8 +331,14 @@ struct ContentView: View {
     private func fetchData() async {
         guard isConfigured else { return }
 
-        // Cancel any in-flight retry loop before starting fresh (e.g. user
-        // pulls to refresh while a retry loop is running).
+        // While a retry window is already running, let it run to its
+        // conclusion rather than restarting it. Otherwise re-triggers (scene
+        // activation, the 5-minute timer, pull-to-refresh) keep resetting the
+        // 25-second retry and the "Refreshing Data" state could persist
+        // indefinitely instead of settling on the usage view or an error.
+        guard !isRefreshing else { return }
+
+        // Cancel any stray task before starting fresh.
         refreshTask?.cancel()
 
         isLoading = true

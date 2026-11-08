@@ -26,6 +26,9 @@ struct ChangelogEntry: Identifiable {
 // adds a new section here as part of the version bump.
 enum Changelog {
     static let entries: [ChangelogEntry] = [
+        ChangelogEntry(version: "1.3.3", features: [
+            "Fixed the app getting stuck on \"Refreshing Data\" indefinitely. The retry now always settles on your usage or an error screen within its retry window, instead of restarting every time you reopen the popover or the app checks again",
+        ]),
         ChangelogEntry(version: "1.3.2", features: [
             "The macOS menu-bar popover now keeps its controls (including Sign Out) visible while it shows \"Refreshing Data\", so you can always sign out and reconnect instead of being stuck with no options when a session expires",
         ]),
